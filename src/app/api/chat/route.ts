@@ -1,14 +1,10 @@
 import { openai } from "@ai-sdk/openai";
 import { streamText } from "ai";
-import { auth } from "@clerk/nextjs/server";
 
 export async function POST(req: Request) {
-  const { userId } = await auth();
-
-  if (!userId) {
-    return new Response("Unauthorized", { status: 401 });
-  }
-
+  // Untuk saat ini, kita tidak menggunakan autentikasi
+  // Di masa depan, ini bisa diimplementasikan dengan sistem auth lain
+  
   if (!process.env.OPENAI_API_KEY) {
     return new Response(
       JSON.stringify({
