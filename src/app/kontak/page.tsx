@@ -23,6 +23,8 @@ import {
 import { Navbar } from "@/components/navbar";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { FormError } from "@/components/form-error";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 export default function KontakPage() {
   const [formData, setFormData] = useState({
@@ -35,6 +37,9 @@ export default function KontakPage() {
     message: ""
   });
 
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [success, setSuccess] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [estimation, setEstimation] = useState({
     show: false,
     package: "",
@@ -158,12 +163,58 @@ export default function KontakPage() {
     }
   };
 
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+    
+    if (!formData.name.trim()) {
+      newErrors.name = "Nama lengkap harus diisi";
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = "Nama minimal 2 karakter";
+    }
+    
+    if (!formData.email.trim()) {
+      newErrors.email = "Email harus diisi";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Format email tidak valid";
+    }
+    
+    if (!formData.projectType) {
+      newErrors.projectType = "Silakan pilih jenis proyek";
+    }
+    
+    if (formData.projectType === "custom" && !formData.budget) {
+      newErrors.budget = "Silakan pilih estimasi budget";
+    }
+    
+    if (!formData.timeline) {
+      newErrors.timeline = "Silakan pilih timeline proyek";
+    }
+    
+    if (!formData.message.trim()) {
+      newErrors.message = "Deskripsi proyek harus diisi";
+    } else if (formData.message.trim().length < 10) {
+      newErrors.message = "Deskripsi proyek minimal 10 karakter";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { id, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [id]: value
     }));
+    
+    // Clear error when user starts typing
+    if (errors[id]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[id];
+        return newErrors;
+      });
+    }
   };
 
   const handleProjectTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -172,6 +223,15 @@ export default function KontakPage() {
       ...prev,
       projectType: value
     }));
+    
+    // Clear error when user selects project type
+    if (errors.projectType) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.projectType;
+        return newErrors;
+      });
+    }
 
     // Show estimation when project type is selected
     if (value && packages[value]) {
@@ -193,27 +253,58 @@ export default function KontakPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log("Form submitted:", formData);
-    alert("Terima kasih! Pesan Anda telah dikirim. Kami akan merespons dalam 24 jam kerja.");
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      projectType: "",
-      budget: "",
-      timeline: "",
-      message: ""
-    });
-    setEstimation({
-      show: false,
-      package: "",
-      price: "",
-      description: "",
-      features: []
-    });
+    
+    // Reset previous messages
+    setErrors({});
+    setSuccess("");
+    
+    // Validate form
+    if (!validateForm()) {
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      // Simulasi proses pengiriman formulir
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Simulasi kemungkinan error
+      if (formData.email === "error@example.com") {
+        throw new Error("Terjadi kesalahan saat mengirim pesan. Silakan coba lagi.");
+      }
+      
+      setSuccess("Terima kasih! Pesan Anda telah dikirim. Kami akan merespons dalam 24 jam kerja.");
+      
+      // Reset form setelah berhasil
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        projectType: "",
+        budget: "",
+        timeline: "",
+        message: ""
+      });
+      
+      setEstimation({
+        show: false,
+        package: "",
+        price: "",
+        description: "",
+        features: []
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setErrors({ general: error.message || "Terjadi kesalahan saat mengirim pesan" });
+      } else {
+        setErrors({ general: "Terjadi kesalahan saat mengirim pesan" });
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -263,6 +354,18 @@ export default function KontakPage() {
                   </p>
 
                   <form onSubmit={handleSubmit} className="space-y-6">
+                    {errors.general && (
+                      <div className="bg-destructive/20 border border-destructive/30 rounded-md p-3 text-sm text-destructive">
+                        {errors.general}
+                      </div>
+                    )}
+                    
+                    {success && (
+                      <div className="bg-green-500/20 border border-green-500/30 rounded-md p-3 text-sm text-green-500">
+                        {success}
+                      </div>
+                    )}
+                    
                     <div>
                       <Label htmlFor="name" className="block text-sm font-medium mb-2">
                         Nama Lengkap
@@ -274,10 +377,14 @@ export default function KontakPage() {
                           placeholder="Nama Anda"
                           value={formData.name}
                           onChange={handleInputChange}
-                          className="bg-gray-700 border-gray-600 focus:border-blue-500 pl-10"
-                          required
+                          className={`bg-gray-700 border-gray-600 focus:border-blue-500 pl-10 ${
+                            errors.name ? "border-destructive focus-visible:ring-destructive/20" : ""
+                          }`}
+                          aria-invalid={!!errors.name}
+                          aria-describedby={errors.name ? "name-error" : undefined}
                         />
                       </div>
+                      <FormError id="name-error" error={errors.name} />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -291,9 +398,13 @@ export default function KontakPage() {
                           placeholder="email@contoh.com"
                           value={formData.email}
                           onChange={handleInputChange}
-                          className="bg-gray-700 border-gray-600 focus:border-blue-500"
-                          required
+                          className={`bg-gray-700 border-gray-600 focus:border-blue-500 ${
+                            errors.email ? "border-destructive focus-visible:ring-destructive/20" : ""
+                          }`}
+                          aria-invalid={!!errors.email}
+                          aria-describedby={errors.email ? "email-error" : undefined}
                         />
+                        <FormError id="email-error" error={errors.email} />
                       </div>
 
                       <div>
@@ -319,8 +430,11 @@ export default function KontakPage() {
                         id="projectType"
                         value={formData.projectType}
                         onChange={handleProjectTypeChange}
-                        className="w-full bg-gray-700 border border-gray-600 focus:border-blue-500 rounded-md px-3 py-2 text-gray-200"
-                        required
+                        className={`w-full bg-gray-700 border border-gray-600 focus:border-blue-500 rounded-md px-3 py-2 text-gray-200 ${
+                          errors.projectType ? "border-destructive focus-visible:ring-destructive/20" : ""
+                        }`}
+                        aria-invalid={!!errors.projectType}
+                        aria-describedby={errors.projectType ? "project-type-error" : undefined}
                       >
                         <option value="">Pilih jenis proyek</option>
                         {projectTypes.map((type) => (
@@ -329,6 +443,7 @@ export default function KontakPage() {
                           </option>
                         ))}
                       </select>
+                      <FormError id="project-type-error" error={errors.projectType} />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -341,7 +456,13 @@ export default function KontakPage() {
                           value={formData.budget}
                           onChange={handleInputChange}
                           disabled={formData.projectType !== "custom"}
-                          className={`w-full bg-gray-700 border border-gray-600 focus:border-blue-500 rounded-md px-3 py-2 text-gray-200 ${formData.projectType !== "custom" ? "opacity-50 cursor-not-allowed" : ""}`}
+                          className={`w-full bg-gray-700 border border-gray-600 focus:border-blue-500 rounded-md px-3 py-2 text-gray-200 ${
+                            formData.projectType !== "custom" ? "opacity-50 cursor-not-allowed" : ""
+                          } ${
+                            errors.budget ? "border-destructive focus-visible:ring-destructive/20" : ""
+                          }`}
+                          aria-invalid={!!errors.budget}
+                          aria-describedby={errors.budget ? "budget-error" : undefined}
                         >
                           <option value="">{formData.projectType === "custom" ? "Pilih estimasi budget" : "Pilih jenis proyek 'Solusi Kustom' dulu"}</option>
                           {budgets.map((budget) => (
@@ -350,6 +471,7 @@ export default function KontakPage() {
                             </option>
                           ))}
                         </select>
+                        <FormError id="budget-error" error={errors.budget} />
                       </div>
 
                       <div>
@@ -360,7 +482,11 @@ export default function KontakPage() {
                           id="timeline"
                           value={formData.timeline}
                           onChange={handleInputChange}
-                          className="w-full bg-gray-700 border border-gray-600 focus:border-blue-500 rounded-md px-3 py-2 text-gray-200"
+                          className={`w-full bg-gray-700 border border-gray-600 focus:border-blue-500 rounded-md px-3 py-2 text-gray-200 ${
+                            errors.timeline ? "border-destructive focus-visible:ring-destructive/20" : ""
+                          }`}
+                          aria-invalid={!!errors.timeline}
+                          aria-describedby={errors.timeline ? "timeline-error" : undefined}
                         >
                           <option value="">Pilih timeline</option>
                           {timelines.map((timeline) => (
@@ -369,6 +495,7 @@ export default function KontakPage() {
                             </option>
                           ))}
                         </select>
+                        <FormError id="timeline-error" error={errors.timeline} />
                       </div>
                     </div>
 
@@ -384,17 +511,32 @@ export default function KontakPage() {
                           rows={5}
                           value={formData.message}
                           onChange={handleInputChange}
-                          className="bg-gray-700 border-gray-600 focus:border-blue-500 pl-10"
+                          className={`bg-gray-700 border-gray-600 focus:border-blue-500 pl-10 ${
+                            errors.message ? "border-destructive focus-visible:ring-destructive/20" : ""
+                          }`}
+                          aria-invalid={!!errors.message}
+                          aria-describedby={errors.message ? "message-error" : undefined}
                         />
                       </div>
+                      <FormError id="message-error" error={errors.message} />
                     </div>
 
                     <Button
                       type="submit"
-                      className="w-full bg-blue-600 hover:bg-blue-700 py-6 text-lg transition-all duration-150 hover:scale-105"
+                      disabled={isLoading}
+                      className="w-full bg-blue-600 hover:bg-blue-700 py-6 text-lg transition-all duration-150 hover:scale-105 flex items-center justify-center"
                     >
-                      <Send className="w-5 h-5 mr-2" />
-                      Kirim Konsultasi
+                      {isLoading ? (
+                        <>
+                          <LoadingSpinner size="sm" className="mr-2" />
+                          Mengirim...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-5 h-5 mr-2" />
+                          Kirim Konsultasi
+                        </>
+                      )}
                     </Button>
                   </form>
                 </Card>

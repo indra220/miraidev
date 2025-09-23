@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -22,17 +22,57 @@ const navigation = [
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const openMenuButtonRef = useRef<HTMLButtonElement>(null);
 
   // Close mobile menu when pathname changes
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [pathname]);
 
+  // Handle Escape key to close mobile menu
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setMobileMenuOpen(false);
+        openMenuButtonRef.current?.focus();
+      }
+    };
+
+    if (mobileMenuOpen) {
+      document.addEventListener("keydown", handleEscape);
+      // Focus the mobile menu when opened
+      mobileMenuRef.current?.focus();
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [mobileMenuOpen]);
+
+  // Handle click outside to close mobile menu
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (mobileMenuOpen && mobileMenuRef.current && !mobileMenuRef.current.contains(e.target as Node)) {
+        setMobileMenuOpen(false);
+        openMenuButtonRef.current?.focus();
+      }
+    };
+
+    if (mobileMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [mobileMenuOpen]);
+
   return (
     <header className="absolute inset-x-0 top-0 z-50">
       <nav className="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
         <div className="flex lg:flex-1">
-          <Link href="/" className="-m-1.5 p-1.5">
+          <Link href="/" className="-m-1.5 p-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md">
             <span className="sr-only">MiraiDev</span>
             <div className="flex items-center">
               <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center mr-3">
@@ -45,9 +85,12 @@ export function Navbar() {
         
         <div className="flex lg:hidden">
           <button
+            ref={openMenuButtonRef}
             type="button"
-            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5"
+            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
             onClick={() => setMobileMenuOpen(true)}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-menu"
           >
             <span className="sr-only">Buka menu utama</span>
             <Menu className="h-6 w-6" aria-hidden="true" />
@@ -59,11 +102,12 @@ export function Navbar() {
             <Link
               key={item.name}
               href={item.href}
-              className={`text-sm font-semibold leading-6 transition-colors ${
+              className={`text-sm font-semibold leading-6 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md px-2 py-1 ${
                 pathname === item.href
                   ? "text-blue-400"
                   : "text-white hover:text-blue-300"
               }`}
+              aria-current={pathname === item.href ? "page" : undefined}
             >
               {item.name}
             </Link>
@@ -72,12 +116,12 @@ export function Navbar() {
         
         <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:gap-x-4">
           <Link href="/auth/login">
-            <Button variant="outline" className="border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-sm font-semibold flex items-center mr-2">
+            <Button variant="outline" className="border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-sm font-semibold flex items-center mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900">
               Masuk
             </Button>
           </Link>
           <Link href="/kontak">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-sm font-semibold flex items-center">
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-sm font-semibold flex items-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900">
               Get Started
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
@@ -86,11 +130,19 @@ export function Navbar() {
       </nav>
       
       {/* Mobile menu */}
-      <div className={`lg:hidden ${mobileMenuOpen ? "block" : "hidden"}`}>
+      <div 
+        ref={mobileMenuRef}
+        id="mobile-menu"
+        className={`lg:hidden ${mobileMenuOpen ? "block" : "hidden"}`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="mobile-menu-title"
+        tabIndex={-1}
+      >
         <div className="fixed inset-0 z-50"></div>
         <div className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-gray-900 px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
           <div className="flex items-center justify-between">
-            <Link href="/" className="-m-1.5 p-1.5">
+            <Link href="/" className="-m-1.5 p-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md">
               <span className="sr-only">MiraiDev</span>
               <div className="flex items-center">
                 <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center mr-3">
@@ -101,7 +153,7 @@ export function Navbar() {
             </Link>
             <button
               type="button"
-              className="-m-2.5 rounded-md p-2.5"
+              className="-m-2.5 rounded-md p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
               onClick={() => setMobileMenuOpen(false)}
             >
               <span className="sr-only">Tutup menu</span>
@@ -116,11 +168,13 @@ export function Navbar() {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 transition-colors ${
+                    className={`-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                       pathname === item.href
                         ? "text-blue-400"
                         : "text-white hover:bg-gray-800"
                     }`}
+                    aria-current={pathname === item.href ? "page" : undefined}
+                    onClick={() => setMobileMenuOpen(false)}
                   >
                     {item.name}
                   </Link>
@@ -128,14 +182,14 @@ export function Navbar() {
               </div>
               
               <div className="py-6 space-y-4">
-                <Link href="/auth/login">
-                  <Button variant="outline" className="w-full border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center">
+                <Link href="/auth/login" onClick={() => setMobileMenuOpen(false)}>
+                  <Button variant="outline" className="w-full border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900">
                     <User className="mr-2 h-4 w-4" />
                     Masuk
                   </Button>
                 </Link>
-                <Link href="/kontak">
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center">
+                <Link href="/kontak" onClick={() => setMobileMenuOpen(false)}>
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900">
                     Get Started
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>

@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { FormError } from "@/components/form-error";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import Link from "next/link";
 import { ArrowRight, Eye, EyeOff, Home, Lock, Mail } from "lucide-react";
 
@@ -13,16 +15,62 @@ export function LoginForm() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
+  const [success, setSuccess] = useState("");
+
+  const validateForm = () => {
+    const newErrors: { email?: string; password?: string } = {};
+    
+    if (!email) {
+      newErrors.email = "Email harus diisi";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Format email tidak valid";
+    }
+    
+    if (!password) {
+      newErrors.password = "Kata sandi harus diisi";
+    } else if (password.length < 6) {
+      newErrors.password = "Kata sandi minimal 6 karakter";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Reset previous messages
+    setErrors({});
+    setSuccess("");
+    
+    // Validate form
+    if (!validateForm()) {
+      return;
+    }
+    
     setIsLoading(true);
     
-    // Simulasi proses login
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    setIsLoading(false);
-    // Di sini nanti akan ada logika autentikasi sesungguhnya
+    try {
+      // Simulasi proses login
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Simulasi kemungkinan error
+      if (email === "error@example.com") {
+        throw new Error("Email atau kata sandi tidak valid");
+      }
+      
+      setSuccess("Login berhasil! Mengalihkan...");
+      // Di sini nanti akan ada logika autentikasi sesungguhnya
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setErrors({ general: error.message || "Terjadi kesalahan saat login" });
+      } else {
+        setErrors({ general: "Terjadi kesalahan saat login" });
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -48,6 +96,18 @@ export function LoginForm() {
           
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+              {errors.general && (
+                <div className="bg-destructive/20 border border-destructive/30 rounded-md p-3 text-sm text-destructive">
+                  {errors.general}
+                </div>
+              )}
+              
+              {success && (
+                <div className="bg-green-500/20 border border-green-500/30 rounded-md p-3 text-sm text-green-500">
+                  {success}
+                </div>
+              )}
+              
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-gray-300 flex items-center">
                   <Mail className="w-4 h-4 mr-2" />
@@ -59,9 +119,13 @@ export function LoginForm() {
                   placeholder="nama@contoh.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 py-6 px-4"
+                  className={`bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 py-6 px-4 ${
+                    errors.email ? "border-destructive focus-visible:ring-destructive/20" : ""
+                  }`}
+                  aria-invalid={!!errors.email}
+                  aria-describedby={errors.email ? "email-error" : undefined}
                 />
+                <FormError id="email-error" error={errors.email} />
               </div>
 
               <div className="space-y-2">
@@ -84,13 +148,17 @@ export function LoginForm() {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 py-6 px-4 pr-12"
+                    className={`bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 py-6 px-4 pr-12 ${
+                      errors.password ? "border-destructive focus-visible:ring-destructive/20" : ""
+                    }`}
+                    aria-invalid={!!errors.password}
+                    aria-describedby={errors.password ? "password-error" : undefined}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                    aria-label={showPassword ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
                   >
                     {showPassword ? (
                       <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-300" />
@@ -99,23 +167,24 @@ export function LoginForm() {
                     )}
                   </button>
                 </div>
+                <FormError id="password-error" error={errors.password} />
               </div>
 
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 mt-6 transition-all duration-200 hover:scale-[1.02]"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 mt-6 transition-all duration-200 hover:scale-[1.02] flex items-center justify-center"
               >
                 {isLoading ? (
-                  <span className="flex items-center justify-center">
-                    <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
+                  <>
+                    <LoadingSpinner size="sm" className="mr-2" />
                     Memproses...
-                  </span>
+                  </>
                 ) : (
-                  <span className="flex items-center justify-center">
+                  <>
                     Masuk
                     <ArrowRight className="ml-2 h-4 w-4" />
-                  </span>
+                  </>
                 )}
               </Button>
             </form>
