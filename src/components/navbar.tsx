@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { 
   Menu, 
   X, 
-  ArrowRight
+  ArrowRight,
+  User
 } from "lucide-react";
 
 const navigation = [
@@ -70,6 +71,11 @@ export function Navbar() {
         </div>
         
         <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:gap-x-4">
+          <Link href="/auth/login">
+            <Button variant="outline" className="border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-sm font-semibold flex items-center mr-2">
+              Masuk
+            </Button>
+          </Link>
           <Link href="/kontak">
             <Button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-sm font-semibold flex items-center">
               Get Started
@@ -121,7 +127,13 @@ export function Navbar() {
                 ))}
               </div>
               
-              <div className="py-6">
+              <div className="py-6 space-y-4">
+                <Link href="/auth/login">
+                  <Button variant="outline" className="w-full border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center">
+                    <User className="mr-2 h-4 w-4" />
+                    Masuk
+                  </Button>
+                </Link>
                 <Link href="/kontak">
                   <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center">
                     Get Started
