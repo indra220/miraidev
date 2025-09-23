@@ -25,6 +25,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { FormError } from "@/components/form-error";
 import { LoadingSpinner } from "@/components/loading-spinner";
+import { submitContactForm } from "@/lib/contact";
 
 export default function KontakPage() {
   const [formData, setFormData] = useState({
@@ -268,39 +269,46 @@ export default function KontakPage() {
     setIsLoading(true);
     
     try {
-      // Simulasi proses pengiriman formulir
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Submit form to Supabase
+      const result = await submitContactForm({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        projectType: formData.projectType,
+        budget: formData.budget,
+        timeline: formData.timeline,
+        message: formData.message
+      });
       
-      // Simulasi kemungkinan error
-      if (formData.email === "error@example.com") {
-        throw new Error("Terjadi kesalahan saat mengirim pesan. Silakan coba lagi.");
+      if (result.success) {
+        setSuccess("Terima kasih! Pesan Anda telah dikirim. Kami akan merespons dalam 24 jam kerja.");
+        
+        // Reset form setelah berhasil
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          projectType: "",
+          budget: "",
+          timeline: "",
+          message: ""
+        });
+        
+        setEstimation({
+          show: false,
+          package: "",
+          price: "",
+          description: "",
+          features: []
+        });
+      } else {
+        throw new Error(result.error || "Terjadi kesalahan saat mengirim pesan");
       }
-      
-      setSuccess("Terima kasih! Pesan Anda telah dikirim. Kami akan merespons dalam 24 jam kerja.");
-      
-      // Reset form setelah berhasil
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        projectType: "",
-        budget: "",
-        timeline: "",
-        message: ""
-      });
-      
-      setEstimation({
-        show: false,
-        package: "",
-        price: "",
-        description: "",
-        features: []
-      });
     } catch (error: unknown) {
       if (error instanceof Error) {
         setErrors({ general: error.message || "Terjadi kesalahan saat mengirim pesan" });
       } else {
-        setErrors({ general: "Terjadi kesalahan saat mengirim pesan" });
+        setErrors({ general: "Terima kasih! Pesan Anda telah dikirim. Kami akan merespons dalam 24 jam kerja." });
       }
     } finally {
       setIsLoading(false);

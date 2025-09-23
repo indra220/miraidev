@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { 
@@ -13,86 +13,140 @@ import {
 } from "lucide-react";
 import { Navbar } from "@/components/navbar";
 import { motion } from "framer-motion";
+import { getPortfolioProjects, getAllPortfolioCategories } from "@/lib/portfolio";
 
 export default function PortofolioPage() {
   const [activeFilter, setActiveFilter] = useState("all");
-  
-  const categories = [
-    { id: "all", name: "Semua", icon: <Globe className="w-4 h-4" /> },
-    { id: "umkm", name: "UMKM", icon: <Globe className="w-4 h-4" /> },
-    { id: "personal", name: "Personal Branding", icon: <Users className="w-4 h-4" /> },
-    { id: "profesional", name: "Profesional Jasa", icon: <Building className="w-4 h-4" /> },
-    { id: "ppdb", name: "Website PPDB Sekolah", icon: <Building className="w-4 h-4" /> },
-  ];
+  const [projects, setProjects] = useState<any[]>([]);
+  const [categories, setCategories] = useState<{id: string, name: string, icon: JSX.Element}[]>([
+    { id: "all", name: "Semua", icon: <Globe className="w-4 h-4" /> }
+  ]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const projects = [
-    {
-      id: 1,
-      title: "Website Kedai Kopi Lokal",
-      category: "UMKM",
-      description: "Website profesional untuk kedai kopi lokal dengan menu online, lokasi, dan informasi kontak.",
-      image: "/placeholder-portfolio-1.jpg",
-      tags: ["Next.js", "Tailwind CSS", "Vercel"],
-      client: "Kedai Kopi Nusantara",
-      date: "Maret 2024",
-      views: "850"
-    },
-    {
-      id: 2,
-      title: "Portofolio Fotografer Freelance",
-      category: "Personal Branding",
-      description: "Website portofolio yang menampilkan karya fotografer freelance dengan galeri interaktif.",
-      image: "/placeholder-portfolio-2.jpg",
-      tags: ["React", "Framer Motion", "Cloudinary"],
-      client: "Andi Prasetyo Photography",
-      date: "Januari 2024",
-      views: "1.2K"
-    },
-    {
-      id: 3,
-      title: "Website Konsultan Finansial",
-      category: "Profesional Jasa",
-      description: "Website untuk konsultan finansial independen dengan blog, layanan, dan form booking.",
-      image: "/placeholder-portfolio-3.jpg",
-      tags: ["Next.js", "MDX", "Formspree"],
-      client: "Rina Financial Consultant",
-      date: "November 2023",
-      views: "950"
-    },
-    {
-      id: 4,
-      title: "Website PPDB SD Negeri 01",
-      category: "ppdb",
-      description: "Website sistem PPDB online untuk SD Negeri 01 dengan form registrasi dan tracking status pendaftaran.",
-      image: "/placeholder-portfolio-4.jpg",
-      tags: ["Next.js", "Firebase", "Tailwind CSS"],
-      client: "SD Negeri 01 Jakarta",
-      date: "September 2023",
-      views: "2.1K"
-    },
-    {
-      id: 5,
-      title: "Portofolio Developer Freelance",
-      category: "Personal Branding",
-      description: "Website portofolio profesional untuk developer freelance dengan studi kasus proyek.",
-      image: "/placeholder-portfolio-5.jpg",
-      tags: ["Next.js", "Framer Motion", "MDX"],
-      client: "Budi Santoso - Web Developer",
-      date: "Juli 2023",
-      views: "1.5K"
-    },
-    {
-      id: 6,
-      title: "Website PPDB SMA Negeri 5",
-      category: "ppdb",
-      description: "Website sistem PPDB online untuk SMA Negeri 5 dengan fitur upload berkas dan verifikasi dokumen.",
-      image: "/placeholder-portfolio-6.jpg",
-      tags: ["React", "Node.js", "MongoDB"],
-      client: "SMA Negeri 5 Bandung",
-      date: "Mei 2023",
-      views: "3.2K"
-    }
-  ];
+  // Fetch projects and categories from Supabase
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Fetch categories
+        const categoryResult = await getAllPortfolioCategories();
+        if (categoryResult.success) {
+          const categoryData = categoryResult.data.map(cat => ({
+            id: cat.toLowerCase(),
+            name: cat,
+            icon: <Globe className="w-4 h-4" />
+          }));
+          
+          setCategories([
+            { id: "all", name: "Semua", icon: <Globe className="w-4 h-4" /> },
+            ...categoryData
+          ]);
+        }
+        
+        // Fetch projects
+        const projectResult = await getPortfolioProjects();
+        if (projectResult.success) {
+          // Transform data to match existing structure
+          const transformedProjects = projectResult.data.map((project: any) => ({
+            id: project.id,
+            title: project.title,
+            category: project.category,
+            description: project.description,
+            image: project.image_url || `/placeholder-portfolio-${Math.floor(Math.random() * 6) + 1}.jpg`,
+            tags: project.tags || [],
+            client: project.client,
+            date: new Date(project.date).toLocaleDateString('id-ID', { 
+              year: 'numeric', 
+              month: 'long' 
+            }),
+            views: project.views?.toString() || "0"
+          }));
+          
+          setProjects(transformedProjects);
+        } else {
+          throw new Error(projectResult.error);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Terjadi kesalahan saat memuat data portofolio");
+        // Fallback to static data if Supabase fetch fails
+        setProjects([
+          {
+            id: 1,
+            title: "Website Kedai Kopi Lokal",
+            category: "UMKM",
+            description: "Website profesional untuk kedai kopi lokal dengan menu online, lokasi, dan informasi kontak.",
+            image: "/placeholder-portfolio-1.jpg",
+            tags: ["Next.js", "Tailwind CSS", "Vercel"],
+            client: "Kedai Kopi Nusantara",
+            date: "Maret 2024",
+            views: "850"
+          },
+          {
+            id: 2,
+            title: "Portofolio Fotografer Freelance",
+            category: "Personal Branding",
+            description: "Website portofolio yang menampilkan karya fotografer freelance dengan galeri interaktif.",
+            image: "/placeholder-portfolio-2.jpg",
+            tags: ["React", "Framer Motion", "Cloudinary"],
+            client: "Andi Prasetyo Photography",
+            date: "Januari 2024",
+            views: "1.2K"
+          },
+          {
+            id: 3,
+            title: "Website Konsultan Finansial",
+            category: "Profesional Jasa",
+            description: "Website untuk konsultan finansial independen dengan blog, layanan, dan form booking.",
+            image: "/placeholder-portfolio-3.jpg",
+            tags: ["Next.js", "MDX", "Formspree"],
+            client: "Rina Financial Consultant",
+            date: "November 2023",
+            views: "950"
+          },
+          {
+            id: 4,
+            title: "Website PPDB SD Negeri 01",
+            category: "ppdb",
+            description: "Website sistem PPDB online untuk SD Negeri 01 dengan form registrasi dan tracking status pendaftaran.",
+            image: "/placeholder-portfolio-4.jpg",
+            tags: ["Next.js", "Firebase", "Tailwind CSS"],
+            client: "SD Negeri 01 Jakarta",
+            date: "September 2023",
+            views: "2.1K"
+          },
+          {
+            id: 5,
+            title: "Portofolio Developer Freelance",
+            category: "Personal Branding",
+            description: "Website portofolio profesional untuk developer freelance dengan studi kasus proyek.",
+            image: "/placeholder-portfolio-5.jpg",
+            tags: ["Next.js", "Framer Motion", "MDX"],
+            client: "Budi Santoso - Web Developer",
+            date: "Juli 2023",
+            views: "1.5K"
+          },
+          {
+            id: 6,
+            title: "Website PPDB SMA Negeri 5",
+            category: "ppdb",
+            description: "Website sistem PPDB online untuk SMA Negeri 5 dengan fitur upload berkas dan verifikasi dokumen.",
+            image: "/placeholder-portfolio-6.jpg",
+            tags: ["React", "Node.js", "MongoDB"],
+            client: "SMA Negeri 5 Bandung",
+            date: "Mei 2023",
+            views: "3.2K"
+          }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // Filter projects based on active filter
   const filteredProjects = activeFilter === "all" 
@@ -187,64 +241,78 @@ export default function PortofolioPage() {
       {/* Portfolio Grid */}
       <div className="py-20">
         <div className="container mx-auto px-4">
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-            layout
-          >
-            {filteredProjects.map((project, index) => (
-              <motion.div
-                key={project.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                whileHover={{ y: -10 }}
-                className="transition-all duration-300"
-                layout
-              >
-                <Card className="bg-gray-800/50 border-gray-700 overflow-hidden group h-full">
-                  <div className="h-48 bg-gray-700 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-80"></div>
-                    <div className="absolute top-4 right-4">
-                      <span className="bg-blue-600 text-xs px-2 py-1 rounded">{project.category}</span>
-                    </div>
-                    <div className="absolute bottom-4 left-4">
-                      <div className="flex flex-wrap gap-1">
-                        {project.tags.map((tag, index) => (
-                          <span key={index} className="bg-gray-900/50 text-xs px-2 py-1 rounded">
-                            {tag}
-                          </span>
-                        ))}
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+              <p className="text-gray-400">Memuat portofolio...</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <div className="bg-destructive/20 border border-destructive/30 rounded-md p-4 max-w-md mx-auto">
+                <p className="text-destructive">{error}</p>
+                <p className="text-gray-400 text-sm mt-2">Menampilkan data statis sebagai gantinya.</p>
+              </div>
+            </div>
+          ) : (
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+              layout
+            >
+              {filteredProjects.map((project, index) => (
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  whileHover={{ y: -10 }}
+                  className="transition-all duration-300"
+                  layout
+                >
+                  <Card className="bg-gray-800/50 border-gray-700 overflow-hidden group h-full">
+                    <div className="h-48 bg-gray-700 relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-80"></div>
+                      <div className="absolute top-4 right-4">
+                        <span className="bg-blue-600 text-xs px-2 py-1 rounded">{project.category}</span>
+                      </div>
+                      <div className="absolute bottom-4 left-4">
+                        <div className="flex flex-wrap gap-1">
+                          {project.tags.map((tag: string, index: number) => (
+                            <span key={index} className="bg-gray-900/50 text-xs px-2 py-1 rounded">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="p-6">
-                    <div className="flex justify-between items-start mb-3">
-                      <h3 className="text-xl font-semibold">{project.title}</h3>
-                      <div className="flex gap-2 text-gray-500">
-                        <Eye className="w-4 h-4" />
-                        <span className="text-xs">{project.views}</span>
+                    <div className="p-6">
+                      <div className="flex justify-between items-start mb-3">
+                        <h3 className="text-xl font-semibold">{project.title}</h3>
+                        <div className="flex gap-2 text-gray-500">
+                          <Eye className="w-4 h-4" />
+                          <span className="text-xs">{project.views}</span>
+                        </div>
                       </div>
+                      <p className="text-gray-400 mb-4 text-sm">{project.description}</p>
+                      <div className="flex justify-between items-center mb-4">
+                        <div className="text-xs text-gray-500 flex items-center">
+                          <Users className="w-3 h-3 mr-1" />
+                          {project.client}
+                        </div>
+                        <div className="text-xs text-gray-500 flex items-center">
+                          <Calendar className="w-3 h-3 mr-1" />
+                          {project.date}
+                        </div>
+                      </div>
+                      <Button variant="link" className="p-0 text-blue-400 hover:text-blue-300 transition-all duration-300">
+                        Lihat Studi Kasus
+                        <ArrowRight className="ml-1 w-4 h-4" />
+                      </Button>
                     </div>
-                    <p className="text-gray-400 mb-4 text-sm">{project.description}</p>
-                    <div className="flex justify-between items-center mb-4">
-                      <div className="text-xs text-gray-500 flex items-center">
-                        <Users className="w-3 h-3 mr-1" />
-                        {project.client}
-                      </div>
-                      <div className="text-xs text-gray-500 flex items-center">
-                        <Calendar className="w-3 h-3 mr-1" />
-                        {project.date}
-                      </div>
-                    </div>
-                    <Button variant="link" className="p-0 text-blue-400 hover:text-blue-300 transition-all duration-300">
-                      Lihat Studi Kasus
-                      <ArrowRight className="ml-1 w-4 h-4" />
-                    </Button>
-                  </div>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
+                  </Card>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
           
           {/* Load More Button */}
           <motion.div 

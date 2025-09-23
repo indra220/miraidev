@@ -16,13 +16,14 @@
 - [x] Menambahkan status pemuatan untuk elemen interaktif
 - [x] Menerapkan status fokus yang tepat untuk aksesibilitas
 - [x] Meningkatkan validasi formulir dan penanganan kesalahan
+- [x] Menambahkan tombol scroll ke atas
 
 ### ⚙️ Peningkatan Fungsionalitas
-- [ ] Menerapkan pengiriman formulir kontak ke Supabase
-- [ ] Menambahkan fungsi penyaringan portofolio
-- [ ] Membuat kalkulator harga dinamis
-- [ ] Menerapkan buletin Berlangganan dengan Supabase
-- [ ] Tambahkan fungsi pencarian di seluruh halaman
+- [x] Menerapkan pengiriman formulir kontak ke Supabase
+- [x] Menambahkan fungsi penyaringan portofolio
+- [x] Membuat kalkulator harga dinamis
+- [x] Menerapkan buletin Berlangganan dengan Supabase
+- [x] Tambahkan fungsi pencarian di seluruh halaman
 
 ### 🚀 Optimasi Performa
 - [ ] Optimalkan pemuatan gambar dengan next/image
@@ -87,9 +88,12 @@
 
 ### Fase 2: Fungsionalitas
 - [x] Formulir kontak yang berfungsi
-- [ ] Manajemen konten dinamis
-- [ ] Pemfilteran portofolio
-- [ ] Animasi yang disempurnakan
+- [x] Pengiriman formulir kontak ke Supabase
+- [x] Fungsi penyaringan portofolio
+- [x] Kalkulator harga dinamis
+- [x] Buletin berlangganan dengan Supabase
+- [x] Fungsi pencarian di seluruh halaman
+- [x] Tombol scroll ke atas
 
 ### Fase 3: Keterlibatan
 - [ ] Bagian blog/berita

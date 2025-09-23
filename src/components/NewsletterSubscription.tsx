@@ -6,11 +6,13 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Mail, CheckCircle, AlertCircle } from "lucide-react";
+import { subscribeToNewsletter } from "@/lib/newsletter";
 
 export default function NewsletterSubscription() {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [message, setMessage] = useState("");
 
   const validateEmail = (email: string) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -22,31 +24,35 @@ export default function NewsletterSubscription() {
     
     if (!validateEmail(email)) {
       setStatus("error");
+      setMessage("Mohon masukkan alamat email yang valid");
       return;
     }
     
     setIsSubmitting(true);
     setStatus("idle");
+    setMessage("");
     
     try {
-      // Simulasi pengiriman data ke API
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const result = await subscribeToNewsletter(email);
       
-      // Simulasi keberhasilan 90% waktu
-      if (Math.random() > 0.1) {
+      if (result.success) {
         setStatus("success");
+        setMessage(result.message);
         setEmail("");
       } else {
         setStatus("error");
+        setMessage(result.error || "Terjadi kesalahan saat berlangganan newsletter");
       }
     } catch (error) {
       setStatus("error");
+      setMessage("Terjadi kesalahan saat berlangganan newsletter");
     } finally {
       setIsSubmitting(false);
       
       // Reset status setelah 5 detik
       setTimeout(() => {
         setStatus("idle");
+        setMessage("");
       }, 5000);
     }
   };
@@ -80,7 +86,7 @@ export default function NewsletterSubscription() {
             <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
             <h4 className="text-xl font-semibold mb-2 text-green-400">Berhasil!</h4>
             <p className="text-gray-300">
-              Terima kasih telah berlangganan. Kami telah mengirimkan email konfirmasi ke {email}.
+              {message}
             </p>
           </motion.div>
         ) : (
@@ -108,7 +114,7 @@ export default function NewsletterSubscription() {
                   className="text-sm text-red-400 mt-2 flex items-center"
                 >
                   <AlertCircle className="w-4 h-4 mr-1" />
-                  Mohon masukkan alamat email yang valid
+                  {message || "Terjadi kesalahan saat berlangganan newsletter"}
                 </motion.p>
               )}
             </div>

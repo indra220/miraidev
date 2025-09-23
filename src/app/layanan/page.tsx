@@ -17,6 +17,7 @@ import {
 import { Navbar } from "@/components/navbar";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import DynamicPriceCalculator from "@/components/DynamicPriceCalculator";
 
 export default function LayananPage() {
   const services = [
@@ -98,6 +99,8 @@ export default function LayananPage() {
       {/* Services Section */}
       <div className="py-20">
         <div className="container mx-auto px-4">
+          <DynamicPriceCalculator />
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {services.map((service, index) => (
               <motion.div

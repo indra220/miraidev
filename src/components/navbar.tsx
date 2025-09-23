@@ -10,6 +10,7 @@ import {
   ArrowRight,
   User
 } from "lucide-react";
+import GlobalSearch from "@/components/GlobalSearch";
 
 const navigation = [
   { name: "Beranda", href: "/" },
@@ -97,7 +98,7 @@ export function Navbar() {
           </button>
         </div>
         
-        <div className="hidden lg:flex lg:gap-x-12">
+        <div className="hidden lg:flex lg:gap-x-8">
           {navigation.map((item) => (
             <Link
               key={item.name}
@@ -115,6 +116,7 @@ export function Navbar() {
         </div>
         
         <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:gap-x-4">
+          <GlobalSearch />
           <Link href="/auth/login">
             <Button variant="outline" className="border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-sm font-semibold flex items-center mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900">
               Masuk
@@ -182,6 +184,9 @@ export function Navbar() {
               </div>
               
               <div className="py-6 space-y-4">
+                <div className="pb-4 border-b border-gray-700">
+                  <GlobalSearch />
+                </div>
                 <Link href="/auth/login" onClick={() => setMobileMenuOpen(false)}>
                   <Button variant="outline" className="w-full border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900">
                     <User className="mr-2 h-4 w-4" />
