@@ -4,17 +4,18 @@
 
 Sebuah aplikasi web modern untuk agensi pengembangan website MiraiDev, dibangun dengan Next.js 15, menggunakan Supabase untuk database, dan mendukung mode gelap.
 
-## Tech Stack
+## Teknologi yang Digunakan
 
 - **Framework:** [Next.js 15](https://nextjs.org/) (App Router)
-- **Language:** TypeScript
+- **Bahasa:** TypeScript
 - **Database:** [Supabase](https://supabase.com/)
 - **Styling:** [Tailwind CSS v4](https://tailwindcss.com/)
-- **UI Components:** [shadcn/ui](https://ui.shadcn.com/)
+- **Komponen UI:** [shadcn/ui](https://ui.shadcn.com/)
+- **Animasi:** [Framer Motion](https://www.framer.com/motion/)
 - **AI Integration:** [Vercel AI SDK](https://sdk.vercel.ai/)
-- **Theme System:** [next-themes](https://github.com/pacocoursey/next-themes)
+- **Sistem Tema:** [next-themes](https://github.com/pacocoursey/next-themes)
 
-## Prerequisites
+## Prasyarat
 
 Sebelum memulai, pastikan Anda memiliki:
 - Node.js 18+ terinstal
@@ -77,13 +78,15 @@ Buat file `.env.local` di direktori root dengan variabel berikut:
 
 ```env
 # Supabase
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url_here
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key_here
 
-# AI Integration (Opsional)
-OPENAI_API_KEY=your_openai_api_key
-ANTHROPIC_API_KEY=your_anthropic_api_key
+# OpenAI API (untuk Vercel AI SDK)
+OPENAI_API_KEY=your_openai_api_key_here
+
+# Anthropic API (opsional, untuk model Claude)
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
 ```
 
 ## Fitur
@@ -94,23 +97,24 @@ ANTHROPIC_API_KEY=your_anthropic_api_key
 - 🌙 Mode gelap dengan deteksi preferensi sistem
 - 🚀 App Router dengan Server Components
 - 📱 Desain responsif dengan TailwindCSS v4
-- 🎨 Font kustom (Geist Sans, Geist Mono, Parkinsans)
+- 🎨 Font kustom (Geist Sans, Geist Mono)
+- 🎭 Animasi halus dengan Framer Motion
 
-## Struktur Project
+## Struktur Proyek
 
 ```
 miraidev/
 ├── src/
 │   ├── app/                    # Halaman Next.js app router
+│   │   ├── api/chat/          # Endpoint API chat AI
 │   │   ├── beranda/           # Halaman beranda
 │   │   ├── layanan/           # Halaman layanan
 │   │   ├── portofolio/        # Halaman portofolio
 │   │   ├── harga/             # Halaman harga
-│   │   ├── tentang/           # Halaman tentang kami
-│   │   ├── kontak/            # Halaman kontak
-│   │   ├── api/chat/          # Endpoint API chat AI
-│   │   ├── globals.css        # Style global dengan mode gelap
-│   │   ├── layout.tsx         # Layout root dengan providers
+│   │   ├── tentang/          # Halaman tentang kami
+│   │   ├── kontak/           # Halaman kontak
+│   │   ├── globals.css       # Style global dengan mode gelap
+│   │   ├── layout.tsx        # Layout root dengan providers
 │   │   └── page.tsx           # Redirect ke beranda
 │   ├── components/            # Komponen React
 │   │   ├── ui/                # Komponen shadcn/ui (40+)
@@ -126,8 +130,6 @@ miraidev/
 │   └── middleware.ts          # Middleware route protection
 ├── supabase/
 │   └── migrations/            # Migrasi database
-├── CLAUDE.md                  # Dokumentasi agen coding AI
-├── SUPABASE_CLERK_SETUP.md   # Panduan setup integrasi (deprecated)
 └── components.json            # Konfigurasi shadcn/ui
 ```
 
@@ -143,33 +145,34 @@ Starter ini menggunakan integrasi Supabase modern:
 
 Starter ini dioptimalkan untuk agen coding AI:
 
-- **`CLAUDE.md`** - Konteks project dan pola yang komprehensif
-- **Panduan setup** dengan langkah integrasi yang detail
+- **Setup guides** dengan langkah integrasi yang detail
 - **Contoh migrasi** dengan template kebijakan RLS
 - **Struktur file** dan konvensi penamaan yang jelas
 - **Integrasi TypeScript** dengan definisi tipe yang tepat
 
-## Dokumentasi Setup
+## Testing dan Build
 
-Untuk mengimplementasi dokumentasi yang dihasilkan dari CodeGuide:
+Untuk memastikan aplikasi berjalan dengan baik:
 
-1. Buat folder `documentation` di direktori root:
+1. **Testing Development:**
    ```bash
-   mkdir documentation
+   npm run dev
    ```
 
-2. Tempatkan semua file markdown yang dihasilkan dari CodeGuide di direktori ini:
+2. **Build Production:**
    ```bash
-   # Contoh struktur
-   documentation/
-   ├── project_requirements_document.md             
-   ├── app_flow_document.md
-   ├── frontend_guideline_document.md
-   └── backend_structure_document.md
+   npm run build
    ```
 
-3. File dokumentasi ini akan secara otomatis dilacak oleh git dan dapat digunakan sebagai referensi untuk fitur dan detail implementasi project Anda.
+3. **Start Server Production:**
+   ```bash
+   npm start
+   ```
 
 ## Kontribusi
 
 Kontribusi sangat welcome! Silakan kirim Pull Request.
+
+## Lisensi
+
+MIT License - lihat file [LICENSE](LICENSE) untuk details.

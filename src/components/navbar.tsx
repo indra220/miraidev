@@ -14,7 +14,6 @@ const navigation = [
   { name: "Beranda", href: "/" },
   { name: "Layanan", href: "/layanan" },
   { name: "Portofolio", href: "/portofolio" },
-  { name: "Harga", href: "/harga" },
   { name: "Tentang Kami", href: "/tentang" },
   { name: "Kontak", href: "/kontak" },
 ];
@@ -71,10 +70,12 @@ export function Navbar() {
         </div>
         
         <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:gap-x-4">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-sm font-semibold flex items-center">
-            Get Started
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
+          <Link href="/kontak">
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-sm font-semibold flex items-center">
+              Get Started
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
         </div>
       </nav>
       
@@ -121,10 +122,12 @@ export function Navbar() {
               </div>
               
               <div className="py-6">
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center">
-                  Get Started
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                <Link href="/kontak">
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center">
+                    Get Started
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

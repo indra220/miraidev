@@ -12,9 +12,7 @@ import {
   Award,
   Heart,
   Lightbulb,
-  TrendingUp,
-  Code,
-  Sparkles
+  TrendingUp
 } from "lucide-react";
 import { Navbar } from "@/components/navbar";
 import { motion } from "framer-motion";
@@ -24,33 +22,86 @@ export default function TentangPage() {
     {
       icon: <Target className="w-8 h-8 text-blue-400" />,
       title: "Kualitas Terbaik",
-      description: "Fokus pada pengiriman kode berkualitas tinggi dengan praktik terbaik dalam pengembangan web."
+      description: "Kami berkomitmen untuk memberikan hasil terbaik dengan standar kualitas tinggi dalam setiap proyek."
     },
     {
       icon: <Users className="w-8 h-8 text-green-400" />,
       title: "Berorientasi pada Klien",
-      description: "Mendengarkan kebutuhan klien dengan seksama untuk memberikan solusi yang tepat sasaran."
+      description: "Kepuasan klien adalah prioritas utama kami. Kami mendengarkan dan memahami kebutuhan Anda."
     },
     {
       icon: <Zap className="w-8 h-8 text-yellow-400" />,
       title: "Inovasi Berkelanjutan",
-      description: "Terus belajar dan mengadopsi teknologi terbaru untuk solusi yang modern dan efisien."
+      description: "Kami selalu mengikuti perkembangan teknologi terkini untuk memberikan solusi inovatif."
     },
     {
       icon: <Globe className="w-8 h-8 text-purple-400" />,
       title: "Berpikir Jangka Panjang",
-      description: "Membangun website yang scalable dan mudah dikelola untuk pertumbuhan bisnis jangka panjang."
+      description: "Setiap solusi yang kami bangun dirancang untuk mendukung pertumbuhan bisnis jangka panjang."
     }
   ];
 
-  
+  const milestones = [
+    {
+      year: "2020",
+      title: "Berdiri",
+      description: "MiraiDev didirikan dengan visi membantu bisnis lokal bersaing di era digital"
+    },
+    {
+      year: "2021",
+      title: "Pertumbuhan Tim",
+      description: "Ekspansi tim menjadi 10 anggota profesional dengan berbagai keahlian"
+    },
+    {
+      year: "2022",
+      title: "50+ Proyek",
+      description: "Menyelesaikan lebih dari 50 proyek untuk berbagai industri"
+    },
+    {
+      year: "2023",
+      title: "Penghargaan",
+      description: "Menerima penghargaan sebagai Agency Terbaik di industri digital"
+    },
+    {
+      year: "2024",
+      title: "100+ Klien",
+      description: "Melayani lebih dari 100 klien puas di seluruh Indonesia"
+    },
+    {
+      year: "2025",
+      title: "Ekspansi",
+      description: "Membuka kantor cabang kedua untuk melayani pasar yang lebih luas"
+    }
+  ];
 
   const team = [
     {
-      name: "Developer Independen",
-      role: "Full-Stack Developer",
-      bio: "Seorang developer yang bersemangat tentang teknologi web modern dan berkomitmen untuk memberikan solusi terbaik bagi setiap proyek.",
-      icon: <Code className="w-6 h-6 text-blue-400" />
+      name: "Ahmad Rifai",
+      role: "CEO & Founder",
+      bio: "Pengembang berpengalaman dengan passion di bidang teknologi dan inovasi digital.",
+      image: "/placeholder-team-1.jpg",
+      icon: <Award className="w-6 h-6 text-blue-400" />
+    },
+    {
+      name: "Dewi Kartika",
+      role: "Lead Designer",
+      bio: "Desainer UI/UX yang kreatif dengan fokus pada pengalaman pengguna yang optimal.",
+      image: "/placeholder-team-2.jpg",
+      icon: <Heart className="w-6 h-6 text-pink-400" />
+    },
+    {
+      name: "Budi Santoso",
+      role: "Lead Developer",
+      bio: "Ahli pengembangan full-stack dengan keahlian di berbagai teknologi modern.",
+      image: "/placeholder-team-3.jpg",
+      icon: <Lightbulb className="w-6 h-6 text-yellow-400" />
+    },
+    {
+      name: "Siti Nurhaliza",
+      role: "Project Manager",
+      bio: "Manajer proyek yang teliti dengan kemampuan komunikasi yang kuat dan organisasi yang baik.",
+      image: "/placeholder-team-4.jpg",
+      icon: <TrendingUp className="w-6 h-6 text-green-400" />
     }
   ];
 
@@ -96,13 +147,13 @@ export default function TentangPage() {
               >
                 <h2 className="text-3xl font-bold mb-6">Cerita Kami</h2>
                 <p className="text-gray-300 mb-4">
-                  MiraiDev bermula dari semangat seorang developer independen yang ingin membantu bisnis lokal bersaing di era digital. Dengan latar belakang pendidikan teknik informatika dan passion terhadap teknologi web, kami memulai perjalanan ini pada tahun 2023.
+                  MiraiDev didirikan pada tahun 2020 dengan visi untuk membantu bisnis lokal bersaing di era digital. Kami memulai perjalanan kami dari sebuah garasi kecil dengan hanya 3 orang yang bersemangat tentang teknologi.
                 </p>
                 <p className="text-gray-300 mb-4">
-                  Nama "Mirai" berasal dari bahasa Jepang yang berarti "masa depan". Kami memilih nama ini karena visi kami untuk membantu bisnis membangun kehadiran digital yang berkelanjutan dan siap menghadapi perkembangan teknologi di masa depan.
+                  Seiring waktu, kami berkembang menjadi tim profesional yang terdiri dari desainer, pengembang, dan strategis digital yang berdedikasi untuk memberikan solusi terbaik bagi klien kami.
                 </p>
                 <p className="text-gray-300">
-                  Kami fokus pada pengembangan website modern dan solusi digital yang efisien, menggunakan teknologi terkini seperti React, Next.js, dan berbagai framework modern lainnya untuk memberikan hasil terbaik bagi klien kami.
+                  Hari ini, kami telah membantu lebih dari 100+ bisnis untuk membangun kehadiran digital mereka yang kuat dan berkelanjutan.
                 </p>
               </motion.div>
               <motion.div 
@@ -114,8 +165,8 @@ export default function TentangPage() {
                 whileHover={{ scale: 1.02 }}
               >
                 <div className="text-center">
-                  <Sparkles className="w-16 h-16 text-blue-400 mx-auto mb-4" />
-                  <p className="text-gray-400">Masa Depan Digital</p>
+                  <Globe className="w-16 h-16 text-blue-400 mx-auto mb-4" />
+                  <p className="text-gray-400">Ilustrasi Tim MiraiDev</p>
                 </div>
               </motion.div>
             </div>
@@ -123,7 +174,54 @@ export default function TentangPage() {
         </div>
       </div>
 
-      
+      {/* Journey Timeline */}
+      <div className="py-20 bg-gray-800/30">
+        <div className="container mx-auto px-4">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Perjalanan Kami</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              Tonggak penting dalam perjalanan kami menuju kesuksesan
+            </p>
+          </motion.div>
+          
+          <div className="max-w-4xl mx-auto">
+            <div className="relative">
+              {/* Vertical line */}
+              <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-blue-500/20"></div>
+              
+              {/* Timeline items */}
+              <div className="space-y-12">
+                {milestones.map((milestone, index) => (
+                  <motion.div
+                    key={index}
+                    className={`relative flex ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'} items-center`}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    viewport={{ once: true }}
+                  >
+                    <div className={`w-1/2 ${index % 2 === 0 ? 'pr-8 text-right' : 'pl-8 text-left'}`}>
+                      <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6 inline-block">
+                        <div className="text-2xl font-bold text-blue-400 mb-1">{milestone.year}</div>
+                        <h3 className="text-xl font-semibold mb-2">{milestone.title}</h3>
+                        <p className="text-gray-400">{milestone.description}</p>
+                      </div>
+                    </div>
+                    <div className="absolute left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full bg-blue-500 border-4 border-gray-900"></div>
+                    <div className="w-1/2"></div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Mission & Vision */}
       <div className="py-20">
@@ -142,7 +240,7 @@ export default function TentangPage() {
                   </div>
                   <h3 className="text-2xl font-bold mb-4">Visi Kami</h3>
                   <p className="text-gray-300">
-                    Menjadi mitra pengembangan digital terpercaya yang membantu bisnis kecil dan menengah menghadapi tantangan digital dengan solusi yang efisien dan terjangkau.
+                    Menjadi mitra pengembangan digital terdepan yang membantu bisnis lokal mengubah tantangan digital menjadi peluang pertumbuhan yang berkelanjutan.
                   </p>
                 </Card>
               </motion.div>
@@ -159,7 +257,7 @@ export default function TentangPage() {
                   </div>
                   <h3 className="text-2xl font-bold mb-4">Misi Kami</h3>
                   <p className="text-gray-300">
-                    Memberdayakan bisnis dengan website modern yang dirancang untuk memberikan pengalaman terbaik kepada pengguna dan mendukung pertumbuhan bisnis jangka panjang.
+                    Memberdayakan bisnis dengan solusi teknologi inovatif yang dirancang khusus untuk memenuhi kebutuhan unik mereka dan mendorong kesuksesan jangka panjang.
                   </p>
                 </Card>
               </motion.div>
@@ -220,7 +318,7 @@ export default function TentangPage() {
           >
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Tim Kami</h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              Seorang developer independen yang berdedikasi untuk kesuksesan proyek Anda
+              Profesional berbakat yang berdedikasi untuk kesuksesan proyek Anda
             </p>
           </motion.div>
           
@@ -272,7 +370,7 @@ export default function TentangPage() {
                 viewport={{ once: true }}
                 whileHover={{ scale: 1.05 }}
               >
-                <div className="text-4xl font-bold text-blue-400 mb-2">20+</div>
+                <div className="text-4xl font-bold text-blue-400 mb-2">100+</div>
                 <div className="text-gray-400">Proyek Selesai</div>
               </motion.div>
               <motion.div 
@@ -283,7 +381,7 @@ export default function TentangPage() {
                 viewport={{ once: true }}
                 whileHover={{ scale: 1.05 }}
               >
-                <div className="text-4xl font-bold text-green-400 mb-2">15+</div>
+                <div className="text-4xl font-bold text-green-400 mb-2">85+</div>
                 <div className="text-gray-400">Klien Puas</div>
               </motion.div>
               <motion.div 
@@ -294,7 +392,7 @@ export default function TentangPage() {
                 viewport={{ once: true }}
                 whileHover={{ scale: 1.05 }}
               >
-                <div className="text-4xl font-bold text-yellow-400 mb-2">2+</div>
+                <div className="text-4xl font-bold text-yellow-400 mb-2">5+</div>
                 <div className="text-gray-400">Tahun Pengalaman</div>
               </motion.div>
               <motion.div 
@@ -305,8 +403,8 @@ export default function TentangPage() {
                 viewport={{ once: true }}
                 whileHover={{ scale: 1.05 }}
               >
-                <div className="text-4xl font-bold text-purple-400 mb-2">1</div>
-                <div className="text-gray-400">Developer Fokus</div>
+                <div className="text-4xl font-bold text-purple-400 mb-2">15+</div>
+                <div className="text-gray-400">Anggota Tim</div>
               </motion.div>
             </div>
           </div>
@@ -324,9 +422,9 @@ export default function TentangPage() {
             viewport={{ once: true }}
             whileHover={{ scale: 1.02 }}
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Siap Membangun Website Impian Anda?</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Siap Berkolaborasi dengan Kami?</h2>
             <p className="text-gray-300 mb-8 max-w-2xl mx-auto">
-              Mari kita wujudkan website modern yang akan membantu bisnis Anda berkembang di era digital.
+              Bergabunglah dengan klien kami yang puas dan wujudkan visi digital masa depan untuk bisnis Anda.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg py-6 px-8 transition-all duration-150 hover:scale-105">
