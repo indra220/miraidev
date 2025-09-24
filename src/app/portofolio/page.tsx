@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { 
@@ -15,10 +15,28 @@ import { Navbar } from "@/components/navbar";
 import { motion } from "framer-motion";
 import { getPortfolioProjects, getAllPortfolioCategories } from "@/lib/portfolio";
 
+interface PortfolioProject {
+  id: number;
+  title: string;
+  category: string;
+  description: string;
+  image: string;
+  tags: string[];
+  client: string;
+  date: string;
+  views: string;
+}
+
+  interface Category {
+    id: string;
+    name: string;
+    icon: ReactNode;
+  }
+
 export default function PortofolioPage() {
   const [activeFilter, setActiveFilter] = useState("all");
-  const [projects, setProjects] = useState<any[]>([]);
-  const [categories, setCategories] = useState<{id: string, name: string, icon: JSX.Element}[]>([
+  const [projects, setProjects] = useState<PortfolioProject[]>([]);
+  const [categories, setCategories] = useState<Category[]>([
     { id: "all", name: "Semua", icon: <Globe className="w-4 h-4" /> }
   ]);
   const [loading, setLoading] = useState(true);
@@ -50,8 +68,8 @@ export default function PortofolioPage() {
         const projectResult = await getPortfolioProjects();
         if (projectResult.success) {
           // Transform data to match existing structure
-          const transformedProjects = projectResult.data.map((project: any) => ({
-            id: project.id,
+          const transformedProjects: PortfolioProject[] = projectResult.data.map((project) => ({
+            id: Number(project.id),
             title: project.title,
             category: project.category,
             description: project.description,

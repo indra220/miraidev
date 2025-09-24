@@ -15,7 +15,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   },
 });
 
-// Server-side Supabase client with service role key (for admin operations)
+// Server-side Supabase client (for admin operations)
 export async function createSupabaseAdminClient() {
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   
@@ -39,7 +39,7 @@ export async function createSupabaseAdminClient() {
   });
 }
 
-// Client-side Supabase client for authenticated users (when we implement auth)
+// Client-side Supabase client (when needed for public operations)
 export function createSupabaseClient() {
   return createClient(supabaseUrl, supabaseAnonKey, {
     global: {

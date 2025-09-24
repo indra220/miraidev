@@ -4,7 +4,7 @@ This file contains essential context about the project structure, technologies, 
 
 ## Project Overview
 
-**CodeGuide Starter Kit** is a modern Next.js starter template featuring authentication, database integration, AI capabilities, and a comprehensive UI component system.
+**CodeGuide Starter Kit** is a modern Next.js starter template featuring database integration, AI capabilities, and a comprehensive UI component system.
 
 ### Core Technologies
 
@@ -12,8 +12,7 @@ This file contains essential context about the project structure, technologies, 
 - **Language**: TypeScript with strict mode enabled
 - **Styling**: TailwindCSS v4 with CSS custom properties
 - **UI Components**: shadcn/ui (New York style) with Lucide icons
-- **Authentication**: Clerk with middleware protection
-- **Database**: Supabase with third-party auth integration
+- **Database**: Supabase with integration
 - **AI Integration**: Vercel AI SDK with support for Anthropic Claude and OpenAI
 - **Theme System**: next-themes with dark mode support
 
@@ -36,9 +35,8 @@ src/
 ├── lib/
 │   ├── utils.ts           # Utility functions (cn, etc.)
 │   ├── supabase.ts        # Supabase client configurations
-│   ├── user.ts            # User utilities using Clerk
 │   └── env-check.ts       # Environment validation
-└── middleware.ts          # Clerk authentication middleware
+└── middleware.ts          # Middleware for security headers
 ```
 
 ## Key Configuration Files
@@ -47,28 +45,21 @@ src/
 - **components.json**: shadcn/ui configuration (New York style, neutral colors)
 - **tsconfig.json**: TypeScript configuration with path aliases (`@/`)
 - **.env.example**: Environment variables template
-- **SUPABASE_CLERK_SETUP.md**: Integration setup guide
 
-## Authentication & Database
-
-### Clerk Integration
-- Middleware protects `/dashboard(.*)` and `/profile(.*)` routes
-- Components: `SignInButton`, `SignedIn`, `SignedOut`, `UserButton`
-- User utilities in `src/lib/user.ts` use `currentUser()` from Clerk
+## Database Integration
 
 ### Supabase Integration
-- **Client**: `createSupabaseServerClient()` for server-side with Clerk tokens  
-- **RLS**: Row Level Security uses `auth.jwt() ->> 'sub'` for Clerk user IDs
-- **Example Migration**: `supabase/migrations/001_example_tables_with_rls.sql`
+- **Client**: `createSupabaseClient()` for client-side operations
+- **Server Client**: `createSupabaseAdminClient()` for server-side operations
 
 #### Supabase Client Usage Patterns
 
 **Server-side (Recommended for data fetching):**
 ```typescript
-import { createSupabaseServerClient } from "@/lib/supabase"
+import { createSupabaseAdminClient } from "@/lib/supabase"
 
 export async function getServerData() {
-  const supabase = await createSupabaseServerClient()
+  const supabase = await createSupabaseAdminClient()
   
   const { data, error } = await supabase
     .from('posts')
@@ -88,20 +79,15 @@ export async function getServerData() {
 ```typescript
 "use client"
 
-import { supabase } from "@/lib/supabase"
-import { useAuth } from "@clerk/nextjs"
+import { createSupabaseClient } from "@/lib/supabase"
 
 function ClientComponent() {
-  const { getToken } = useAuth()
+  const supabase = createSupabaseClient()
 
   const fetchData = async () => {
-    const token = await getToken()
-    
-    // Pass token manually for client-side operations
     const { data, error } = await supabase
       .from('posts')
       .select('*')
-      .auth(token)
     
     return data
   }
@@ -127,13 +113,10 @@ function ClientComponent() {
 - **Toggle Components**: `ThemeToggle` (dropdown) and `SimpleThemeToggle` (button)
 - **Persistence**: Automatic theme persistence across sessions
 
-## AI Integration
-
-### Vercel AI SDK
+### AI Integration
 - **Endpoint**: `/api/chat/route.ts`
 - **Providers**: Anthropic Claude and OpenAI support
 - **Chat Component**: Real-time streaming chat interface
-- **Authentication**: Requires Clerk authentication
 
 ## Development Conventions
 
@@ -147,12 +130,10 @@ function ClientComponent() {
 ```typescript
 // Path aliases (configured in tsconfig.json)
 import { Button } from "@/components/ui/button"
-import { getCurrentUser } from "@/lib/user"
 import { supabase } from "@/lib/supabase"
 
 // External libraries
 import { useTheme } from "next-themes"
-import { SignedIn, useAuth } from "@clerk/nextjs"
 ```
 
 ### Component Patterns
@@ -172,10 +153,6 @@ export default async function ServerComponent() {
 Required for full functionality:
 
 ```bash
-# Clerk Authentication
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
-CLERK_SECRET_KEY=sk_test_...
-
 # Supabase Database
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
@@ -183,82 +160,61 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
 # AI Integration (optional)
 OPENAI_API_KEY=sk-...
 ANTHROPIC_API_KEY=sk-ant-...
+
+# Supabase Service Role Key (for admin operations)
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
 
 ## Common Patterns
 
 ### Row Level Security (RLS) Policies
 
-All database tables should use RLS policies that reference Clerk user IDs via `auth.jwt() ->> 'sub'`.
+Database tables can use RLS policies for access control based on application logic.
 
-**Basic User-Owned Data Pattern:**
+**Public Read Pattern:**
 ```sql
 -- Enable RLS on table
 ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
 
--- Users can read all posts (public)
+-- Anyone can read posts (public)
 CREATE POLICY "Anyone can read posts" ON posts
   FOR SELECT USING (true);
 
--- Users can only insert posts as themselves
-CREATE POLICY "Users can insert own posts" ON posts
-  FOR INSERT WITH CHECK (auth.jwt() ->> 'sub' = user_id);
+-- Authenticated users can insert posts
+CREATE POLICY "Authenticated users can insert posts" ON posts
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 
--- Users can only update their own posts
+-- Users can only update/delete their own posts
 CREATE POLICY "Users can update own posts" ON posts
-  FOR UPDATE USING (auth.jwt() ->> 'sub' = user_id);
+  FOR UPDATE USING (auth.uid() = user_id);
 
--- Users can only delete their own posts
 CREATE POLICY "Users can delete own posts" ON posts
-  FOR DELETE USING (auth.jwt() ->> 'sub' = user_id);
+  FOR DELETE USING (auth.uid() = user_id);
 ```
 
-**Private Data Pattern:**
+**Public Data Pattern:**
 ```sql
--- Completely private to each user
-CREATE POLICY "Users can only access own data" ON private_notes
-  FOR ALL USING (auth.jwt() ->> 'sub' = user_id);
-```
-
-**Conditional Visibility Pattern:**
-```sql
--- Public profiles or own profile
-CREATE POLICY "Users can read public profiles or own profile" ON profiles
-  FOR SELECT USING (
-    is_public = true OR auth.jwt() ->> 'sub' = user_id
-  );
-```
-
-**Collaboration Pattern:**
-```sql
--- Owner and collaborators can access
-CREATE POLICY "Owners and collaborators can read" ON collaborations
-  FOR SELECT USING (
-    auth.jwt() ->> 'sub' = owner_id OR 
-    auth.jwt() ->> 'sub' = ANY(collaborators)
-  );
+-- All data is publicly readable
+CREATE POLICY "Public read access" ON public_table
+  FOR SELECT USING (true);
 ```
 
 ### Database Operations with Supabase
 
 **Complete CRUD Example:**
 ```typescript
-import { createSupabaseServerClient } from "@/lib/supabase"
-import { getCurrentUser } from "@/lib/user"
+import { createSupabaseAdminClient } from "@/lib/supabase"
 
 // CREATE - Insert new record
-export async function createPost(title: string, content: string) {
-  const user = await getCurrentUser()
-  if (!user) return null
-  
-  const supabase = await createSupabaseServerClient()
+export async function createPost(title: string, content: string, userId: string) {
+  const supabase = await createSupabaseAdminClient()
   
   const { data, error } = await supabase
     .from('posts')
     .insert({
       title,
       content,
-      user_id: user.id, // Clerk user ID
+      user_id: userId,
     })
     .select()
     .single()
@@ -271,9 +227,9 @@ export async function createPost(title: string, content: string) {
   return data
 }
 
-// READ - Fetch user's posts
-export async function getUserPosts() {
-  const supabase = await createSupabaseServerClient()
+// READ - Fetch all posts
+export async function getPosts() {
+  const supabase = await createSupabaseAdminClient()
   
   const { data, error } = await supabase
     .from('posts')
@@ -296,7 +252,7 @@ export async function getUserPosts() {
 
 // UPDATE - Modify existing record
 export async function updatePost(postId: string, updates: { title?: string; content?: string }) {
-  const supabase = await createSupabaseServerClient()
+  const supabase = await createSupabaseAdminClient()
   
   const { data, error } = await supabase
     .from('posts')
@@ -315,7 +271,7 @@ export async function updatePost(postId: string, updates: { title?: string; cont
 
 // DELETE - Remove record
 export async function deletePost(postId: string) {
-  const supabase = await createSupabaseServerClient()
+  const supabase = await createSupabaseAdminClient()
   
   const { error } = await supabase
     .from('posts')
@@ -336,21 +292,18 @@ export async function deletePost(postId: string) {
 "use client"
 
 import { useEffect, useState } from "react"
-import { supabase } from "@/lib/supabase"
-import { useAuth } from "@clerk/nextjs"
+import { createSupabaseClient } from "@/lib/supabase"
 
 function useRealtimePosts() {
   const [posts, setPosts] = useState([])
-  const { getToken } = useAuth()
 
   useEffect(() => {
+    const supabase = createSupabaseClient()
+    
     const fetchPosts = async () => {
-      const token = await getToken()
-      
       const { data } = await supabase
         .from('posts')
         .select('*')
-        .auth(token)
       
       setPosts(data || [])
     }
@@ -369,16 +322,16 @@ function useRealtimePosts() {
       .subscribe()
 
     return () => {
-      subscription.unsubscribe()
+      supabase.removeChannel(subscription)
     }
-  }, [getToken])
+  }, [])
 
   return posts
 }
 ```
 
-### Protected Routes
-Routes matching `/dashboard(.*)` and `/profile(.*)` are automatically protected by Clerk middleware.
+### Route Security
+Security for routes can be implemented as needed using Next.js middleware.
 
 ### Theme-Aware Components
 ```typescript

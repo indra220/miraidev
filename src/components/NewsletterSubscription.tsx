@@ -37,7 +37,7 @@ export default function NewsletterSubscription() {
       
       if (result.success) {
         setStatus("success");
-        setMessage(result.message);
+        setMessage(result.message || "Berlangganan berhasil!");
         setEmail("");
       } else {
         setStatus("error");

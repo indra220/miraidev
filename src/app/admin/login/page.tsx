@@ -1,22 +1,23 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormError } from "@/components/form-error";
 import { LoadingSpinner } from "@/components/loading-spinner";
-import Link from "next/link";
-import { ArrowRight, Eye, EyeOff, Home, Lock, Mail } from "lucide-react";
+import { createSupabaseClient } from "@/lib/supabase";
+import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 
-export function LoginForm() {
+export default function AdminLoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
-  const [success, setSuccess] = useState("");
 
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -42,7 +43,6 @@ export function LoginForm() {
     
     // Reset previous messages
     setErrors({});
-    setSuccess("");
     
     // Validate form
     if (!validateForm()) {
@@ -52,16 +52,20 @@ export function LoginForm() {
     setIsLoading(true);
     
     try {
-      // Simulasi proses login
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const supabase = createSupabaseClient();
       
-      // Simulasi kemungkinan error
-      if (email === "error@example.com") {
-        throw new Error("Email atau kata sandi tidak valid");
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) {
+        setErrors({ general: error.message || "Terjadi kesalahan saat login" });
+      } else {
+        // Redirect to admin dashboard after successful login
+        router.push("/admin/dashboard");
+        router.refresh();
       }
-      
-      setSuccess("Login berhasil! Mengalihkan...");
-      // Di sini nanti akan ada logika autentikasi sesungguhnya
     } catch (error: unknown) {
       if (error instanceof Error) {
         setErrors({ general: error.message || "Terjadi kesalahan saat login" });
@@ -80,17 +84,17 @@ export function LoginForm() {
           <div className="mx-auto w-16 h-16 rounded-full bg-blue-600/10 flex items-center justify-center mb-4">
             <Lock className="w-8 h-8 text-blue-400" />
           </div>
-          <h1 className="text-3xl font-bold">Selamat Datang Kembali</h1>
+          <h1 className="text-3xl font-bold">Admin Login</h1>
           <p className="text-gray-400 mt-2">
-            Masuk ke akun Anda untuk melanjutkan
+            Masuk ke akun admin untuk mengelola situs
           </p>
         </div>
 
         <Card className="bg-gray-800/50 border-gray-700 shadow-xl backdrop-blur-sm">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">Masuk</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">Login Admin</CardTitle>
             <CardDescription className="text-center text-gray-400">
-              Masukkan kredensial Anda untuk mengakses akun
+              Gunakan akun admin yang telah terdaftar
             </CardDescription>
           </CardHeader>
           
@@ -102,21 +106,15 @@ export function LoginForm() {
                 </div>
               )}
               
-              {success && (
-                <div className="bg-green-500/20 border border-green-500/30 rounded-md p-3 text-sm text-green-500">
-                  {success}
-                </div>
-              )}
-              
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-gray-300 flex items-center">
                   <Mail className="w-4 h-4 mr-2" />
-                  Email
+                  Email Admin
                 </Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="nama@contoh.com"
+                  placeholder="admin@contoh.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className={`bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 py-6 px-4 ${
@@ -129,18 +127,10 @@ export function LoginForm() {
               </div>
 
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-gray-300 flex items-center">
-                    <Lock className="w-4 h-4 mr-2" />
-                    Kata Sandi
-                  </Label>
-                  <Link
-                    href="/auth/forgot-password"
-                    className="text-sm text-blue-400 hover:text-blue-300 flex items-center"
-                  >
-                    Lupa kata sandi?
-                  </Link>
-                </div>
+                <Label htmlFor="password" className="text-gray-300 flex items-center">
+                  <Lock className="w-4 h-4 mr-2" />
+                  Kata Sandi
+                </Label>
                 <div className="relative">
                   <Input
                     id="password"
@@ -182,44 +172,16 @@ export function LoginForm() {
                   </>
                 ) : (
                   <>
-                    Masuk
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                    Masuk sebagai Admin
                   </>
                 )}
               </Button>
             </form>
           </CardContent>
-          
-          <CardFooter className="flex flex-col gap-4">
-            <div className="relative w-full">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-gray-700" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-gray-800/50 px-2 text-gray-400">
-                  Atau
-                </span>
-              </div>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-3 w-full">
-              <Button asChild variant="outline" className="flex-1 border-gray-600 text-white hover:bg-gray-800 transition-all">
-                <Link href="/">
-                  <Home className="mr-2 h-4 w-4" />
-                  Kembali ke Beranda
-                </Link>
-              </Button>
-              <Button asChild variant="ghost" className="flex-1 text-blue-400 hover:text-blue-300 hover:bg-gray-800/50">
-                <Link href="/auth/register">
-                  Daftar
-                </Link>
-              </Button>
-            </div>
-          </CardFooter>
         </Card>
         
         <div className="text-center text-sm text-gray-500 mt-6">
-          <p>© 2025 MiraiDev. Hak Cipta Dilindungi.</p>
+          <p>Hanya untuk pengguna admin terdaftar</p>
         </div>
       </div>
     </div>

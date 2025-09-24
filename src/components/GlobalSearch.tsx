@@ -83,28 +83,28 @@ export default function GlobalSearch() {
           id: "1",
           title: "Layanan Pengembangan Website",
           description: "Solusi pengembangan website kustom untuk bisnis Anda",
-          type: "service",
+          type: "service" as const,
           url: "/layanan"
         },
         {
           id: "2",
           title: "Portofolio Website E-Commerce",
           description: "Website toko online untuk UMKM lokal",
-          type: "portfolio",
+          type: "portfolio" as const,
           url: "/portofolio"
         },
         {
           id: "3",
           title: "Tentang Kami",
           description: "Pelajari lebih lanjut tentang tim dan visi kami",
-          type: "page",
+          type: "page" as const,
           url: "/tentang"
         },
         {
           id: "4",
           title: "Kontak",
           description: "Hubungi kami untuk konsultasi gratis",
-          type: "page",
+          type: "page" as const,
           url: "/kontak"
         }
       ].filter(result => 
@@ -129,7 +129,7 @@ export default function GlobalSearch() {
   };
 
   // Get icon for result type
-  const getTypeIcon = (type: string) => {
+  const getTypeIcon = (type: "page" | "portfolio" | "service" | "blog") => {
     switch (type) {
       case "page": return <Globe className="w-4 h-4" />;
       case "portfolio": return <Briefcase className="w-4 h-4" />;
@@ -140,7 +140,7 @@ export default function GlobalSearch() {
   };
 
   // Get type label
-  const getTypeLabel = (type: string) => {
+  const getTypeLabel = (type: "page" | "portfolio" | "service" | "blog") => {
     switch (type) {
       case "page": return "Halaman";
       case "portfolio": return "Portofolio";
