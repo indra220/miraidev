@@ -3,11 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { 
-  Code, 
-  Smartphone, 
   Globe, 
-  Palette, 
-  Rocket, 
   Wrench,
   RefreshCw,
   Search,

@@ -9,10 +9,6 @@ import {
   Zap,
   Globe,
   ArrowRight,
-  Award,
-  Heart,
-  Lightbulb,
-  TrendingUp,
   Code,
   Sparkles
 } from "lucide-react";

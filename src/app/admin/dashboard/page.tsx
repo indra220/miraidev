@@ -5,11 +5,8 @@ import {
   FolderOpen, 
   Users, 
   Eye, 
-  Calendar,
   BarChart3,
-  TrendingUp,
-  MessageSquare,
-  Clock
+  MessageSquare
 } from "lucide-react";
 
 export default function AdminDashboard() {

@@ -43,7 +43,7 @@ export default function NewsletterSubscription() {
         setStatus("error");
         setMessage(result.error || "Terjadi kesalahan saat berlangganan newsletter");
       }
-    } catch (error) {
+    } catch (_error) { // eslint-disable-line @typescript-eslint/no-unused-vars
       setStatus("error");
       setMessage("Terjadi kesalahan saat berlangganan newsletter");
     } finally {

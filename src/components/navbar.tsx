@@ -8,7 +8,6 @@ import {
   Menu, 
   X, 
   ArrowRight,
-  User,
   LogOut
 } from "lucide-react";
 import GlobalSearch from "@/components/GlobalSearch";
@@ -173,19 +172,12 @@ export function Navbar() {
               Keluar
             </button>
           ) : (
-            <>
-              <Link href="/kontak">
-                <Button variant="outline" className="border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-sm font-semibold flex items-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900">
-                  Kontak
-                </Button>
-              </Link>
-              <Link href="/kontak">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-sm font-semibold flex items-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900">
-                  Get Started
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </>
+            <Link href="/kontak">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-sm font-semibold flex items-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900">
+                Get Started
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
           )}
         </div>
       </nav>
@@ -302,19 +294,12 @@ export function Navbar() {
                     Keluar
                   </button>
                 ) : (
-                  <>
-                    <Link href="/kontak" onClick={() => setMobileMenuOpen(false)}>
-                      <Button variant="outline" className="w-full border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900">
-                        Kontak
-                      </Button>
-                    </Link>
-                    <Link href="/kontak" onClick={() => setMobileMenuOpen(false)}>
-                      <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900">
-                        Get Started
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </Link>
-                  </>
+                  <Link href="/kontak" onClick={() => setMobileMenuOpen(false)}>
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900">
+                      Get Started
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
                 )}
               </div>
             </div>

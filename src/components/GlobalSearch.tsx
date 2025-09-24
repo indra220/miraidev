@@ -10,11 +10,10 @@ import {
   X, 
   Globe, 
   FileText, 
-  User, 
   Briefcase,
   ArrowRight
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+
 
 interface SearchResult {
   id: string;
