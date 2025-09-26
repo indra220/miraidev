@@ -11,103 +11,104 @@ import {
   Search,
   Edit,
   Trash2,
-  Eye,
+  X,
+  Palette,
+  Code,
+  Smartphone,
+  ShoppingCart,
+  Globe,
   Users,
-  FolderOpen,
-  X
+  Settings
 } from "lucide-react";
-import { portfolioAdminService } from "@/lib/admin-service";
-import { PortfolioItem } from "@/lib/types";
+import { servicesAdminService } from "@/lib/admin-service";
+import { ServiceItem } from "@/lib/types";
 import { LoadingSpinner } from "@/components/loading-spinner";
 
-export default function PortfolioManagement() {
-  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
+export default function ServicesManagement() {
+  const [services, setServices] = useState<ServiceItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentItem, setCurrentItem] = useState<PortfolioItem | null>(null);
+  const [currentService, setCurrentService] = useState<ServiceItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Ambil data portfolio dari API saat komponen dimuat
+  // Ambil data layanan dari API saat komponen dimuat
   useEffect(() => {
-    const fetchPortfolioItems = async () => {
+    const fetchServices = async () => {
       try {
-        const items = await portfolioAdminService.getAll();
-        setPortfolioItems(items);
+        const items = await servicesAdminService.getAll();
+        setServices(items);
         setLoading(false);
       } catch (err) {
-        console.error('Error fetching portfolio items:', err);
-        setError('Gagal mengambil data portofolio. Silakan coba lagi nanti.');
+        console.error('Error fetching services:', err);
+        setError('Gagal mengambil data layanan. Silakan coba lagi nanti.');
         setLoading(false);
       }
     };
 
-    fetchPortfolioItems();
+    fetchServices();
   }, []);
 
   // Fungsi untuk menyegarkan data
   const refreshData = async () => {
     try {
       setLoading(true);
-      const items = await portfolioAdminService.getAll();
-      setPortfolioItems(items);
+      const items = await servicesAdminService.getAll();
+      setServices(items);
       setLoading(false);
     } catch (err) {
-      console.error('Error fetching portfolio items:', err);
-      setError('Gagal mengambil data portofolio. Silakan coba lagi nanti.');
+      console.error('Error fetching services:', err);
+      setError('Gagal mengambil data layanan. Silakan coba lagi nanti.');
       setLoading(false);
     }
   };
 
   const handleAddNew = () => {
-    setCurrentItem(null);
+    setCurrentService(null);
     setIsModalOpen(true);
   };
 
-  const handleEdit = (item: PortfolioItem) => {
-    setCurrentItem(item);
+  const handleEdit = (service: ServiceItem) => {
+    setCurrentService(service);
     setIsModalOpen(true);
   };
 
   const handleDelete = async (id: number) => {
-    if (confirm("Apakah Anda yakin ingin menghapus item ini?")) {
+    if (confirm("Apakah Anda yakin ingin menghapus layanan ini?")) {
       try {
-        await portfolioAdminService.delete(id);
+        await servicesAdminService.delete(id);
         // Hapus item dari state
-        setPortfolioItems(portfolioItems.filter(item => item.id !== id));
+        setServices(services.filter(service => service.id !== id));
       } catch (err) {
-        console.error('Error deleting portfolio item:', err);
-        alert('Gagal menghapus item portofolio. Silakan coba lagi.');
+        console.error('Error deleting service:', err);
+        alert('Gagal menghapus layanan. Silakan coba lagi.');
       }
     }
   };
 
-  const handleSave = async (item: PortfolioItem) => {
+  const handleSave = async (service: ServiceItem) => {
     try {
-      let savedItem: PortfolioItem;
-      if (currentItem) {
+      let savedService: ServiceItem;
+      if (currentService) {
         // Update existing item
-        savedItem = await portfolioAdminService.update(item);
-        setPortfolioItems(portfolioItems.map(p => p.id === item.id ? savedItem : p));
+        savedService = await servicesAdminService.update(service);
+        setServices(services.map(s => s.id === service.id ? savedService : s));
       } else {
         // Add new item
-        savedItem = await portfolioAdminService.create({
-          title: item.title,
-          category: item.category,
-          description: item.description,
-          client: item.client,
-          date: item.date,
-          views: item.views,
-          image_url: item.image_url,
-          tags: item.tags,
-          case_study_url: item.case_study_url,
+        savedService = await servicesAdminService.create({
+          title: service.title,
+          category: service.category,
+          description: service.description,
+          features: service.features,
+          icon: service.icon,
+          order: service.order,
         });
-        setPortfolioItems([...portfolioItems, savedItem]);
+        setServices([...services, savedService]);
       }
       setIsModalOpen(false);
     } catch (err) {
-      console.error('Error saving portfolio item:', err);
-      alert('Gagal menyimpan item portofolio. Silakan coba lagi.');
+      console.error('Error saving service:', err);
+      alert('Gagal menyimpan layanan. Silakan coba lagi.');
     }
   };
 
@@ -122,7 +123,7 @@ export default function PortfolioManagement() {
   if (error) {
     return (
       <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
-        <h1 className="text-3xl font-bold text-white">Manajemen Portofolio</h1>
+        <h1 className="text-3xl font-bold text-white">Manajemen Layanan</h1>
         <div className="mt-6 p-6 bg-red-900/20 border border-red-700/50 rounded-lg text-center">
           <p className="text-red-300">{error}</p>
           <Button 
@@ -136,25 +137,38 @@ export default function PortfolioManagement() {
     );
   }
 
-  const filteredItems = portfolioItems.filter(item =>
-    item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.client?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredServices = services.filter(service =>
+    service.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    service.category?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Fungsi untuk mendapatkan ikon berdasarkan nama
+  const getIcon = (iconName: string) => {
+    switch(iconName) {
+      case "Code": return <Code className="h-10 w-10 text-gray-300/50" />;
+      case "Palette": return <Palette className="h-10 w-10 text-gray-300/50" />;
+      case "Smartphone": return <Smartphone className="h-10 w-10 text-gray-300/50" />;
+      case "ShoppingCart": return <ShoppingCart className="h-10 w-10 text-gray-300/50" />;
+      case "Globe": return <Globe className="h-10 w-10 text-gray-300/50" />;
+      case "Users": return <Users className="h-10 w-10 text-gray-300/50" />;
+      case "Settings": return <Settings className="h-10 w-10 text-gray-300/50" />;
+      default: return <Code className="h-10 w-10 text-gray-300/50" />;
+    }
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
         <div>
-          <h1 className="text-3xl font-bold text-white">Manajemen Portofolio</h1>
-          <p className="text-gray-300 mt-2">Kelola proyek portofolio Anda</p>
+          <h1 className="text-3xl font-bold text-white">Manajemen Layanan</h1>
+          <p className="text-gray-300 mt-2">Kelola layanan yang ditawarkan oleh MiraiDev</p>
         </div>
         <Button 
           className="mt-4 sm:mt-0 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-5 px-6" 
           onClick={handleAddNew}
         >
           <Plus className="mr-2 h-4 w-4" />
-          Tambah Proyek
+          Tambah Layanan
         </Button>
       </div>
 
@@ -163,7 +177,7 @@ export default function PortfolioManagement() {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
-            placeholder="Cari proyek..."
+            placeholder="Cari layanan..."
             className="pl-10 bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -171,46 +185,38 @@ export default function PortfolioManagement() {
         </div>
       </Card>
 
-      {/* Portfolio Items */}
+      {/* Services Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredItems.map((item) => (
-          <Card key={item.id} className="overflow-hidden bg-white/5 backdrop-blur-sm border border-gray-700/50 hover:bg-white/10 transition-all duration-200">
+        {filteredServices.map((service) => (
+          <Card key={service.id} className="overflow-hidden bg-white/5 backdrop-blur-sm border border-gray-700/50 hover:bg-white/10 transition-all duration-200">
             <div className="h-32 bg-gradient-to-r from-blue-500/20 to-purple-500/20 relative flex items-center justify-center">
               <div className="absolute top-2 right-2">
                 <span className="bg-blue-600/80 text-white text-xs px-2 py-1 rounded">
-                  {item.category}
+                  {service.category}
                 </span>
               </div>
-              <FolderOpen className="h-10 w-10 text-gray-300/50" />
+              {getIcon(service.icon || "Code")}
             </div>
             <div className="p-4">
-              <h3 className="font-bold text-white">{item.title}</h3>
-              <p className="text-sm text-gray-400 mt-1">{item.description}</p>
+              <h3 className="font-bold text-white text-lg">{service.title}</h3>
+              <p className="text-sm text-gray-400 mt-2">{service.description}</p>
               
-              <div className="flex flex-wrap gap-1 mt-3">
-                {item.tags?.map((tag, index) => (
-                  <span key={index} className="bg-gray-700/50 text-gray-300 text-xs px-2 py-1 rounded border border-gray-600/30">
-                    {tag}
-                  </span>
-                ))}
+              <div className="mt-4">
+                <h4 className="text-sm font-medium text-gray-300 mb-2">Fitur:</h4>
+                <ul className="space-y-1">
+                  {(service.features || []).map((feature, index) => (
+                    <li key={index} className="text-xs text-gray-400 flex items-start">
+                      <span className="mr-2">•</span> {feature}
+                    </li>
+                  ))}
+                </ul>
               </div>
               
-              <div className="flex justify-between items-center mt-4 text-xs text-gray-500">
-                <div className="flex items-center">
-                  <Users className="h-3 w-3 mr-1" />
-                  {item.client}
-                </div>
-                <div className="flex items-center">
-                  <Eye className="h-3 w-3 mr-1" />
-                  {item.views}
-                </div>
-              </div>
-              
-              <div className="flex justify-end space-x-2 mt-4">
+              <div className="flex justify-end space-x-2 mt-6">
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => handleEdit(item)}
+                  onClick={() => handleEdit(service)}
                   className="border-gray-600 text-gray-300 hover:bg-gray-700/50"
                 >
                   <Edit className="h-4 w-4" />
@@ -218,7 +224,7 @@ export default function PortfolioManagement() {
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => handleDelete(item.id)}
+                  onClick={() => handleDelete(service.id)}
                   className="border-red-600/50 text-red-400 hover:bg-red-600/20"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -229,10 +235,10 @@ export default function PortfolioManagement() {
         ))}
       </div>
 
-      {/* Modal for adding/editing portfolio items */}
+      {/* Modal for adding/editing services */}
       {isModalOpen && (
-        <PortfolioModal 
-          item={currentItem}
+        <ServiceModal 
+          service={currentService}
           onSave={handleSave}
           onClose={() => setIsModalOpen(false)}
         />
@@ -241,55 +247,52 @@ export default function PortfolioManagement() {
   );
 }
 
-interface PortfolioModalProps {
-  item: PortfolioItem | null;
-  onSave: (item: PortfolioItem) => void;
+interface ServiceModalProps {
+  service: ServiceItem | null;
+  onSave: (service: ServiceItem) => void;
   onClose: () => void;
 }
 
-function PortfolioModal({ item, onSave, onClose }: PortfolioModalProps) {
-  const [formData, setFormData] = useState<PortfolioItem>(
-    item || {
+function ServiceModal({ service, onSave, onClose }: ServiceModalProps) {
+  const [formData, setFormData] = useState<ServiceItem>(
+    service || {
       id: 0,
       title: "",
       category: "",
       description: null,
-      client: null,
-      date: null,
-      views: 0,
-      tags: null,
-      image_url: null,
-      case_study_url: null,
+      features: null,
+      icon: null,
+      order: 0,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     }
   );
 
-  const [tagInput, setTagInput] = useState("");
+  const [featureInput, setFeatureInput] = useState("");
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value || null });
   };
 
-  const handleAddTag = () => {
-    if (tagInput.trim()) {
-      const currentTags = formData.tags || [];
-      if (!currentTags.includes(tagInput.trim())) {
+  const handleAddFeature = () => {
+    if (featureInput.trim()) {
+      const currentFeatures = formData.features || [];
+      if (!currentFeatures.includes(featureInput.trim())) {
         setFormData({
           ...formData,
-          tags: [...currentTags, tagInput.trim()]
+          features: [...currentFeatures, featureInput.trim()]
         });
-        setTagInput("");
+        setFeatureInput("");
       }
     }
   };
 
-  const handleRemoveTag = (tagToRemove: string) => {
-    const currentTags = formData.tags || [];
+  const handleRemoveFeature = (featureToRemove: string) => {
+    const currentFeatures = formData.features || [];
     setFormData({
       ...formData,
-      tags: currentTags.filter(tag => tag !== tagToRemove)
+      features: currentFeatures.filter(feature => feature !== featureToRemove)
     });
   };
 
@@ -304,7 +307,7 @@ function PortfolioModal({ item, onSave, onClose }: PortfolioModalProps) {
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold text-white">
-              {item ? "Edit Proyek" : "Tambah Proyek Baru"}
+              {service ? "Edit Layanan" : "Tambah Layanan Baru"}
             </h2>
             <button 
               onClick={onClose}
@@ -316,7 +319,7 @@ function PortfolioModal({ item, onSave, onClose }: PortfolioModalProps) {
           
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="title" className="text-gray-300">Judul Proyek</Label>
+              <Label htmlFor="title" className="text-gray-300">Judul Layanan</Label>
               <Input
                 id="title"
                 name="title"
@@ -340,58 +343,32 @@ function PortfolioModal({ item, onSave, onClose }: PortfolioModalProps) {
             </div>
             
             <div>
-              <Label htmlFor="client" className="text-gray-300">Klien</Label>
-              <Input
-                id="client"
-                name="client"
-                value={formData.client || ""}
+              <Label htmlFor="icon" className="text-gray-300">Ikon</Label>
+              <select
+                id="icon"
+                name="icon"
+                value={formData.icon || "Code"}
                 onChange={handleInputChange}
-                className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-500"
-              />
+                className="w-full bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-500 rounded-md px-3 py-2"
+              >
+                <option value="Code">Code (Pengembangan)</option>
+                <option value="Palette">Palette (Desain)</option>
+                <option value="Smartphone">Smartphone (Mobile)</option>
+                <option value="ShoppingCart">ShoppingCart (E-commerce)</option>
+                <option value="Globe">Globe (Web)</option>
+                <option value="Users">Users (Konsultasi)</option>
+                <option value="Settings">Settings (Pemeliharaan)</option>
+              </select>
             </div>
             
             <div>
-              <Label htmlFor="date" className="text-gray-300">Tanggal</Label>
+              <Label htmlFor="order" className="text-gray-300">Urutan</Label>
               <Input
-                id="date"
-                name="date"
-                type="date"
-                value={formData.date || ""}
-                onChange={handleInputChange}
-                className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-500"
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="views" className="text-gray-300">Jumlah Views</Label>
-              <Input
-                id="views"
-                name="views"
+                id="order"
+                name="order"
                 type="number"
-                value={formData.views || 0}
-                onChange={(e) => setFormData({ ...formData, views: parseInt(e.target.value) || 0 })}
-                className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-500"
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="image_url" className="text-gray-300">URL Gambar</Label>
-              <Input
-                id="image_url"
-                name="image_url"
-                value={formData.image_url || ""}
-                onChange={handleInputChange}
-                className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-500"
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="case_study_url" className="text-gray-300">URL Studi Kasus</Label>
-              <Input
-                id="case_study_url"
-                name="case_study_url"
-                value={formData.case_study_url || ""}
-                onChange={handleInputChange}
+                value={formData.order || 0}
+                onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
                 className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-500"
               />
             </div>
@@ -409,38 +386,38 @@ function PortfolioModal({ item, onSave, onClose }: PortfolioModalProps) {
             </div>
             
             <div>
-              <Label className="text-gray-300">Tags</Label>
+              <Label className="text-gray-300">Fitur</Label>
               <div className="flex mt-1">
                 <Input
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  placeholder="Tambah tag..."
+                  value={featureInput}
+                  onChange={(e) => setFeatureInput(e.target.value)}
+                  placeholder="Tambah fitur..."
                   className="flex-1 bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-500"
                   onKeyPress={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
-                      handleAddTag();
+                      handleAddFeature();
                     }
                   }}
                 />
                 <Button 
                   type="button" 
-                  onClick={handleAddTag}
+                  onClick={handleAddFeature}
                   className="ml-2 bg-gray-700 hover:bg-gray-600"
                 >
                   Tambah
                 </Button>
               </div>
               <div className="flex flex-wrap gap-2 mt-2">
-                {(formData.tags || []).map((tag, index) => (
+                {(formData.features || []).map((feature, index) => (
                   <span 
                     key={index} 
                     className="bg-blue-600/30 text-blue-300 text-sm px-2 py-1 rounded flex items-center border border-blue-600/30"
                   >
-                    {tag}
+                    {feature}
                     <button
                       type="button"
-                      onClick={() => handleRemoveTag(tag)}
+                      onClick={() => handleRemoveFeature(feature)}
                       className="ml-1 text-blue-200 hover:text-white"
                     >
                       ×

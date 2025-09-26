@@ -11,7 +11,10 @@ import {
   Settings,
   LogOut,
   Menu,
-  X
+  X,
+  MessageSquare,
+  Users,
+  BarChart3
 } from "lucide-react";
 
 interface AdminPanelLayoutProps {
@@ -56,7 +59,12 @@ export default function AdminPanelLayout({ children }: AdminPanelLayoutProps) {
 
   const menuItems = [
     { href: "/admin/dashboard", label: "Dasbor", icon: Dashboard },
+    { href: "/admin/analytics", label: "Analitik", icon: BarChart3 },
     { href: "/admin/portfolio", label: "Portofolio", icon: FolderOpen },
+    { href: "/admin/services", label: "Layanan", icon: FolderOpen },
+    { href: "/admin/contact", label: "Kontak", icon: MessageSquare },
+    { href: "/admin/clients", label: "Klien", icon: Users },
+    { href: "/admin/seo", label: "SEO", icon: BarChart3 },
     { href: "/admin/settings", label: "Pengaturan", icon: Settings },
   ];
 

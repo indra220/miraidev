@@ -25,7 +25,6 @@ export default function SettingsPage() {
 
   const handleSave = () => {
     // Implement save logic here
-    console.log("Settings saved:", settings);
     alert("Pengaturan berhasil disimpan!");
   };
 
