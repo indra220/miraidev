@@ -21,7 +21,7 @@ import {
   Smartphone
 } from "lucide-react";
 import { Navbar } from "@/components/navbar";
-import { motion } from "framer-motion";
+import OptimizedMotion from "@/components/OptimizedMotion";
 import { useState } from "react";
 import { FormError } from "@/components/form-error";
 import { LoadingSpinner } from "@/components/loading-spinner";
@@ -32,6 +32,7 @@ export default function KontakPage() {
     name: "",
     email: "",
     phone: "",
+    company: "",
     projectType: "",
     budget: "",
     timeline: "",
@@ -39,8 +40,8 @@ export default function KontakPage() {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [estimation, setEstimation] = useState({
     show: false,
     package: "",
@@ -53,20 +54,20 @@ export default function KontakPage() {
     {
       icon: <Phone className="w-6 h-6 text-blue-400" />,
       title: "Telepon",
-      detail: "+62 812 3456 7890",
-      description: "Senin - Jumat, 09:00 - 18:00 WIB"
+      detail: "+62 812-3456-7890",
+      description: "Senin - Jumat, 09:00 - 17:00"
     },
     {
-      icon: <Mail className="w-6 h-6 text-green-400" />,
+      icon: <Mail className="w-6 h-6 text-blue-400" />,
       title: "Email",
-      detail: "hello@miraidev.id",
-      description: "Dapatkan respons dalam 24 jam"
+      detail: "hello@mirai.dev",
+      description: "Balas dalam 24 jam kerja"
     },
     {
-      icon: <MapPin className="w-6 h-6 text-yellow-400" />,
+      icon: <MapPin className="w-6 h-6 text-blue-400" />,
       title: "Alamat",
-      detail: "Jl. Teknologi No. 123, Jakarta",
-      description: "Jakarta Selatan, 12345"
+      detail: "Jakarta, Indonesia",
+      description: "Remote-first operations"
     }
   ];
 
@@ -99,54 +100,61 @@ export default function KontakPage() {
       price: "Rp 3.000.000 - Rp 5.000.000",
       description: "Solusi ideal untuk bisnis kecil yang baru memulai kehadiran digital",
       features: [
-        "Website landing page 5 halaman",
-        "Desain responsif (mobile-friendly)",
+        "Desain responsif untuk semua perangkat",
+        "5 halaman website (Beranda, Tentang, Layanan, Kontak, Blog)",
+        "Integrasi Google Maps",
+        "Formulir kontak dengan notifikasi email",
+        "Optimasi SEO dasar",
         "Hosting dan domain (1 tahun)",
-        "Formulir kontak dasar",
-        "Integrasi media sosial",
-        "Optimasi SEO dasar"
+        "Dukungan teknis 1 bulan"
       ]
     },
     business: {
-      name: "Paket Business",
-      price: "Rp 7.500.000 - Rp 12.000.000",
-      description: "Solusi komprehensif untuk bisnis menengah yang ingin berkembang",
+      name: "Paket Profesional",
+      price: "Rp 7.000.000 - Rp 12.000.000",
+      description: "Solusi komprehensif untuk bisnis yang ingin memperkuat kehadiran digital mereka",
       features: [
-        "Website kustom hingga 15 halaman",
-        "Desain responsif premium",
-        "Hosting dan domain (1 tahun)",
-        "Formulir kontak canggih",
-        "Integrasi media sosial & blog",
+        "Desain kustom responsif",
+        "10-15 halaman website",
+        "Sistem manajemen konten (CMS)",
+        "Integrasi media sosial",
         "Optimasi SEO lanjutan",
-        "Google Analytics & Search Console"
+        "Keamanan SSL",
+        "Hosting dan domain (1 tahun)",
+        "Dukungan teknis 3 bulan",
+        "Training dasar pengelolaan konten"
       ]
     },
     ecommerce: {
       name: "Paket E-Commerce",
       price: "Rp 15.000.000 - Rp 25.000.000",
-      description: "Solusi lengkap untuk toko online dengan fitur e-commerce profesional",
+      description: "Solusi e-commerce lengkap untuk toko online yang ingin meningkatkan penjualan",
       features: [
-        "Website e-commerce lengkap",
-        "Desain responsif premium",
-        "Hosting dan domain (1 tahun)",
+        "Desain toko online responsif",
+        "Katalog produk tidak terbatas",
         "Sistem keranjang belanja",
-        "Integrasi pembayaran (Bank Transfer, QRIS)",
-        "Manajemen produk & inventaris",
-        "Sistem pengelolaan pesanan",
-        "Optimasi SEO e-commerce"
+        "Integrasi pembayaran (Midtrans, DOKU, dll)",
+        "Sistem manajemen inventaris dasar",
+        "Fitur pelanggan (login, riwayat pesanan)",
+        "SEO e-commerce",
+        "Keamanan SSL",
+        "Hosting dan domain (1 tahun)",
+        "Dukungan teknis 6 bulan"
       ]
     },
     mobile: {
-      name: "Paket Mobile",
-      price: "Rp 12.000.000 - Rp 20.000.000",
-      description: "Aplikasi mobile untuk iOS dan Android dengan fitur lengkap",
+      name: "Paket Mobile App",
+      price: "Custom Pricing",
+      description: "Aplikasi mobile kustom untuk Android dan iOS yang terintegrasi dengan website Anda",
       features: [
-        "Aplikasi mobile untuk iOS & Android",
-        "Desain UI/UX yang menarik",
-        "Fitur dasar sesuai kebutuhan",
-        "Integrasi dengan sistem backend",
-        "Push notifications",
-        "Testing dan debugging"
+        "Aplikasi Android dan iOS",
+        "Desain UI/UX kustom",
+        "Integrasi dengan website/web API",
+        "Notifikasi push",
+        "Sistem login pengguna",
+        "Dashboard admin untuk manajemen konten",
+        "Dukungan teknis 6 bulan",
+        "Publish ke Play Store/App Store"
       ]
     },
     custom: {
@@ -179,22 +187,28 @@ export default function KontakPage() {
       newErrors.email = "Format email tidak valid";
     }
     
+    if (!formData.phone.trim()) {
+      newErrors.phone = "Nomor telepon harus diisi";
+    } else if (!/^[0-9+\-\s()]+$/.test(formData.phone)) {
+      newErrors.phone = "Format nomor telepon tidak valid";
+    }
+    
     if (!formData.projectType) {
       newErrors.projectType = "Silakan pilih jenis proyek";
     }
     
-    if (formData.projectType === "custom" && !formData.budget) {
-      newErrors.budget = "Silakan pilih estimasi budget";
+    if (!formData.budget) {
+      newErrors.budget = "Silakan pilih estimasi anggaran";
     }
     
     if (!formData.timeline) {
-      newErrors.timeline = "Silakan pilih timeline proyek";
+      newErrors.timeline = "Silakan pilih estimasi waktu pengerjaan";
     }
     
     if (!formData.message.trim()) {
-      newErrors.message = "Deskripsi proyek harus diisi";
+      newErrors.message = "Pesan harus diisi";
     } else if (formData.message.trim().length < 10) {
-      newErrors.message = "Deskripsi proyek minimal 10 karakter";
+      newErrors.message = "Pesan minimal 10 karakter";
     }
     
     setErrors(newErrors);
@@ -258,42 +272,31 @@ export default function KontakPage() {
     e.preventDefault();
     
     // Reset previous messages
-    setErrors({});
     setSuccess("");
+    setErrors({});
     
     // Validate form
     if (!validateForm()) {
       return;
     }
     
-    setIsLoading(true);
+    setIsSubmitting(true);
     
     try {
-      // Submit form to Supabase
-      const result = await submitContactForm({
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        projectType: formData.projectType,
-        budget: formData.budget,
-        timeline: formData.timeline,
-        message: formData.message
-      });
+      const result = await submitContactForm(formData);
       
       if (result.success) {
-        setSuccess("Terima kasih! Pesan Anda telah dikirim. Kami akan merespons dalam 24 jam kerja.");
-        
-        // Reset form setelah berhasil
+        setSuccess("Pesan Anda telah berhasil dikirim! Kami akan segera menghubungi Anda.");
         setFormData({
           name: "",
           email: "",
           phone: "",
+          company: "",
           projectType: "",
           budget: "",
           timeline: "",
           message: ""
         });
-        
         setEstimation({
           show: false,
           package: "",
@@ -302,394 +305,405 @@ export default function KontakPage() {
           features: []
         });
       } else {
-        throw new Error(result.error || "Terjadi kesalahan saat mengirim pesan");
+        setErrors({ general: result.error || "Terjadi kesalahan saat mengirim formulir" });
       }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        setErrors({ general: error.message || "Terjadi kesalahan saat mengirim pesan" });
-      } else {
-        setErrors({ general: "Terima kasih! Pesan Anda telah dikirim. Kami akan merespons dalam 24 jam kerja." });
-      }
+    } catch (error) {
+      setErrors({ 
+        general: error instanceof Error ? error.message : "Terjadi kesalahan saat mengirim formulir" 
+      });
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
       <Navbar />
-
+      
       {/* Hero Section */}
       <div className="relative overflow-hidden pt-16">
         <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10"></div>
         <div className="container mx-auto px-4 py-24 sm:py-32 relative">
           <div className="max-w-3xl mx-auto text-center">
-            <motion.h1
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6"
+            <OptimizedMotion
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
+              viewport={{ once: true }}
             >
-              Hubungi <span className="text-blue-400">Kami</span>
-            </motion.h1>
-            <motion.p
-              className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto"
+              <h1 className="text-4xl md:text-5xl font-bold mb-6">
+                Hubungi <span className="text-blue-400">Kami</span>
+              </h1>
+            </OptimizedMotion>
+            <OptimizedMotion
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
+              viewport={{ once: true }}
             >
-              Punya pertanyaan atau ingin membicarakan proyek Anda? Kami siap membantu Anda.
-            </motion.p>
+              <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+                Punya pertanyaan atau ingin diskusi proyek? Kami siap membantu Anda mewujudkan visi digital Anda
+              </p>
+            </OptimizedMotion>
           </div>
         </div>
       </div>
 
       <div className="py-20">
         <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              {/* Contact Form */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5 }}
-                viewport={{ once: true }}
-              >
-                <Card className="bg-gray-800/50 border-gray-700 p-8">
-                  <h2 className="text-3xl font-bold mb-6">Konsultasi Gratis</h2>
-                  <p className="text-gray-400 mb-8">
-                    Ceritakan proyek Anda dan dapatkan estimasi harga yang sesuai dengan kebutuhan Anda.
-                  </p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {/* Contact Form */}
+            <OptimizedMotion
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+              viewport={{ once: true }}
+            >
+              <Card className="bg-gray-800/50 border-gray-700 p-8">
+                <h2 className="text-3xl font-bold mb-6">Konsultasi Gratis</h2>
+                <p className="text-gray-400 mb-8">
+                  Ceritakan proyek Anda dan dapatkan estimasi harga yang sesuai dengan kebutuhan Anda.
+                </p>
 
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    {errors.general && (
-                      <div className="bg-destructive/20 border border-destructive/30 rounded-md p-3 text-sm text-destructive">
-                        {errors.general}
-                      </div>
-                    )}
-                    
-                    {success && (
-                      <div className="bg-green-500/20 border border-green-500/30 rounded-md p-3 text-sm text-green-500">
-                        {success}
-                      </div>
-                    )}
-                    
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {errors.general && (
+                    <div className="bg-destructive/20 border border-destructive/30 rounded-md p-3 text-sm text-destructive">
+                      {errors.general}
+                    </div>
+                  )}
+                  
+                  {success && (
+                    <div className="bg-green-500/20 border border-green-500/30 rounded-md p-3 text-sm text-green-500">
+                      {success}
+                    </div>
+                  )}
+                  
+                  <div>
+                    <Label htmlFor="name" className="block text-sm font-medium mb-2">
+                      Nama Lengkap
+                    </Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
+                      <Input
+                        id="name"
+                        type="text"
+                        placeholder="Nama lengkap Anda"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        className="bg-gray-700/50 border-gray-600 pl-10 focus:border-blue-500 text-white placeholder:text-gray-400 py-6"
+                        aria-invalid={!!errors.name}
+                        aria-describedby={errors.name ? "name-error" : undefined}
+                      />
+                    </div>
+                    <FormError id="name-error" error={errors.name} />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <Label htmlFor="name" className="block text-sm font-medium mb-2">
-                        Nama Lengkap
+                      <Label htmlFor="email" className="block text-sm font-medium mb-2">
+                        Email
                       </Label>
                       <div className="relative">
-                        <User className="absolute left-3 top-3 w-4 h-4 text-gray-500" />
-                        <Input
-                          id="name"
-                          placeholder="Nama Anda"
-                          value={formData.name}
-                          onChange={handleInputChange}
-                          className={`bg-gray-700 border-gray-600 focus:border-blue-500 pl-10 ${
-                            errors.name ? "border-destructive focus-visible:ring-destructive/20" : ""
-                          }`}
-                          aria-invalid={!!errors.name}
-                          aria-describedby={errors.name ? "name-error" : undefined}
-                        />
-                      </div>
-                      <FormError id="name-error" error={errors.name} />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <Label htmlFor="email" className="block text-sm font-medium mb-2">
-                          Email
-                        </Label>
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
                         <Input
                           id="email"
                           type="email"
                           placeholder="email@contoh.com"
                           value={formData.email}
                           onChange={handleInputChange}
-                          className={`bg-gray-700 border-gray-600 focus:border-blue-500 ${
-                            errors.email ? "border-destructive focus-visible:ring-destructive/20" : ""
-                          }`}
+                          className="bg-gray-700/50 border-gray-600 pl-10 focus:border-blue-500 text-white placeholder:text-gray-400 py-6"
                           aria-invalid={!!errors.email}
                           aria-describedby={errors.email ? "email-error" : undefined}
                         />
-                        <FormError id="email-error" error={errors.email} />
                       </div>
+                      <FormError id="email-error" error={errors.email} />
+                    </div>
 
-                      <div>
-                        <Label htmlFor="phone" className="block text-sm font-medium mb-2">
-                          Telepon
-                        </Label>
+                    <div>
+                      <Label htmlFor="phone" className="block text-sm font-medium mb-2">
+                        Telepon
+                      </Label>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
                         <Input
                           id="phone"
                           type="tel"
                           placeholder="+62 812 3456 7890"
                           value={formData.phone}
                           onChange={handleInputChange}
-                          className="bg-gray-700 border-gray-600 focus:border-blue-500"
+                          className="bg-gray-700/50 border-gray-600 pl-10 focus:border-blue-500 text-white placeholder:text-gray-400 py-6"
+                          aria-invalid={!!errors.phone}
+                          aria-describedby={errors.phone ? "phone-error" : undefined}
                         />
                       </div>
+                      <FormError id="phone-error" error={errors.phone} />
                     </div>
+                  </div>
 
+                  <div>
+                    <Label htmlFor="company" className="block text-sm font-medium mb-2">
+                      Nama Perusahaan/Bisnis (Opsional)
+                    </Label>
+                    <Input
+                      id="company"
+                      type="text"
+                      placeholder="Nama perusahaan atau bisnis Anda"
+                      value={formData.company}
+                      onChange={handleInputChange}
+                      className="bg-gray-700/50 border-gray-600 focus:border-blue-500 text-white placeholder:text-gray-400 py-6"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <Label htmlFor="projectType" className="block text-sm font-medium mb-2">
                         Jenis Proyek
                       </Label>
-                      <select
-                        id="projectType"
-                        value={formData.projectType}
-                        onChange={handleProjectTypeChange}
-                        className={`w-full bg-gray-700 border border-gray-600 focus:border-blue-500 rounded-md px-3 py-2 text-gray-200 ${
-                          errors.projectType ? "border-destructive focus-visible:ring-destructive/20" : ""
-                        }`}
-                        aria-invalid={!!errors.projectType}
-                        aria-describedby={errors.projectType ? "project-type-error" : undefined}
-                      >
-                        <option value="">Pilih jenis proyek</option>
-                        {projectTypes.map((type) => (
-                          <option key={type.id} value={type.id}>
-                            {type.name}
-                          </option>
-                        ))}
-                      </select>
+                      <div className="relative">
+                        <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
+                        <select
+                          id="projectType"
+                          value={formData.projectType}
+                          onChange={handleProjectTypeChange}
+                          className="w-full bg-gray-700/50 border-gray-600 pl-10 pr-10 py-6 rounded-md focus:border-blue-500 text-white appearance-none"
+                          aria-invalid={!!errors.projectType}
+                          aria-describedby={errors.projectType ? "project-type-error" : undefined}
+                        >
+                          <option value="">Pilih jenis proyek...</option>
+                          {projectTypes.map(type => (
+                            <option key={type.id} value={type.id}>
+                              {type.name}
+                            </option>
+                          ))}
+                        </select>
+                        <ArrowRight className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 rotate-90" />
+                      </div>
                       <FormError id="project-type-error" error={errors.projectType} />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <Label htmlFor="budget" className="block text-sm font-medium mb-2">
-                          Estimasi Budget
-                        </Label>
+                    <div>
+                      <Label htmlFor="budget" className="block text-sm font-medium mb-2">
+                        Estimasi Anggaran
+                      </Label>
+                      <div className="relative">
+                        <ArrowRight className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
                         <select
                           id="budget"
                           value={formData.budget}
                           onChange={handleInputChange}
-                          disabled={formData.projectType !== "custom"}
-                          className={`w-full bg-gray-700 border border-gray-600 focus:border-blue-500 rounded-md px-3 py-2 text-gray-200 ${
-                            formData.projectType !== "custom" ? "opacity-50 cursor-not-allowed" : ""
-                          } ${
-                            errors.budget ? "border-destructive focus-visible:ring-destructive/20" : ""
-                          }`}
+                          className="w-full bg-gray-700/50 border-gray-600 pl-10 pr-10 py-6 rounded-md focus:border-blue-500 text-white appearance-none"
                           aria-invalid={!!errors.budget}
                           aria-describedby={errors.budget ? "budget-error" : undefined}
                         >
-                          <option value="">{formData.projectType === "custom" ? "Pilih estimasi budget" : "Pilih jenis proyek 'Solusi Kustom' dulu"}</option>
-                          {budgets.map((budget) => (
+                          <option value="">Pilih estimasi anggaran...</option>
+                          {budgets.map(budget => (
                             <option key={budget.id} value={budget.value}>
                               {budget.name}
                             </option>
                           ))}
                         </select>
-                        <FormError id="budget-error" error={errors.budget} />
+                        <ArrowRight className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 rotate-90" />
                       </div>
-
-                      <div>
-                        <Label htmlFor="timeline" className="block text-sm font-medium mb-2">
-                          Timeline Proyek
-                        </Label>
-                        <select
-                          id="timeline"
-                          value={formData.timeline}
-                          onChange={handleInputChange}
-                          className={`w-full bg-gray-700 border border-gray-600 focus:border-blue-500 rounded-md px-3 py-2 text-gray-200 ${
-                            errors.timeline ? "border-destructive focus-visible:ring-destructive/20" : ""
-                          }`}
-                          aria-invalid={!!errors.timeline}
-                          aria-describedby={errors.timeline ? "timeline-error" : undefined}
-                        >
-                          <option value="">Pilih timeline</option>
-                          {timelines.map((timeline) => (
-                            <option key={timeline.id} value={timeline.value}>
-                              {timeline.name}
-                            </option>
-                          ))}
-                        </select>
-                        <FormError id="timeline-error" error={errors.timeline} />
-                      </div>
+                      <FormError id="budget-error" error={errors.budget} />
                     </div>
+                  </div>
 
-                    <div>
-                      <Label htmlFor="message" className="block text-sm font-medium mb-2">
-                        Deskripsi Proyek
-                      </Label>
-                      <div className="relative">
-                        <MessageSquare className="absolute left-3 top-3 w-4 h-4 text-gray-500" />
-                        <Textarea
-                          id="message"
-                          placeholder="Ceritakan detail proyek Anda..."
-                          rows={5}
-                          value={formData.message}
-                          onChange={handleInputChange}
-                          className={`bg-gray-700 border-gray-600 focus:border-blue-500 pl-10 ${
-                            errors.message ? "border-destructive focus-visible:ring-destructive/20" : ""
-                          }`}
-                          aria-invalid={!!errors.message}
-                          aria-describedby={errors.message ? "message-error" : undefined}
-                        />
-                      </div>
-                      <FormError id="message-error" error={errors.message} />
+                  <div>
+                    <Label htmlFor="timeline" className="block text-sm font-medium mb-2">
+                      Estimasi Waktu Pengerjaan
+                    </Label>
+                    <div className="relative">
+                      <ArrowRight className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
+                      <select
+                        id="timeline"
+                        value={formData.timeline}
+                        onChange={handleInputChange}
+                        className="w-full bg-gray-700/50 border-gray-600 pl-10 pr-10 py-6 rounded-md focus:border-blue-500 text-white appearance-none"
+                        aria-invalid={!!errors.timeline}
+                        aria-describedby={errors.timeline ? "timeline-error" : undefined}
+                      >
+                        <option value="">Pilih estimasi waktu pengerjaan...</option>
+                        {timelines.map(timeline => (
+                          <option key={timeline.id} value={timeline.value}>
+                            {timeline.name}
+                          </option>
+                        ))}
+                      </select>
+                      <ArrowRight className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 rotate-90" />
                     </div>
+                    <FormError id="timeline-error" error={errors.timeline} />
+                  </div>
 
-                    <Button
-                      type="submit"
-                      disabled={isLoading}
-                      className="w-full bg-blue-600 hover:bg-blue-700 py-6 text-lg transition-all duration-150 hover:scale-105 flex items-center justify-center"
-                    >
-                      {isLoading ? (
-                        <>
-                          <LoadingSpinner size="sm" className="mr-2" />
-                          Mengirim...
-                        </>
-                      ) : (
-                        <>
-                          <Send className="w-5 h-5 mr-2" />
-                          Kirim Konsultasi
-                        </>
-                      )}
-                    </Button>
-                  </form>
-                </Card>
-              </motion.div>
+                  <div>
+                    <Label htmlFor="message" className="block text-sm font-medium mb-2">
+                      Deskripsi Proyek
+                    </Label>
+                    <div className="relative">
+                      <MessageSquare className="absolute left-3 top-3 w-4 h-4 text-gray-500" />
+                      <Textarea
+                        id="message"
+                        placeholder="Ceritakan detail proyek Anda..."
+                        value={formData.message}
+                        onChange={handleInputChange}
+                        rows={4}
+                        className="bg-gray-700/50 border-gray-600 pl-10 pt-3 focus:border-blue-500 text-white placeholder:text-gray-400"
+                        aria-invalid={!!errors.message}
+                        aria-describedby={errors.message ? "message-error" : undefined}
+                      />
+                    </div>
+                    <FormError id="message-error" error={errors.message} />
+                  </div>
 
-              {/* Estimation & Contact Info */}
-              <div>
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5 }}
-                  viewport={{ once: true }}
-                  className="mb-12"
-                >
-                  <Card className="bg-gray-800/50 border-gray-700 p-8">
-                    <h2 className="text-3xl font-bold mb-6">Estimasi Harga</h2>
-                    <p className="text-gray-400 mb-8">
-                      Berdasarkan jenis proyek yang Anda pilih, berikut estimasi harga kami:
-                    </p>
-
-                    {estimation.show ? (
-                      <div className="space-y-6">
-                        <div className="bg-blue-900/20 border border-blue-800/50 rounded-xl p-6">
-                          <div className="flex justify-between items-start mb-4">
-                            <div>
-                              <h3 className="text-xl font-bold text-blue-400">{estimation.package}</h3>
-                              <p className="text-2xl font-bold mt-2">{estimation.price}</p>
-                            </div>
-                            <div className="bg-blue-500/10 p-3 rounded-lg">
-                              <Globe className="w-6 h-6 text-blue-400" />
-                            </div>
-                          </div>
-                          <p className="text-gray-300 mb-4">{estimation.description}</p>
-                          <div className="border-t border-gray-700 pt-4">
-                            <h4 className="font-semibold mb-2">Fitur Utama:</h4>
-                            <ul className="space-y-2">
-                              {estimation.features.slice(0, 4).map((feature, index) => (
-                                <li key={index} className="flex items-start">
-                                  <div className="w-2 h-2 rounded-full bg-blue-400 mt-2 mr-3"></div>
-                                  <span className="text-gray-300">{feature}</span>
-                                </li>
-                              ))}
-                              {estimation.features.length > 4 && (
-                                <li className="text-gray-400 text-sm">+ {estimation.features.length - 4} fitur lainnya</li>
-                              )}
-                            </ul>
-                          </div>
-                        </div>
-
-                        <div className="bg-gray-700/50 rounded-xl p-6">
-                          <h4 className="font-semibold mb-3">Catatan:</h4>
-                          <p className="text-gray-300 text-sm">
-                            Harga di atas adalah estimasi awal. Kami akan memberikan penawaran yang lebih akurat setelah 
-                            melakukan konsultasi mendalam dengan Anda untuk memahami kebutuhan proyek secara detail.
-                          </p>
-                        </div>
-                      </div>
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-6 transition-all duration-150 hover:scale-105"
+                  >
+                    {isSubmitting ? (
+                      <span className="flex items-center justify-center">
+                        <LoadingSpinner size="sm" className="mr-2" />
+                        Mengirim...
+                      </span>
                     ) : (
-                      <div className="text-center py-12">
-                        <div className="bg-gray-700/50 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                          <Globe className="w-8 h-8 text-gray-400" />
+                      <span className="flex items-center justify-center">
+                        Kirim Pesan
+                        <Send className="ml-2 w-5 h-5" />
+                      </span>
+                    )}
+                  </Button>
+                </form>
+              </Card>
+            </OptimizedMotion>
+
+            {/* Estimation & Contact Info */}
+            <div>
+              <OptimizedMotion
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+                viewport={{ once: true }}
+                className="mb-12"
+              >
+                <Card className="bg-gray-800/50 border-gray-700 p-8">
+                  <h2 className="text-3xl font-bold mb-6">Estimasi Harga</h2>
+                  <p className="text-gray-400 mb-8">
+                    Berdasarkan jenis proyek yang Anda pilih, berikut estimasi harga kami:
+                  </p>
+
+                  {estimation.show ? (
+                    <div className="space-y-6">
+                      <div className="bg-blue-900/20 border border-blue-800/50 rounded-xl p-6">
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <h3 className="text-xl font-bold text-blue-400">{estimation.package}</h3>
+                            <p className="text-2xl font-bold mt-2">{estimation.price}</p>
+                          </div>
+                          <div className="bg-blue-500/10 p-3 rounded-lg">
+                            <Globe className="w-6 h-6 text-blue-400" />
+                          </div>
                         </div>
-                        <h3 className="text-xl font-semibold mb-2">Pilih Jenis Proyek</h3>
-                        <p className="text-gray-400">
-                          Pilih jenis proyek di form sebelah kiri untuk melihat estimasi harga yang sesuai
+                        <p className="text-gray-300 mb-4">{estimation.description}</p>
+                        <div className="border-t border-gray-700 pt-4">
+                          <h4 className="font-semibold mb-2">Fitur Utama:</h4>
+                          <ul className="space-y-2">
+                            {estimation.features.slice(0, 4).map((feature, index) => (
+                              <li key={index} className="flex items-start">
+                                <div className="w-2 h-2 rounded-full bg-blue-400 mt-2 mr-3"></div>
+                                <span className="text-gray-300">{feature}</span>
+                              </li>
+                            ))}
+                            {estimation.features.length > 4 && (
+                              <li className="text-gray-400 text-sm">+ {estimation.features.length - 4} fitur lainnya</li>
+                            )}
+                          </ul>
+                        </div>
+                      </div>
+
+                      <div className="bg-gray-700/50 rounded-xl p-6">
+                        <h4 className="font-semibold mb-3">Catatan:</h4>
+                        <p className="text-gray-300 text-sm">
+                          Harga di atas adalah estimasi awal. Kami akan memberikan penawaran yang lebih akurat setelah 
+                          melakukan konsultasi mendalam tentang kebutuhan spesifik proyek Anda.
                         </p>
                       </div>
-                    )}
-                  </Card>
-                </motion.div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <div className="bg-gray-700/50 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
+                        <Globe className="w-8 h-8 text-gray-500" />
+                      </div>
+                      <h3 className="text-xl font-semibold mb-2">Pilih Jenis Proyek</h3>
+                      <p className="text-gray-400">
+                        Pilih jenis proyek di form sebelah kiri untuk melihat estimasi harga yang sesuai
+                      </p>
+                    </div>
+                  )}
+                </Card>
+              </OptimizedMotion>
 
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: 0.1 }}
+              <OptimizedMotion
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                viewport={{ once: true }}
+              >
+                <Card className="bg-gray-800/50 border-gray-700 p-8">
+                  <h2 className="text-2xl font-bold mb-6">Informasi Kontak</h2>
+                  <div className="space-y-6">
+                    {contactInfo.map((info, index) => (
+                      <div key={index} className="flex items-start">
+                        <div className="mt-1 mr-4">
+                          {info.icon}
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-lg">{info.title}</h3>
+                          <p className="text-blue-400 font-medium">{info.detail}</p>
+                          <p className="text-gray-400 text-sm">{info.description}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              </OptimizedMotion>
+            </div>
+          </div>
+
+          {/* Map Section */}
+          <div className="py-20 bg-gray-800/30 mt-12">
+            <div className="container mx-auto px-4">
+              <div className="max-w-4xl mx-auto">
+                <OptimizedMotion
+                  className="text-3xl font-bold text-center mb-8"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
                   viewport={{ once: true }}
                 >
-                  <Card className="bg-gray-800/50 border-gray-700 p-8">
-                    <h2 className="text-2xl font-bold mb-6">Informasi Kontak</h2>
-                    <div className="space-y-6">
-                      {contactInfo.map((info, index) => (
-                        <div key={index} className="flex items-start">
-                          <div className="mt-1 mr-4">
-                            {info.icon}
-                          </div>
-                          <div>
-                            <h3 className="font-semibold text-lg">{info.title}</h3>
-                            <p className="text-blue-400 font-medium">{info.detail}</p>
-                            <p className="text-gray-400 text-sm">{info.description}</p>
-                          </div>
-                        </div>
-                      ))}
+                  Lokasi Kami
+                </OptimizedMotion>
+                <OptimizedMotion
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.1 }}
+                  viewport={{ once: true }}
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <Card className="bg-gray-800/50 border-gray-700 overflow-hidden">
+                    <div className="h-64 bg-gray-700 flex items-center justify-center">
+                      <div className="text-center">
+                        <MapPin className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                        <p className="text-gray-400">Peta Interaktif</p>
+                      </div>
                     </div>
                   </Card>
-                </motion.div>
+                </OptimizedMotion>
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Map Section */}
-      <div className="py-20 bg-gray-800/30">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <motion.h2
-              className="text-3xl font-bold text-center mb-8"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
-            >
-              Lokasi Kami
-            </motion.h2>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              viewport={{ once: true }}
-              whileHover={{ scale: 1.02 }}
-              className="transition-all duration-300"
-            >
-              <Card className="bg-gray-800/50 border-gray-700 h-96 flex items-center justify-center">
-                <div className="text-center">
-                  <MapPin className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">Peta Lokasi</h3>
-                  <p className="text-gray-400">Jl. Teknologi No. 123, Jakarta Selatan, 12345</p>
-                  <Button
-                    variant="outline"
-                    className="mt-4 border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white transition-all duration-150 hover:scale-105"
-                  >
-                    Buka di Google Maps
-                  </Button>
-                </div>
-              </Card>
-            </motion.div>
-          </div>
-        </div>
-      </div>
-
-      {/* Get Started CTA Section */}
-      <div className="py-20">
-        <div className="container mx-auto px-4">
-          <motion.div
-            className="max-w-4xl mx-auto text-center bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-2xl p-12 border border-gray-700"
+          {/* Final CTA */}
+          <OptimizedMotion
+            className="max-w-4xl mx-auto text-center bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-2xl p-12 border border-gray-700 mt-20"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -716,7 +730,7 @@ export default function KontakPage() {
                 Hubungi Kami
               </Button>
             </div>
-          </motion.div>
+          </OptimizedMotion>
         </div>
       </div>
     </div>

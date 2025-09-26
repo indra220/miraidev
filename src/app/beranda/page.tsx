@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import Image from "next/image";
 import { 
   Globe, 
   Palette, 
@@ -16,7 +17,7 @@ import {
   Users
 } from "lucide-react";
 import { Navbar } from "@/components/navbar";
-import { motion } from "framer-motion";
+import OptimizedMotion from "@/components/OptimizedMotion";
 import Link from "next/link";
 
 export default function HomePage() {
@@ -85,7 +86,7 @@ export default function HomePage() {
       text: "Harga Terjangkau"
     },
     {
-      icon: <TrendingUp className="w-6 h-6" />,
+      trendingUp: <TrendingUp className="w-6 h-6" />,
       text: "Proses Transparan"
     },
     {
@@ -107,27 +108,27 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10"></div>
         <div className="container mx-auto px-4 py-24 sm:py-32 relative">
           <div className="max-w-3xl">
-            <motion.h1 
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6"
+            <OptimizedMotion 
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
+              className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6"
             >
               Wujudkan <span className="text-blue-400">Website Impian</span> Bisnis Anda dengan Solusi yang Terjangkau
-            </motion.h1>
-            <motion.p 
-              className="text-xl text-gray-300 mb-8 max-w-2xl"
+            </OptimizedMotion>
+            <OptimizedMotion 
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.1 }}
+              className="text-xl text-gray-300 mb-8 max-w-2xl"
             >
               Website modern dan responsif yang dirancang khusus untuk membantu bisnis Anda tumbuh di era digital, dengan harga yang terjangkau untuk UMKM dan startup.
-            </motion.p>
-            <motion.div 
-              className="flex flex-col sm:flex-row gap-4"
+            </OptimizedMotion>
+            <OptimizedMotion 
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.2 }}
+              className="flex flex-col sm:flex-row gap-4"
             >
               <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg py-6 px-8 transition-all duration-150 hover:scale-105">
                 <Link href="/kontak">
@@ -140,14 +141,14 @@ export default function HomePage() {
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
-            </motion.div>
+            </OptimizedMotion>
             
             {/* Feature Highlights */}
-            <motion.div 
-              className="mt-12 flex flex-wrap gap-4"
+            <OptimizedMotion 
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.3 }}
+              className="mt-12 flex flex-wrap gap-4"
             >
               {features.map((feature, index) => (
                 <div key={index} className="flex items-center gap-2 bg-gray-800/50 px-4 py-2 rounded-full">
@@ -157,13 +158,13 @@ export default function HomePage() {
                   <span className="text-sm">{feature.text}</span>
                 </div>
               ))}
-            </motion.div>
+            </OptimizedMotion>
           </div>
         </div>
       </div>
 
       {/* Client Trust Section */}
-      <motion.div 
+      <OptimizedMotion 
         className="py-12 bg-gray-800/50"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -179,12 +180,12 @@ export default function HomePage() {
             ))}
           </div>
         </div>
-      </motion.div>
+      </OptimizedMotion>
 
       {/* Services Overview */}
       <div className="py-20">
         <div className="container mx-auto px-4">
-          <motion.div 
+          <OptimizedMotion 
             className="text-center mb-16"
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -195,16 +196,15 @@ export default function HomePage() {
             <p className="text-gray-400 max-w-2xl mx-auto">
               Solusi komprehensif untuk kebutuhan digital Anda
             </p>
-          </motion.div>
+          </OptimizedMotion>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {services.map((service, index) => (
-              <motion.div
+              <OptimizedMotion
                 key={index}
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
-                viewport={{ once: true }}
                 whileHover={{ y: -5 }}
                 className="transition-all duration-200"
               >
@@ -217,7 +217,7 @@ export default function HomePage() {
                     <p className="text-gray-400">{service.description}</p>
                   </Link>
                 </Card>
-              </motion.div>
+              </OptimizedMotion>
             ))}
           </div>
         </div>
@@ -226,7 +226,7 @@ export default function HomePage() {
       {/* Featured Portfolio */}
       <div className="py-20 bg-gray-800/30">
         <div className="container mx-auto px-4">
-          <motion.div 
+          <OptimizedMotion 
             className="text-center mb-16"
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -237,11 +237,11 @@ export default function HomePage() {
             <p className="text-gray-400 max-w-2xl mx-auto">
               Proyek-proyek terbaik kami yang telah membantu klien mencapai kesuksesan
             </p>
-          </motion.div>
+          </OptimizedMotion>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {portfolio.map((item, index) => (
-              <motion.div
+              <OptimizedMotion
                 key={item.id}
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -252,7 +252,14 @@ export default function HomePage() {
               >
                 <Card className="bg-gray-800/50 border-gray-700 overflow-hidden group h-full cursor-pointer">
                   <Link href="/portofolio" className="block h-full">
-                    <div className="h-48 bg-gray-700 relative overflow-hidden">
+                    <div className="relative h-48 overflow-hidden">
+                      <Image
+                        src={item.image}
+                        alt={item.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
                       <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-80"></div>
                       <div className="absolute bottom-4 left-4">
                         <span className="bg-blue-600 text-xs px-2 py-1 rounded">{item.category}</span>
@@ -269,11 +276,11 @@ export default function HomePage() {
                     </div>
                   </Link>
                 </Card>
-              </motion.div>
+              </OptimizedMotion>
             ))}
           </div>
           
-          <motion.div 
+          <OptimizedMotion 
             className="text-center mt-12"
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -285,14 +292,14 @@ export default function HomePage() {
                 Lihat Semua Portofolio
               </Link>
             </Button>
-          </motion.div>
+          </OptimizedMotion>
         </div>
       </div>
 
       {/* Why Choose Us */}
       <div className="py-20">
         <div className="container mx-auto px-4">
-          <motion.div 
+          <OptimizedMotion 
             className="text-center mb-16"
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -303,10 +310,10 @@ export default function HomePage() {
             <p className="text-gray-400 max-w-2xl mx-auto">
               Alasan mengapa klien memilih MiraiDev sebagai mitra pengembangan digital mereka
             </p>
-          </motion.div>
+          </OptimizedMotion>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <motion.div 
+            <OptimizedMotion 
               className="text-center p-6 transition-all duration-200"
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -321,9 +328,9 @@ export default function HomePage() {
               <p className="text-gray-400">
                 Kami menggunakan teknologi dan framework terbaru untuk memastikan performa dan keamanan terbaik.
               </p>
-            </motion.div>
+            </OptimizedMotion>
             
-            <motion.div 
+            <OptimizedMotion 
               className="text-center p-6 transition-all duration-200"
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -338,9 +345,9 @@ export default function HomePage() {
               <p className="text-gray-400">
                 Komunikasi yang jelas dan transparan sepanjang proses pengembangan untuk memastikan kepuasan klien.
               </p>
-            </motion.div>
+            </OptimizedMotion>
             
-            <motion.div 
+            <OptimizedMotion 
               className="text-center p-6 transition-all duration-200"
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -355,7 +362,7 @@ export default function HomePage() {
               <p className="text-gray-400">
                 Dukungan berkelanjutan setelah peluncuran untuk memastikan website Anda tetap berjalan optimal.
               </p>
-            </motion.div>
+            </OptimizedMotion>
           </div>
         </div>
       </div>
@@ -363,7 +370,7 @@ export default function HomePage() {
       {/* Testimonials */}
       <div className="py-20 bg-gray-800/30">
         <div className="container mx-auto px-4">
-          <motion.div 
+          <OptimizedMotion 
             className="text-center mb-16"
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -374,11 +381,11 @@ export default function HomePage() {
             <p className="text-gray-400 max-w-2xl mx-auto">
               Pengalaman nyata dari klien yang telah bekerja sama dengan kami
             </p>
-          </motion.div>
+          </OptimizedMotion>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {testimonials.map((testimonial, index) => (
-              <motion.div
+              <OptimizedMotion
                 key={index}
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -395,14 +402,14 @@ export default function HomePage() {
                       <p className="text-sm text-gray-400">{testimonial.role}</p>
                     </div>
                   </div>
-                  <p className="text-gray-300 italic">"&quot;{testimonial.content}&quot;"</p>
+                  <p className="text-gray-300 italic">"{testimonial.content}"</p>
                   <div className="flex mt-4">
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
                     ))}
                   </div>
                 </Card>
-              </motion.div>
+              </OptimizedMotion>
             ))}
           </div>
         </div>
@@ -411,7 +418,7 @@ export default function HomePage() {
       {/* Final CTA */}
       <div className="py-20">
         <div className="container mx-auto px-4">
-          <motion.div 
+          <OptimizedMotion 
             className="max-w-4xl mx-auto text-center bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-2xl p-12 border border-gray-700 transition-all duration-200"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -436,7 +443,7 @@ export default function HomePage() {
                 </Link>
               </Button>
             </div>
-          </motion.div>
+          </OptimizedMotion>
         </div>
       </div>
     </div>

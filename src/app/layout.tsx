@@ -1,23 +1,63 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
+import { geistSans, geistMono } from "@/lib/font-optimizer";
 import "./globals.css";
 import ScrollToTop from "@/components/ScrollToTop";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import RegisterSW from "@/components/RegisterSW";
 
 export const metadata: Metadata = {
-  title: "MiraiDev - Solusi Pengembangan Website Modern",
-  description:
-    "MiraiDev menyediakan solusi pengembangan website modern, desain UI/UX, dan layanan pemeliharaan untuk bisnis Anda",
+  title: {
+    default: "MiraiDev - Solusi Pengembangan Website Modern",
+    template: "%s | MiraiDev"
+  },
+  description: "MiraiDev menyediakan solusi pengembangan website modern, desain UI/UX, dan layanan pemeliharaan untuk bisnis Anda",
+  keywords: ["website", "development", "UMKM", "digital", "solution", "Indonesia"],
+  authors: [{ name: "MiraiDev", url: "https://www.mirai.dev" }],
+  creator: "MiraiDev",
+  publisher: "MiraiDev",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL("https://www.mirai.dev"),
+  openGraph: {
+    type: "website",
+    title: "MiraiDev - Solusi Pengembangan Website Modern",
+    description: "MiraiDev menyediakan solusi pengembangan website modern, desain UI/UX, dan layanan pemeliharaan untuk bisnis Anda",
+    url: "https://www.mirai.dev",
+    siteName: "MiraiDev",
+    images: [
+      {
+        url: "/og-image.png", // Anda perlu menyediakan gambar ini di folder public
+        width: 1200,
+        height: 630,
+        alt: "MiraiDev - Solusi Pengembangan Website Modern",
+      },
+    ],
+    locale: "id_ID",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "MiraiDev - Solusi Pengembangan Website Modern",
+    description: "MiraiDev menyediakan solusi pengembangan website modern, desain UI/UX, dan layanan pemeliharaan untuk bisnis Anda",
+    images: ["/og-image.png"], // Anda perlu menyediakan gambar ini di folder public
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: "google-site-verification-code", // Ganti dengan kode verifikasi Anda
+  },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -36,6 +76,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <RegisterSW />
           {children}
           <ScrollToTop />
         </ThemeProvider>

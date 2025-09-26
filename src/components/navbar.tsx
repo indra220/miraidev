@@ -10,7 +10,12 @@ import {
   ArrowRight,
   LogOut
 } from "lucide-react";
-import GlobalSearch from "@/components/GlobalSearch";
+import dynamic from "next/dynamic";
+
+const GlobalSearch = dynamic(() => import("@/components/GlobalSearch"), {
+  loading: () => <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">...</div>,
+  ssr: false
+});
 
 const navigation = [
   { name: "Beranda", href: "/" },

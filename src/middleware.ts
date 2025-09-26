@@ -14,5 +14,5 @@ export function middleware(_request: NextRequest) { // eslint-disable-line @type
 }
 
 export const config = {
-  matcher: ["/((?!.*\..*|_next).*)", "/", "/(api|trpc)(.*)"],
+  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
 };

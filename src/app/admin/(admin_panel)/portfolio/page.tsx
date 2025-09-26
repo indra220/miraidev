@@ -12,7 +12,9 @@ import {
   Edit,
   Trash2,
   Eye,
-  Users
+  Users,
+  FolderOpen,
+  X
 } from "lucide-react";
 
 interface PortfolioItem {
@@ -100,13 +102,13 @@ export default function PortfolioManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Manajemen Portofolio</h1>
-          <p className="text-gray-600 mt-2">Kelola proyek portofolio Anda</p>
+          <h1 className="text-3xl font-bold text-white">Manajemen Portofolio</h1>
+          <p className="text-gray-300 mt-2">Kelola proyek portofolio Anda</p>
         </div>
         <Button 
-          className="mt-4 sm:mt-0 bg-blue-600 hover:bg-blue-700" 
+          className="mt-4 sm:mt-0 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-5 px-6" 
           onClick={handleAddNew}
         >
           <Plus className="mr-2 h-4 w-4" />
@@ -115,12 +117,12 @@ export default function PortfolioManagement() {
       </div>
 
       {/* Search Bar */}
-      <Card className="p-4">
+      <Card className="p-4 bg-white/5 backdrop-blur-sm border border-gray-700/50">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
             placeholder="Cari proyek..."
-            className="pl-10"
+            className="pl-10 bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -130,21 +132,22 @@ export default function PortfolioManagement() {
       {/* Portfolio Items */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredItems.map((item) => (
-          <Card key={item.id} className="overflow-hidden">
-            <div className="h-32 bg-gray-200 relative">
+          <Card key={item.id} className="overflow-hidden bg-white/5 backdrop-blur-sm border border-gray-700/50 hover:bg-white/10 transition-all duration-200">
+            <div className="h-32 bg-gradient-to-r from-blue-500/20 to-purple-500/20 relative flex items-center justify-center">
               <div className="absolute top-2 right-2">
-                <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                <span className="bg-blue-600/80 text-white text-xs px-2 py-1 rounded">
                   {item.category}
                 </span>
               </div>
+              <FolderOpen className="h-10 w-10 text-gray-300/50" />
             </div>
             <div className="p-4">
-              <h3 className="font-bold text-gray-900">{item.title}</h3>
-              <p className="text-sm text-gray-600 mt-1">{item.description}</p>
+              <h3 className="font-bold text-white">{item.title}</h3>
+              <p className="text-sm text-gray-400 mt-1">{item.description}</p>
               
               <div className="flex flex-wrap gap-1 mt-3">
                 {item.tags.map((tag, index) => (
-                  <span key={index} className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">
+                  <span key={index} className="bg-gray-700/50 text-gray-300 text-xs px-2 py-1 rounded border border-gray-600/30">
                     {tag}
                   </span>
                 ))}
@@ -166,6 +169,7 @@ export default function PortfolioManagement() {
                   variant="outline" 
                   size="sm"
                   onClick={() => handleEdit(item)}
+                  className="border-gray-600 text-gray-300 hover:bg-gray-700/50"
                 >
                   <Edit className="h-4 w-4" />
                 </Button>
@@ -173,6 +177,7 @@ export default function PortfolioManagement() {
                   variant="outline" 
                   size="sm"
                   onClick={() => handleDelete(item.id)}
+                  className="border-red-600/50 text-red-400 hover:bg-red-600/20"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -244,71 +249,84 @@ function PortfolioModal({ item, onSave, onClose }: PortfolioModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-gray-800/90 border border-gray-700">
         <div className="p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            {item ? "Edit Proyek" : "Tambah Proyek Baru"}
-          </h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold text-white">
+              {item ? "Edit Proyek" : "Tambah Proyek Baru"}
+            </h2>
+            <button 
+              onClick={onClose}
+              className="text-gray-400 hover:text-white"
+            >
+              <X className="h-6 w-6" />
+            </button>
+          </div>
           
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="title">Judul Proyek</Label>
+              <Label htmlFor="title" className="text-gray-300">Judul Proyek</Label>
               <Input
                 id="title"
                 name="title"
                 value={formData.title}
                 onChange={handleInputChange}
                 required
+                className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-500"
               />
             </div>
             
             <div>
-              <Label htmlFor="category">Kategori</Label>
+              <Label htmlFor="category" className="text-gray-300">Kategori</Label>
               <Input
                 id="category"
                 name="category"
                 value={formData.category}
                 onChange={handleInputChange}
                 required
+                className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-500"
               />
             </div>
             
             <div>
-              <Label htmlFor="client">Klien</Label>
+              <Label htmlFor="client" className="text-gray-300">Klien</Label>
               <Input
                 id="client"
                 name="client"
                 value={formData.client}
                 onChange={handleInputChange}
                 required
+                className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-500"
               />
             </div>
             
             <div>
-              <Label htmlFor="date">Tanggal</Label>
+              <Label htmlFor="date" className="text-gray-300">Tanggal</Label>
               <Input
                 id="date"
                 name="date"
                 value={formData.date}
                 onChange={handleInputChange}
                 required
+                className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-500"
               />
             </div>
             
             <div>
-              <Label htmlFor="views">Jumlah Views</Label>
+              <Label htmlFor="views" className="text-gray-300">Jumlah Views</Label>
               <Input
                 id="views"
                 name="views"
                 value={formData.views}
                 onChange={handleInputChange}
                 required
+                className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-500"
               />
             </div>
             
             <div>
-              <Label htmlFor="description">Deskripsi</Label>
+              <Label htmlFor="description" className="text-gray-300">Deskripsi</Label>
               <Textarea
                 id="description"
                 name="description"
@@ -316,17 +334,18 @@ function PortfolioModal({ item, onSave, onClose }: PortfolioModalProps) {
                 onChange={handleInputChange}
                 rows={3}
                 required
+                className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-500"
               />
             </div>
             
             <div>
-              <Label>Tags</Label>
+              <Label className="text-gray-300">Tags</Label>
               <div className="flex mt-1">
                 <Input
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
                   placeholder="Tambah tag..."
-                  className="flex-1"
+                  className="flex-1 bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-500"
                   onKeyPress={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -337,7 +356,7 @@ function PortfolioModal({ item, onSave, onClose }: PortfolioModalProps) {
                 <Button 
                   type="button" 
                   onClick={handleAddTag}
-                  className="ml-2"
+                  className="ml-2 bg-gray-700 hover:bg-gray-600"
                 >
                   Tambah
                 </Button>
@@ -346,13 +365,13 @@ function PortfolioModal({ item, onSave, onClose }: PortfolioModalProps) {
                 {formData.tags.map((tag, index) => (
                   <span 
                     key={index} 
-                    className="bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded flex items-center"
+                    className="bg-blue-600/30 text-blue-300 text-sm px-2 py-1 rounded flex items-center border border-blue-600/30"
                   >
                     {tag}
                     <button
                       type="button"
                       onClick={() => handleRemoveTag(tag)}
-                      className="ml-1 text-blue-600 hover:text-blue-800"
+                      className="ml-1 text-blue-200 hover:text-white"
                     >
                       ×
                     </button>
@@ -362,10 +381,10 @@ function PortfolioModal({ item, onSave, onClose }: PortfolioModalProps) {
             </div>
             
             <div className="flex justify-end space-x-2 pt-4">
-              <Button type="button" variant="outline" onClick={onClose}>
+              <Button type="button" variant="outline" onClick={onClose} className="border-gray-600 text-gray-300 hover:bg-gray-700">
                 Batal
               </Button>
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+              <Button type="submit" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
                 Simpan
               </Button>
             </div>

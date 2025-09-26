@@ -11,7 +11,7 @@ import {
   Users
 } from "lucide-react";
 import { Navbar } from "@/components/navbar";
-import { motion } from "framer-motion";
+import OptimizedMotion from "@/components/OptimizedMotion";
 import { getPortfolioProjects, getAllPortfolioCategories } from "@/lib/portfolio";
 
 interface PortfolioProject {
@@ -26,11 +26,11 @@ interface PortfolioProject {
   views: string;
 }
 
-  interface Category {
-    id: string;
-    name: string;
-    icon: ReactNode;
-  }
+interface Category {
+  id: string;
+  name: string;
+  icon: ReactNode;
+}
 
 export default function PortofolioPage() {
   const [activeFilter, setActiveFilter] = useState("all");
@@ -186,22 +186,22 @@ export default function PortofolioPage() {
         <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10"></div>
         <div className="container mx-auto px-4 py-24 sm:py-32 relative">
           <div className="max-w-4xl mx-auto text-center">
-            <motion.h1 
+            <OptimizedMotion 
               className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
               Portofolio <span className="text-blue-400">Kami</span>
-            </motion.h1>
-            <motion.p 
+            </OptimizedMotion>
+            <OptimizedMotion 
               className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
               Kumpulan proyek website yang telah membantu UMKM dan profesional lokal membangun kehadiran digital mereka
-            </motion.p>
+            </OptimizedMotion>
           </div>
         </div>
       </div>
@@ -211,7 +211,7 @@ export default function PortofolioPage() {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {stats.map((stat, index) => (
-              <motion.div 
+              <OptimizedMotion 
                 key={index}
                 className="p-4"
                 initial={{ opacity: 0, y: 20 }}
@@ -221,14 +221,14 @@ export default function PortofolioPage() {
               >
                 <div className="text-3xl font-bold text-blue-400 mb-1">{stat.value}</div>
                 <div className="text-gray-400 text-sm">{stat.label}</div>
-              </motion.div>
+              </OptimizedMotion>
             ))}
           </div>
         </div>
       </div>
 
       {/* Filter Section */}
-      <motion.div 
+      <OptimizedMotion 
         className="py-8 bg-gray-800/50"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -253,7 +253,7 @@ export default function PortofolioPage() {
             ))}
           </div>
         </div>
-      </motion.div>
+      </OptimizedMotion>
 
       {/* Portfolio Grid */}
       <div className="py-20">
@@ -271,12 +271,12 @@ export default function PortofolioPage() {
               </div>
             </div>
           ) : (
-            <motion.div 
+            <OptimizedMotion 
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
               layout
             >
               {filteredProjects.map((project, index) => (
-                <motion.div
+                <OptimizedMotion
                   key={project.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -326,13 +326,13 @@ export default function PortofolioPage() {
                       </Button>
                     </div>
                   </Card>
-                </motion.div>
+                </OptimizedMotion>
               ))}
-            </motion.div>
+            </OptimizedMotion>
           )}
           
           {/* Load More Button */}
-          <motion.div 
+          <OptimizedMotion 
             className="text-center mt-12"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -342,14 +342,14 @@ export default function PortofolioPage() {
             <Button size="lg" variant="outline" className="border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white transition-all duration-150 hover:scale-105">
               Muat Lebih Banyak
             </Button>
-          </motion.div>
+          </OptimizedMotion>
         </div>
       </div>
 
       {/* CTA Section */}
       <div className="py-20">
         <div className="container mx-auto px-4">
-          <motion.div 
+          <OptimizedMotion 
             className="max-w-4xl mx-auto text-center bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-2xl p-12 border border-gray-700"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -370,7 +370,7 @@ export default function PortofolioPage() {
                 Hubungi Kami
               </Button>
             </div>
-          </motion.div>
+          </OptimizedMotion>
         </div>
       </div>
     </div>

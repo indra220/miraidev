@@ -45,117 +45,127 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Pengaturan</h1>
-        <p className="text-gray-600 mt-2">Kelola pengaturan situs web Anda</p>
+      <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
+        <h1 className="text-3xl font-bold text-white">Pengaturan</h1>
+        <p className="text-gray-300 mt-2">Kelola pengaturan situs web Anda</p>
       </div>
 
-      <Card className="p-6">
+      <Card className="p-6 bg-white/5 backdrop-blur-sm border border-gray-700/50">
         <div className="space-y-6">
           <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Informasi Situs</h2>
+            <h2 className="text-xl font-bold text-white mb-4">Informasi Situs</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="siteName">Nama Situs</Label>
+                <Label htmlFor="siteName" className="text-gray-300">Nama Situs</Label>
                 <Input
                   id="siteName"
                   value={settings.siteName}
                   onChange={(e) => handleChange("siteName", e.target.value)}
+                  className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500"
                 />
               </div>
               <div>
-                <Label htmlFor="siteDescription">Deskripsi Situs</Label>
+                <Label htmlFor="siteDescription" className="text-gray-300">Deskripsi Situs</Label>
                 <Textarea
                   id="siteDescription"
                   value={settings.siteDescription}
                   onChange={(e) => handleChange("siteDescription", e.target.value)}
                   rows={3}
+                  className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500"
                 />
               </div>
             </div>
           </div>
 
           <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Kontak</h2>
+            <h2 className="text-xl font-bold text-white mb-4">Kontak</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="adminEmail">Email Admin</Label>
+                <Label htmlFor="adminEmail" className="text-gray-300">Email Admin</Label>
                 <Input
                   id="adminEmail"
                   type="email"
                   value={settings.adminEmail}
                   onChange={(e) => handleChange("adminEmail", e.target.value)}
+                  className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500"
                 />
               </div>
               <div>
-                <Label htmlFor="contactEmail">Email Kontak</Label>
+                <Label htmlFor="contactEmail" className="text-gray-300">Email Kontak</Label>
                 <Input
                   id="contactEmail"
                   type="email"
                   value={settings.contactEmail}
                   onChange={(e) => handleChange("contactEmail", e.target.value)}
+                  className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500"
                 />
               </div>
               <div>
-                <Label htmlFor="phone">Telepon</Label>
+                <Label htmlFor="phone" className="text-gray-300">Telepon</Label>
                 <Input
                   id="phone"
                   value={settings.phone}
                   onChange={(e) => handleChange("phone", e.target.value)}
+                  className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500"
                 />
               </div>
               <div>
-                <Label htmlFor="address">Alamat</Label>
+                <Label htmlFor="address" className="text-gray-300">Alamat</Label>
                 <Input
                   id="address"
                   value={settings.address}
                   onChange={(e) => handleChange("address", e.target.value)}
+                  className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500"
                 />
               </div>
             </div>
           </div>
 
           <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Media Sosial</h2>
+            <h2 className="text-xl font-bold text-white mb-4">Media Sosial</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="facebook">Facebook</Label>
+                <Label htmlFor="facebook" className="text-gray-300">Facebook</Label>
                 <Input
                   id="facebook"
                   value={settings.socialMedia.facebook}
                   onChange={(e) => handleSocialMediaChange("facebook", e.target.value)}
+                  className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500"
                 />
               </div>
               <div>
-                <Label htmlFor="twitter">Twitter</Label>
+                <Label htmlFor="twitter" className="text-gray-300">Twitter</Label>
                 <Input
                   id="twitter"
                   value={settings.socialMedia.twitter}
                   onChange={(e) => handleSocialMediaChange("twitter", e.target.value)}
+                  className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500"
                 />
               </div>
               <div>
-                <Label htmlFor="instagram">Instagram</Label>
+                <Label htmlFor="instagram" className="text-gray-300">Instagram</Label>
                 <Input
                   id="instagram"
                   value={settings.socialMedia.instagram}
                   onChange={(e) => handleSocialMediaChange("instagram", e.target.value)}
+                  className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500"
                 />
               </div>
               <div>
-                <Label htmlFor="linkedin">LinkedIn</Label>
+                <Label htmlFor="linkedin" className="text-gray-300">LinkedIn</Label>
                 <Input
                   id="linkedin"
                   value={settings.socialMedia.linkedin}
                   onChange={(e) => handleSocialMediaChange("linkedin", e.target.value)}
+                  className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500"
                 />
               </div>
             </div>
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end pt-4">
             <Button 
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-5 px-6"
               onClick={handleSave}
             >
               Simpan Pengaturan

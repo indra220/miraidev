@@ -26,11 +26,11 @@
 - [x] Tambahkan fungsi pencarian di seluruh halaman
 
 ### 🚀 Optimasi Performa
-- [ ] Optimalkan pemuatan gambar dengan next/image
-- [ ] Terapkan pemisahan kode untuk waktu pemuatan yang lebih baik
-- [ ] Tambahkan tag meta dan gambar Open Graph yang tepat
-- [ ] Terapkan service worker untuk dukungan offline
-- [ ] Optimalkan animasi untuk perangkat kelas bawah
+- [x] Optimalkan pemuatan gambar dengan next/image
+- [x] Terapkan pemisahan kode untuk waktu pemuatan yang lebih baik
+- [x] Tambahkan tag meta dan gambar Open Graph yang tepat
+- [x] Terapkan service worker untuk dukungan offline
+- [x] Optimalkan animasi untuk perangkat kelas bawah
 
 ## 📈 Tujuan Jangka Menengah
 

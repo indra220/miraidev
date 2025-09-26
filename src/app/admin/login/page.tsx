@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { FormError } from "@/components/form-error";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { createSupabaseClient } from "@/lib/supabase";
@@ -78,111 +78,119 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="mx-auto w-16 h-16 rounded-full bg-blue-600/10 flex items-center justify-center mb-4">
-            <Lock className="w-8 h-8 text-blue-400" />
+    <div className="w-full max-w-md">
+      <div className="text-center mb-8">
+        <div className="mx-auto w-16 h-16 rounded-full bg-blue-600/20 flex items-center justify-center mb-4">
+          <div className="w-10 h-10 rounded-full bg-blue-600/30 flex items-center justify-center">
+            <Lock className="w-6 h-6 text-blue-400" />
           </div>
-          <h1 className="text-3xl font-bold">Admin Login</h1>
-          <p className="text-gray-400 mt-2">
-            Masuk ke akun admin untuk mengelola situs
+        </div>
+        <h1 className="text-3xl font-bold text-white">Admin Portal</h1>
+        <p className="text-gray-400 mt-2">
+          Masuk ke akun admin untuk mengelola situs
+        </p>
+      </div>
+
+      <Card className="bg-white/10 backdrop-blur-md border border-gray-700 shadow-xl rounded-xl overflow-hidden">
+        <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 p-6 text-center">
+          <h2 className="text-2xl font-bold text-white">Masuk ke Panel Admin</h2>
+          <p className="text-gray-300 text-sm mt-1">
+            Gunakan akun admin yang telah terdaftar
           </p>
         </div>
-
-        <Card className="bg-gray-800/50 border-gray-700 shadow-xl backdrop-blur-sm">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">Login Admin</CardTitle>
-            <CardDescription className="text-center text-gray-400">
-              Gunakan akun admin yang telah terdaftar
-            </CardDescription>
-          </CardHeader>
-          
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {errors.general && (
-                <div className="bg-destructive/20 border border-destructive/30 rounded-md p-3 text-sm text-destructive">
-                  {errors.general}
+        
+        <CardContent className="p-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {errors.general && (
+              <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-3 text-sm text-red-200 flex items-start">
+                <span className="mr-2">⚠️</span> {errors.general}
+              </div>
+            )}
+            
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-gray-300 flex items-center">
+                <Mail className="w-4 h-4 mr-2" />
+                Email Admin
+              </Label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-gray-500" />
                 </div>
-              )}
-              
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-gray-300 flex items-center">
-                  <Mail className="w-4 h-4 mr-2" />
-                  Email Admin
-                </Label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="admin@contoh.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={`bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 py-6 px-4 ${
-                    errors.email ? "border-destructive focus-visible:ring-destructive/20" : ""
+                  className={`bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-500 pl-10 py-6 ${
+                    errors.email ? "border-red-500 focus:ring-red-500/30" : "focus:ring-blue-500/30"
                   }`}
                   aria-invalid={!!errors.email}
                   aria-describedby={errors.email ? "email-error" : undefined}
                 />
-                <FormError id="email-error" error={errors.email} />
               </div>
+              <FormError id="email-error" error={errors.email} />
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-gray-300 flex items-center">
-                  <Lock className="w-4 h-4 mr-2" />
-                  Kata Sandi
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className={`bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 py-6 px-4 pr-12 ${
-                      errors.password ? "border-destructive focus-visible:ring-destructive/20" : ""
-                    }`}
-                    aria-invalid={!!errors.password}
-                    aria-describedby={errors.password ? "password-error" : undefined}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-4 flex items-center"
-                    aria-label={showPassword ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-300" />
-                    ) : (
-                      <Eye className="h-5 w-5 text-gray-400 hover:text-gray-300" />
-                    )}
-                  </button>
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-gray-300 flex items-center">
+                <Lock className="w-4 h-4 mr-2" />
+                Kata Sandi
+              </Label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-gray-500" />
                 </div>
-                <FormError id="password-error" error={errors.password} />
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className={`bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-500 pl-10 pr-12 py-6 ${
+                    errors.password ? "border-red-500 focus:ring-red-500/30" : "focus:ring-blue-500/30"
+                  }`}
+                  aria-invalid={!!errors.password}
+                  aria-describedby={errors.password ? "password-error" : undefined}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-300"
+                  aria-label={showPassword ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
               </div>
+              <FormError id="password-error" error={errors.password} />
+            </div>
 
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 mt-6 transition-all duration-200 hover:scale-[1.02] flex items-center justify-center"
-              >
-                {isLoading ? (
-                  <>
-                    <LoadingSpinner size="sm" className="mr-2" />
-                    Memproses...
-                  </>
-                ) : (
-                  <>
-                    Masuk sebagai Admin
-                  </>
-                )}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-        
-        <div className="text-center text-sm text-gray-500 mt-6">
-          <p>Hanya untuk pengguna admin terdaftar</p>
-        </div>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-6 mt-4 transition-all duration-200 hover:scale-[1.02] flex items-center justify-center shadow-lg"
+            >
+              {isLoading ? (
+                <>
+                  <LoadingSpinner size="sm" className="mr-2" />
+                  Memproses...
+                </>
+              ) : (
+                <>
+                  Masuk sebagai Admin
+                </>
+              )}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+      
+      <div className="text-center text-sm text-gray-500 mt-6">
+        <p>Hanya untuk pengguna admin terdaftar</p>
       </div>
     </div>
   );

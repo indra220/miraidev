@@ -11,7 +11,7 @@ import {
   CheckCircle
 } from "lucide-react";
 import { Navbar } from "@/components/navbar";
-import { motion } from "framer-motion";
+import OptimizedMotion from "@/components/OptimizedMotion";
 import Link from "next/link";
 import DynamicPriceCalculator from "@/components/DynamicPriceCalculator";
 
@@ -72,22 +72,22 @@ export default function LayananPage() {
         <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10"></div>
         <div className="container mx-auto px-4 py-24 sm:py-32 relative">
           <div className="max-w-3xl mx-auto text-center">
-            <motion.h1 
+            <OptimizedMotion 
               className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6"
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.5 }}
             >
               Layanan <span className="text-blue-400">Kami</span>
-            </motion.h1>
-            <motion.p 
+            </OptimizedMotion>
+            <OptimizedMotion 
               className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto"
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.1 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
             >
               Solusi komprehensif untuk memenuhi semua kebutuhan pengembangan website dan digital Anda
-            </motion.p>
+            </OptimizedMotion>
           </div>
         </div>
       </div>
@@ -99,7 +99,7 @@ export default function LayananPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {services.map((service, index) => (
-              <motion.div
+              <OptimizedMotion
                 key={index}
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -126,14 +126,16 @@ export default function LayananPage() {
                   
                   <Button 
                     asChild
-                    className="w-full bg-blue-600 hover:bg-blue-700 transition-all duration-200 hover:scale-105"
+                    variant="outline"
+                    className="border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white w-full transition-all duration-150"
                   >
                     <Link href="/kontak">
                       Pelajari Lebih Lanjut
+                      <ArrowRight className="ml-2 w-4 h-4" />
                     </Link>
                   </Button>
                 </Card>
-              </motion.div>
+              </OptimizedMotion>
             ))}
           </div>
         </div>
@@ -143,25 +145,19 @@ export default function LayananPage() {
       <div className="py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-2xl p-12 border border-gray-700">
-            <motion.h2 
-              className="text-3xl md:text-4xl font-bold mb-4"
-              initial={{ opacity: 0, y: 10 }}
+            <OptimizedMotion
+              className="text-center mb-8"
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.5 }}
               viewport={{ once: true }}
             >
-              Butuh Solusi Khusus?
-            </motion.h2>
-            <motion.p 
-              className="text-gray-300 mb-8 max-w-2xl mx-auto"
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.1 }}
-              viewport={{ once: true }}
-            >
-              Setiap proyek memiliki kebutuhan yang unik. Diskusikan kebutuhan spesifik Anda dengan tim ahli kami untuk solusi yang disesuaikan.
-            </motion.p>
-            <motion.div 
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Siap Memulai Proyek Anda?</h2>
+              <p className="text-gray-300 max-w-2xl mx-auto">
+                Setiap proyek memiliki kebutuhan yang unik. Diskusikan kebutuhan spesifik Anda dengan tim ahli kami untuk solusi yang disesuaikan.
+              </p>
+            </OptimizedMotion>
+            <OptimizedMotion 
               className="flex flex-col sm:flex-row gap-4 justify-center"
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -188,7 +184,7 @@ export default function LayananPage() {
                   Hubungi Kami
                 </Link>
               </Button>
-            </motion.div>
+            </OptimizedMotion>
           </div>
         </div>
       </div>
