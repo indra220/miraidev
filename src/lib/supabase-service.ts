@@ -1,17 +1,32 @@
 import { createClient } from "@supabase/supabase-js";
 import { PortfolioItem, ServiceItem, Client, ContactSubmission, SeoSetting, AnalyticsData } from "./types";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-
 // Server-side Supabase client untuk operasi admin
 export const createSupabaseAdminClient = () => {
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   
   if (!supabaseServiceKey) {
     throw new Error("SUPABASE_SERVICE_ROLE_KEY is not defined");
   }
 
+  if (!supabaseUrl) {
+    throw new Error("NEXT_PUBLIC_SUPABASE_URL is not defined");
+  }
+
   return createClient(supabaseUrl, supabaseServiceKey);
+};
+
+// Client-side Supabase client untuk operasi user
+export const createSupabaseUserClient = () => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error("Supabase environment variables are not defined");
+  }
+
+  return createClient(supabaseUrl, supabaseAnonKey);
 };
 
 // Service untuk manajemen portfolio

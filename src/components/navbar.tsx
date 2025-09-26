@@ -8,7 +8,8 @@ import {
   Menu, 
   X, 
   ArrowRight,
-  LogOut
+  LogOut,
+  User
 } from "lucide-react";
 import dynamic from "next/dynamic";
 
@@ -27,12 +28,29 @@ const navigation = [
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const pathname = usePathname();
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const openMenuButtonRef = useRef<HTMLButtonElement>(null);
   
   // Check if we're on an admin page
   const isAdminPage = pathname.startsWith('/admin');
+
+  // Check authentication status
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const supabase = (await import('@/lib/supabase')).createSupabaseClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        setIsAuthenticated(!!session);
+      } catch (error) {
+        console.error('Error checking auth status:', error);
+        setIsAuthenticated(false);
+      }
+    };
+    
+    checkAuth();
+  }, []);
 
   // Close mobile menu when pathname changes
   useEffect(() => {
@@ -163,6 +181,28 @@ export function Navbar() {
         
         <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:gap-x-4">
           {!isAdminPage && <GlobalSearch />}
+          {!isAdminPage && !isAuthenticated && (
+            <Link href="/user/login">
+              <Button 
+                variant="outline" 
+                className="border border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-sm font-semibold flex items-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+              >
+                <User className="mr-2 h-4 w-4" />
+                Masuk
+              </Button>
+            </Link>
+          )}
+          {!isAdminPage && isAuthenticated && (
+            <Link href="/user/dashboard">
+              <Button 
+                variant="outline" 
+                className="border border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-sm font-semibold flex items-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+              >
+                <User className="mr-2 h-4 w-4" />
+                Masuk
+              </Button>
+            </Link>
+          )}
           {isAdminPage ? (
             // Admin logout button
             <button
@@ -285,6 +325,28 @@ export function Navbar() {
                   <div className="pb-4 border-b border-gray-700">
                     <GlobalSearch />
                   </div>
+                )}
+                {!isAdminPage && !isAuthenticated && (
+                  <Link href="/user/login" onClick={() => setMobileMenuOpen(false)}>
+                    <Button 
+                      variant="outline" 
+                      className="w-full border border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                    >
+                      <User className="mr-2 h-4 w-4" />
+                      Masuk
+                    </Button>
+                  </Link>
+                )}
+                {!isAdminPage && isAuthenticated && (
+                  <Link href="/user/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                    <Button 
+                      variant="outline" 
+                      className="w-full border border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                    >
+                      <User className="mr-2 h-4 w-4" />
+                      Masuk
+                    </Button>
+                  </Link>
                 )}
                 {isAdminPage ? (
                   <button
