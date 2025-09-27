@@ -1,5 +1,5 @@
-// Sementara mengganti implementasi karena konflik tipe antara versi ai dan @ai-sdk/openai
-// TODO: Harus diperbaiki setelah update dependency
+import { openai } from "@ai-sdk/openai";
+import { streamText } from "ai";
 
 export async function POST(req: Request) {
   // Untuk saat ini, kita tidak menggunakan autentikasi
@@ -19,19 +19,14 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { messages } = await req.json(); // eslint-disable-line @typescript-eslint/no-unused-vars
+    const { messages } = await req.json();
 
-    // Fungsi chat sementara dinonaktifkan karena konflik tipe
-    // TODO: Implementasikan kembali setelah perbaikan dependency
-    return new Response(
-      JSON.stringify({
-        error: "Fungsi chat sedang dalam maintenance. Silakan coba lagi nanti."
-      }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
+    const result = streamText({
+      model: openai("gpt-4o"),
+      messages,
+    });
+
+    return result.toDataStreamResponse();
   } catch (error) {
     console.error("Chat API error:", error);
     return new Response(

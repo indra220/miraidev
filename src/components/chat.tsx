@@ -1,19 +1,13 @@
 "use client";
 
+import { useChat } from "ai/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { checkEnvironmentVariables } from "@/lib/env-check";
 import SetupGuide from "@/components/setup-guide";
 import { AlertCircle, Bot, User } from "lucide-react";
-import { useState, useEffect, FormEvent } from "react";
-
-// Mendefinisikan tipe untuk pesan
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-}
+import { useState, useEffect } from "react";
 
 export default function Chat() {
   const [envStatus, setEnvStatus] = useState({
@@ -23,67 +17,18 @@ export default function Chat() {
   });
   const [isLoading, setIsLoading] = useState(true);
 
-  // State untuk menyimpan pesan dan input
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const [error, setError] = useState<Error | null>(null);
-  const [chatLoading, setChatLoading] = useState(false);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInput(e.target.value);
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-
-    if (!input.trim() || chatLoading) return;
-
-    try {
-      setChatLoading(true);
-      setError(null);
-
-      // Tambahkan pesan pengguna ke daftar pesan
-      const userMessage: Message = {
-        id: Date.now().toString(),
-        role: 'user',
-        content: input
-      };
-      setMessages(prev => [...prev, userMessage]);
-      setInput(""); // Kosongkan input setelah submit
-
-      // Kirim permintaan ke API endpoint kita
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          messages: [...messages, userMessage].map(msg => ({
-            role: msg.role,
-            content: msg.content
-          }))
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Gagal mengirim pesan');
-      }
-
-      // Sementara menambahkan pesan dummy karena fungsi chat dinonaktifkan
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: 'Fungsi chat sedang dalam maintenance. Silakan coba lagi nanti.'
-      };
-      setMessages(prev => [...prev, assistantMessage]);
-    } catch (err) {
-      console.error("Chat error:", err);
-      setError(err as Error);
-    } finally {
-      setChatLoading(false);
-    }
-  };
+  const {
+    messages,
+    input,
+    handleInputChange,
+    handleSubmit,
+    error,
+    isLoading: chatLoading,
+  } = useChat({
+    onError: (error) => {
+      console.error("Chat error:", error);
+    },
+  });
 
   useEffect(() => {
     const status = checkEnvironmentVariables();
