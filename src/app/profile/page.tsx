@@ -13,7 +13,7 @@ import { User, Mail, Phone, Building2 } from "lucide-react";
 
 interface UserData {
   id: string;
-  email: string;
+  email: string | null;
   user_metadata: {
     name?: string;
   };
@@ -39,9 +39,15 @@ export default function ProfilePage() {
           return;
         }
 
-        setUser(userData);
-        setName(userData.user_metadata?.name || "");
-        setEmail(userData.email || "");
+        // Konversi User dari Supabase ke format UserData
+        const formattedUserData: UserData = {
+          id: userData.id,
+          email: userData.email || null,
+          user_metadata: userData.user_metadata || { name: "" }
+        };
+        setUser(formattedUserData);
+        setName(formattedUserData.user_metadata?.name || "");
+        setEmail(formattedUserData.email || "");
         
         // Ambil detail lengkap dari tabel clients
         const supabase = createSupabaseClient();
@@ -105,7 +111,13 @@ export default function ProfilePage() {
       // Refresh user data
       const updatedUser = await getCurrentUser();
       if (updatedUser) {
-        setUser(updatedUser);
+        // Konversi User dari Supabase ke format UserData
+        const formattedUpdatedUser: UserData = {
+          id: updatedUser.id,
+          email: updatedUser.email || null,
+          user_metadata: updatedUser.user_metadata || { name: "" }
+        };
+        setUser(formattedUpdatedUser);
       }
     } catch (error: unknown) {
       if (error instanceof Error) {

@@ -50,6 +50,26 @@ export async function isAdmin(): Promise<boolean> {
   return role === 'admin';
 }
 
+// Fungsi untuk mendapatkan user saat ini
+export async function getCurrentUser() {
+  const supabase = createSupabaseClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  
+  if (!session) {
+    return null;
+  }
+  
+  // Dapatkan informasi user dari session
+  const { data: { user }, error } = await supabase.auth.getUser();
+  
+  if (error || !user) {
+    console.error("Gagal mengambil informasi user:", error);
+    return null;
+  }
+  
+  return user;
+}
+
 // Fungsi untuk logout
 export async function logout() {
   const supabase = createSupabaseClient();
