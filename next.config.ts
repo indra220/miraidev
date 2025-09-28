@@ -27,6 +27,15 @@ const nextConfig: NextConfig = {
   
   // Optimasi output
   output: "standalone",
+  
+  // Optimasi kompilasi untuk development
+  // Hanya kompilasi halaman yang benar-benar dibutuhkan
+  onDemandEntries: {
+    // Waktu maksimal halaman tetap di memori (detik)
+    maxInactiveAge: 60 * 1000,
+    // Jumlah maksimal halaman yang bisa dikeep di memori
+    pagesBufferLength: 2,
+  },
 };
 
 export default nextConfig;

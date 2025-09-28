@@ -1,52 +1,78 @@
 "use client";
 
-import { useChat } from "ai/react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { checkEnvironmentVariables } from "@/lib/env-check";
 import SetupGuide from "@/components/setup-guide";
 import { AlertCircle, Bot, User } from "lucide-react";
-import { useState, useEffect } from "react";
+
+interface Message {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+}
 
 export default function Chat() {
-  const [envStatus, setEnvStatus] = useState({
-    supabase: false,
-    ai: false,
-    allConfigured: false,
-  });
-  const [isLoading, setIsLoading] = useState(true);
+  const [envStatus] = useState(() => checkEnvironmentVariables());
+  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const {
-    messages,
-    input,
-    handleInputChange,
-    handleSubmit,
-    error,
-    isLoading: chatLoading,
-  } = useChat({
-    onError: (error) => {
-      console.error("Chat error:", error);
-    },
-  });
-
-  useEffect(() => {
-    const status = checkEnvironmentVariables();
-    setEnvStatus({
-      supabase: status.supabase,
-      ai: status.ai,
-      allConfigured: status.allConfigured
-    });
-    setIsLoading(false);
-  }, []);
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center py-24">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-      </div>
-    );
-  }
+  // Fungsi untuk menangani pengiriman pesan
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!input.trim()) return;
+    
+    // Tambahkan pesan pengguna ke daftar
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: "user",
+      content: input
+    };
+    
+    setMessages(prev => [...prev, userMessage]);
+    setInput("");
+    setIsLoading(true);
+    
+    try {
+      // Simulasikan koneksi ke API
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: [...messages, userMessage]
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Gagal menghubungi API');
+      }
+      
+      const data = await response.json();
+      
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: data.text || "Maaf, saya tidak dapat memproses permintaan Anda saat ini."
+      };
+      
+      setMessages(prev => [...prev, assistantMessage]);
+    } catch {
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: "Terjadi kesalahan saat menghubungi asisten AI. Silakan coba lagi nanti."
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (!envStatus.ai) {
     return (
@@ -77,18 +103,6 @@ export default function Chat() {
           Didukung oleh OpenAI GPT-4o
         </p>
       </div>
-
-      {error && (
-        <Card className="p-4 border-red-200 bg-red-50 dark:bg-red-900/20 mb-4">
-          <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-red-600" />
-            <span className="text-red-700 dark:text-red-300 text-sm">
-              {error.message ||
-                "Terjadi kesalahan saat memproses permintaan Anda."}
-            </span>
-          </div>
-        </Card>
-      )}
 
       <div className="space-y-4 mb-4 min-h-[400px] max-h-[600px] overflow-y-auto">
         {messages.length === 0 ? (
@@ -122,7 +136,7 @@ export default function Chat() {
           ))
         )}
 
-        {chatLoading && (
+        {isLoading && (
           <Card className="p-4">
             <div className="flex items-center gap-2 mb-2">
               <Bot className="w-4 h-4 text-green-600" />
@@ -149,12 +163,12 @@ export default function Chat() {
         <Input
           value={input}
           placeholder="Ketik pesan Anda..."
-          onChange={handleInputChange}
+          onChange={(e) => setInput(e.target.value)}
           className="flex-1"
-          disabled={chatLoading}
+          disabled={isLoading}
         />
-        <Button type="submit" disabled={chatLoading || !input.trim()}>
-          {chatLoading ? "Mengirim..." : "Kirim"}
+        <Button type="submit" disabled={isLoading || !input.trim()}>
+          {isLoading ? "Mengirim..." : "Kirim"}
         </Button>
       </form>
     </div>

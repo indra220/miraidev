@@ -1,4 +1,5 @@
-import { PortfolioItem, ServiceItem, Client, ContactSubmission } from "./types";
+import { PortfolioItem, ServiceDetails, ClientData, ContactSubmission } from "./types";
+import type { Database } from './supabase-types/supabase';
 
 // Fungsi untuk membuat panggilan API ke endpoint admin
 const makeApiCall = async (endpoint: string, options: RequestInit = {}) => {
@@ -66,33 +67,41 @@ export const portfolioAdminService = {
 // Service untuk manajemen layanan
 export const servicesAdminService = {
   // Mendapatkan semua layanan
-  getAll: async (): Promise<ServiceItem[]> => {
+  getAll: async (): Promise<ServiceDetails[]> => {
     const response = await makeApiCall('/services');
-    return response.data as ServiceItem[];
+    // Tambahkan default value untuk is_featured karena itu adalah properti tambahan
+    return (response.data || []).map((item: Database['public']['Tables']['services']['Row']) => ({ 
+      ...item, 
+      is_featured: false // default value
+    })) as ServiceDetails[];
   },
 
   // Mendapatkan layanan berdasarkan ID
-  getById: async (id: number): Promise<ServiceItem | null> => {
+  getById: async (id: number): Promise<ServiceDetails | null> => {
     const allItems = await servicesAdminService.getAll();
-    return allItems.find(item => item.id === id) || null;
+    const item = allItems.find(item => item.id === id) || null;
+    // Tambahkan default value untuk is_featured karena itu adalah properti tambahan
+    return item ? { ...item, is_featured: false } as ServiceDetails : null;
   },
 
   // Menambahkan layanan
-  create: async (service: Omit<ServiceItem, 'id' | 'created_at' | 'updated_at'>): Promise<ServiceItem> => {
+  create: async (service: Omit<ServiceDetails, 'id' | 'created_at' | 'updated_at' | 'is_featured'>): Promise<ServiceDetails> => {
     const response = await makeApiCall('/services', {
       method: 'POST',
       body: JSON.stringify(service),
     });
-    return response.data as ServiceItem;
+    // Tambahkan default value untuk is_featured karena itu adalah properti tambahan
+    return { ...response.data, is_featured: false } as ServiceDetails;
   },
 
   // Memperbarui layanan
-  update: async (service: ServiceItem): Promise<ServiceItem> => {
+  update: async (service: ServiceDetails): Promise<ServiceDetails> => {
     const response = await makeApiCall('/services', {
       method: 'PUT',
       body: JSON.stringify(service),
     });
-    return response.data as ServiceItem;
+    // Tambahkan default value untuk is_featured karena itu adalah properti tambahan
+    return { ...response.data, is_featured: false } as ServiceDetails;
   },
 
   // Menghapus layanan
@@ -106,19 +115,25 @@ export const servicesAdminService = {
 // Service untuk manajemen klien
 export const clientsAdminService = {
   // Mendapatkan semua klien
-  getAll: async (): Promise<Client[]> => {
+  getAll: async (): Promise<ClientData[]> => {
     const response = await makeApiCall('/clients');
-    return response.data as Client[];
+    // Tambahkan default value untuk last_contacted karena itu adalah properti tambahan
+    return (response.data || []).map((item: Database['public']['Tables']['clients']['Row']) => ({ 
+      ...item, 
+      last_contacted: null // default value
+    })) as ClientData[];
   },
 
   // Mendapatkan klien berdasarkan ID
-  getById: async (id: number): Promise<Client | null> => {
+  getById: async (id: number): Promise<ClientData | null> => {
     const allItems = await clientsAdminService.getAll();
-    return allItems.find(item => item.id === id) || null;
+    const item = allItems.find(item => item.id === id) || null;
+    // Tambahkan default value untuk last_contacted karena itu adalah properti tambahan
+    return item ? { ...item, last_contacted: null } as ClientData : null;
   },
 
   // Menambahkan klien
-  create: async (client: Omit<Client, 'id' | 'created_at' | 'updated_at' | 'project_count' | 'rating'>): Promise<Client> => {
+  create: async (client: Omit<ClientData, 'id' | 'created_at' | 'updated_at' | 'project_count' | 'rating' | 'last_contacted'>): Promise<ClientData> => {
     const response = await makeApiCall('/clients', {
       method: 'POST',
       body: JSON.stringify({
@@ -127,16 +142,18 @@ export const clientsAdminService = {
         rating: 0
       }),
     });
-    return response.data as Client;
+    // Tambahkan default value untuk last_contacted karena itu adalah properti tambahan
+    return { ...response.data, last_contacted: null } as ClientData;
   },
 
   // Memperbarui klien
-  update: async (client: Client): Promise<Client> => {
+  update: async (client: ClientData): Promise<ClientData> => {
     const response = await makeApiCall('/clients', {
       method: 'PUT',
       body: JSON.stringify(client),
     });
-    return response.data as Client;
+    // Tambahkan default value untuk last_contacted karena itu adalah properti tambahan
+    return { ...response.data, last_contacted: null } as ClientData;
   },
 
   // Menghapus klien

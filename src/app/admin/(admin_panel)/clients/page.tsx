@@ -22,16 +22,16 @@ import {
   Star
 } from "lucide-react";
 import { clientsAdminService } from "@/lib/admin-service";
-import { Client } from "@/lib/types";
+import { ClientData } from "@/lib/types";
 import { LoadingSpinner } from "@/components/loading-spinner";
 
 export default function ClientManagement() {
-  const [clients, setClients] = useState<Client[]>([]);
+  const [clients, setClients] = useState<ClientData[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("semua");
   const [roleFilter, setRoleFilter] = useState<string>("semua");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentClient, setCurrentClient] = useState<Client | null>(null);
+  const [currentClient, setCurrentClient] = useState<ClientData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -71,7 +71,7 @@ export default function ClientManagement() {
     setIsModalOpen(true);
   };
 
-  const handleEdit = (client: Client) => {
+  const handleEdit = (client: ClientData) => {
     setCurrentClient(client);
     setIsModalOpen(true);
   };
@@ -105,9 +105,9 @@ export default function ClientManagement() {
     }
   };
 
-  const handleSave = async (client: Client) => {
+  const handleSave = async (client: ClientData) => {
     try {
-      let savedClient: Client;
+      let savedClient: ClientData;
       if (currentClient) {
         // Update existing client
         savedClient = await clientsAdminService.update(client);
@@ -355,13 +355,13 @@ export default function ClientManagement() {
 }
 
 interface ClientModalProps {
-  client: Client | null;
-  onSave: (client: Client) => void;
+  client: ClientData | null;
+  onSave: (client: ClientData) => void;
   onClose: () => void;
 }
 
 function ClientModal({ client, onSave, onClose }: ClientModalProps) {
-  const [formData, setFormData] = useState<Client>(
+  const [formData, setFormData] = useState<ClientData>(
     client || {
       id: 0,
       name: "",
@@ -374,7 +374,8 @@ function ClientModal({ client, onSave, onClose }: ClientModalProps) {
       project_count: 0,
       rating: 0,
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
+      last_contacted: null
     }
   );
 

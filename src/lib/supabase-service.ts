@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { PortfolioItem, ServiceItem, Client, ContactSubmission, SeoSetting, AnalyticsData } from "./types";
+import { PortfolioItem, ServiceDetails, ClientData, ContactSubmission } from "./types";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 
@@ -30,7 +30,11 @@ export const portfolioService = {
       throw new Error('Gagal mengambil data portofolio');
     }
     
-    return data as PortfolioItem[];
+    // Tambahkan default value untuk is_highlighted karena itu adalah properti tambahan
+    return data?.map(item => ({ 
+      ...item, 
+      is_highlighted: false // default value
+    })) as PortfolioItem[];
   },
 
   // Mendapatkan item portfolio berdasarkan ID
@@ -52,11 +56,12 @@ export const portfolioService = {
       throw new Error('Gagal mengambil data portofolio');
     }
     
-    return data as PortfolioItem;
+    // Tambahkan default value untuk is_highlighted karena itu adalah properti tambahan
+    return data ? { ...data, is_highlighted: false } as PortfolioItem : null;
   },
 
   // Menambahkan atau memperbarui item portfolio
-  upsert: async (item: Omit<PortfolioItem, 'id' | 'created_at' | 'updated_at'> & { id?: number }): Promise<PortfolioItem> => {
+  upsert: async (item: Omit<PortfolioItem, 'id' | 'created_at' | 'updated_at' | 'is_highlighted'> & { id?: number }): Promise<PortfolioItem> => {
     const supabase = createSupabaseAdminClient();
     
     let result;
@@ -98,7 +103,8 @@ export const portfolioService = {
       result = data;
     }
     
-    return result as PortfolioItem;
+    // Tambahkan default value untuk is_highlighted karena itu adalah properti tambahan
+    return { ...result, is_highlighted: false } as PortfolioItem;
   },
 
   // Menghapus item portfolio
@@ -120,7 +126,7 @@ export const portfolioService = {
 // Service untuk manajemen layanan
 export const servicesService = {
   // Mendapatkan semua layanan
-  getAll: async (): Promise<ServiceItem[]> => {
+  getAll: async (): Promise<ServiceDetails[]> => {
     const supabase = createSupabaseAdminClient();
     
     const { data, error } = await supabase
@@ -133,11 +139,15 @@ export const servicesService = {
       throw new Error('Gagal mengambil data layanan');
     }
     
-    return data as ServiceItem[];
+    // Tambahkan default value untuk is_featured karena itu adalah properti tambahan
+    return data?.map(item => ({ 
+      ...item, 
+      is_featured: false // default value
+    })) as ServiceDetails[];
   },
 
   // Mendapatkan layanan berdasarkan ID
-  getById: async (id: number): Promise<ServiceItem | null> => {
+  getById: async (id: number): Promise<ServiceDetails | null> => {
     const supabase = createSupabaseAdminClient();
     
     const { data, error } = await supabase
@@ -155,11 +165,12 @@ export const servicesService = {
       throw new Error('Gagal mengambil data layanan');
     }
     
-    return data as ServiceItem;
+    // Tambahkan default value untuk is_featured karena itu adalah properti tambahan
+    return data ? { ...data, is_featured: false } as ServiceDetails : null;
   },
 
   // Menambahkan atau memperbarui layanan
-  upsert: async (service: Omit<ServiceItem, 'id' | 'created_at' | 'updated_at'> & { id?: number }): Promise<ServiceItem> => {
+  upsert: async (service: Omit<ServiceDetails, 'id' | 'created_at' | 'updated_at' | 'is_featured'> & { id?: number }): Promise<ServiceDetails> => {
     const supabase = createSupabaseAdminClient();
     
     let result;
@@ -201,7 +212,8 @@ export const servicesService = {
       result = data;
     }
     
-    return result as ServiceItem;
+    // Tambahkan default value untuk is_featured karena itu adalah properti tambahan
+    return { ...result, is_featured: false } as ServiceDetails;
   },
 
   // Menghapus layanan
@@ -223,7 +235,7 @@ export const servicesService = {
 // Service untuk manajemen klien
 export const clientsService = {
   // Mendapatkan semua klien
-  getAll: async (): Promise<Client[]> => {
+  getAll: async (): Promise<ClientData[]> => {
     const supabase = createSupabaseAdminClient();
     
     const { data, error } = await supabase
@@ -236,11 +248,15 @@ export const clientsService = {
       throw new Error('Gagal mengambil data klien');
     }
     
-    return data as Client[];
+    // Tambahkan default value untuk last_contacted karena itu adalah properti tambahan
+    return data?.map(item => ({ 
+      ...item, 
+      last_contacted: null // default value
+    })) as ClientData[];
   },
 
   // Mendapatkan klien berdasarkan ID
-  getById: async (id: number): Promise<Client | null> => {
+  getById: async (id: number): Promise<ClientData | null> => {
     const supabase = createSupabaseAdminClient();
     
     const { data, error } = await supabase
@@ -258,11 +274,12 @@ export const clientsService = {
       throw new Error('Gagal mengambil data klien');
     }
     
-    return data as Client;
+    // Tambahkan default value untuk last_contacted karena itu adalah properti tambahan
+    return data ? { ...data, last_contacted: null } as ClientData : null;
   },
 
   // Menambahkan atau memperbarui klien
-  upsert: async (client: Omit<Client, 'id' | 'created_at' | 'updated_at' | 'project_count' | 'rating'> & { id?: number }): Promise<Client> => {
+  upsert: async (client: Omit<ClientData, 'id' | 'created_at' | 'updated_at' | 'project_count' | 'rating' | 'last_contacted'> & { id?: number }): Promise<ClientData> => {
     const supabase = createSupabaseAdminClient();
     
     let result;
@@ -306,11 +323,12 @@ export const clientsService = {
       result = data;
     }
     
-    return result as Client;
+    // Tambahkan default value untuk last_contacted karena itu adalah properti tambahan
+    return { ...result, last_contacted: null } as ClientData;
   },
 
   // Mengubah status klien
-  updateStatus: async (id: number, status: 'aktif' | 'tidak aktif' | 'pending'): Promise<Client> => {
+  updateStatus: async (id: number, status: 'aktif' | 'tidak aktif' | 'pending'): Promise<ClientData> => {
     const supabase = createSupabaseAdminClient();
     
     const { data, error } = await supabase
@@ -328,7 +346,8 @@ export const clientsService = {
       throw new Error('Gagal memperbarui status klien');
     }
     
-    return data as Client;
+    // Tambahkan default value untuk last_contacted karena itu adalah properti tambahan
+    return { ...data, last_contacted: null } as ClientData;
   },
 
   // Menghapus klien
@@ -470,210 +489,3 @@ export const contactService = {
   }
 };
 
-// Service untuk manajemen SEO
-export const seoService = {
-  // Mendapatkan semua pengaturan SEO
-  getAll: async (): Promise<SeoSetting[]> => {
-    const supabase = createSupabaseAdminClient();
-    
-    const { data, error } = await supabase
-      .from('seo_settings')
-      .select('*')
-      .order('page_path', { ascending: true });
-    
-    if (error) {
-      console.error('Error fetching SEO settings:', error);
-      throw new Error('Gagal mengambil data SEO');
-    }
-    
-    return data as SeoSetting[];
-  },
-
-  // Mendapatkan pengaturan SEO berdasarkan path halaman
-  getByPath: async (path: string): Promise<SeoSetting | null> => {
-    const supabase = createSupabaseAdminClient();
-    
-    const { data, error } = await supabase
-      .from('seo_settings')
-      .select('*')
-      .eq('page_path', path)
-      .single();
-    
-    if (error) {
-      if (error.code === 'PGRST116') {
-        // Record not found
-        return null;
-      }
-      console.error('Error fetching SEO setting:', error);
-      throw new Error('Gagal mengambil data SEO');
-    }
-    
-    return data as SeoSetting;
-  },
-
-  // Menambahkan atau memperbarui pengaturan SEO
-  upsert: async (seo: Omit<SeoSetting, 'id' | 'created_at' | 'updated_at' | 'last_modified'> & { id?: number }): Promise<SeoSetting> => {
-    const supabase = createSupabaseAdminClient();
-    
-    let result;
-    if (seo.id) {
-      // Update existing SEO setting
-      const { data, error } = await supabase
-        .from('seo_settings')
-        .update({
-          ...seo,
-          last_modified: new Date().toISOString().split('T')[0],
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', seo.id)
-        .select()
-        .single();
-      
-      if (error) {
-        console.error('Error updating SEO setting:', error);
-        throw new Error('Gagal memperbarui data SEO');
-      }
-      
-      result = data;
-    } else {
-      // Insert new SEO setting
-      const { data, error } = await supabase
-        .from('seo_settings')
-        .insert([{
-          ...seo,
-          last_modified: new Date().toISOString().split('T')[0],
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }])
-        .select()
-        .single();
-      
-      if (error) {
-        console.error('Error inserting SEO setting:', error);
-        throw new Error('Gagal menambahkan data SEO');
-      }
-      
-      result = data;
-    }
-    
-    return result as SeoSetting;
-  },
-
-  // Menghapus pengaturan SEO
-  delete: async (id: number): Promise<void> => {
-    const supabase = createSupabaseAdminClient();
-    
-    const { error } = await supabase
-      .from('seo_settings')
-      .delete()
-      .eq('id', id);
-    
-    if (error) {
-      console.error('Error deleting SEO setting:', error);
-      throw new Error('Gagal menghapus data SEO');
-    }
-  }
-};
-
-// Service untuk manajemen analitik
-export const analyticsService = {
-  // Mendapatkan semua data analitik
-  getAll: async (): Promise<AnalyticsData[]> => {
-    const supabase = createSupabaseAdminClient();
-    
-    const { data, error } = await supabase
-      .from('analytics_data')
-      .select('*')
-      .order('date', { ascending: false });
-    
-    if (error) {
-      console.error('Error fetching analytics data:', error);
-      throw new Error('Gagal mengambil data analitik');
-    }
-    
-    return data as AnalyticsData[];
-  },
-
-  // Mendapatkan data analitik berdasarkan tanggal
-  getByDate: async (date: string): Promise<AnalyticsData | null> => {
-    const supabase = createSupabaseAdminClient();
-    
-    const { data, error } = await supabase
-      .from('analytics_data')
-      .select('*')
-      .eq('date', date)
-      .single();
-    
-    if (error) {
-      if (error.code === 'PGRST116') {
-        // Record not found
-        return null;
-      }
-      console.error('Error fetching analytics data:', error);
-      throw new Error('Gagal mengambil data analitik');
-    }
-    
-    return data as AnalyticsData;
-  },
-
-  // Menambahkan atau memperbarui data analitik
-  upsert: async (analytics: Omit<AnalyticsData, 'id' | 'created_at' | 'updated_at'> & { id?: number }): Promise<AnalyticsData> => {
-    const supabase = createSupabaseAdminClient();
-    
-    let result;
-    if (analytics.id) {
-      // Update existing analytics data
-      const { data, error } = await supabase
-        .from('analytics_data')
-        .update({
-          ...analytics,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', analytics.id)
-        .select()
-        .single();
-      
-      if (error) {
-        console.error('Error updating analytics data:', error);
-        throw new Error('Gagal memperbarui data analitik');
-      }
-      
-      result = data;
-    } else {
-      // Insert new analytics data
-      const { data, error } = await supabase
-        .from('analytics_data')
-        .insert([{
-          ...analytics,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }])
-        .select()
-        .single();
-      
-      if (error) {
-        console.error('Error inserting analytics data:', error);
-        throw new Error('Gagal menambahkan data analitik');
-      }
-      
-      result = data;
-    }
-    
-    return result as AnalyticsData;
-  },
-
-  // Menghapus data analitik
-  delete: async (id: number): Promise<void> => {
-    const supabase = createSupabaseAdminClient();
-    
-    const { error } = await supabase
-      .from('analytics_data')
-      .delete()
-      .eq('id', id);
-    
-    if (error) {
-      console.error('Error deleting analytics data:', error);
-      throw new Error('Gagal menghapus data analitik');
-    }
-  }
-};

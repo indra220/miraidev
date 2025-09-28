@@ -1,6 +1,3 @@
-import { openai } from "@ai-sdk/openai";
-import { streamText } from "ai";
-
 export async function POST(req: Request) {
   // Untuk saat ini, kita tidak menggunakan autentikasi
   // Di masa depan, ini bisa diimplementasikan dengan sistem auth lain
@@ -21,12 +18,22 @@ export async function POST(req: Request) {
   try {
     const { messages } = await req.json();
 
-    const result = streamText({
-      model: openai("gpt-4o"),
-      messages,
-    });
+    // Simulasi respons dari AI
+    const lastMessage = messages[messages.length - 1];
+    const userMessage = lastMessage?.content || "";
 
-    return result.toDataStreamResponse();
+    // Buat respons sederhana
+    const responseText = `Ini adalah simulasi balasan untuk pesan Anda: "${userMessage}". Sistem AI sedang dalam pengembangan.`;
+
+    return new Response(
+      JSON.stringify({
+        text: responseText,
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
   } catch (error) {
     console.error("Chat API error:", error);
     return new Response(

@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import OptimizedMotion from "@/components/OptimizedMotion";
-import { ServiceItem } from "@/lib/types";
+import { ServiceDetails } from "@/lib/types";
 import { 
   Globe, 
   Palette, 
@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 interface ServiceCardProps {
-  service: ServiceItem;
+  service: ServiceDetails;
   index: number;
 }
 

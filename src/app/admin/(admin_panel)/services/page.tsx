@@ -21,14 +21,14 @@ import {
   Settings
 } from "lucide-react";
 import { servicesAdminService } from "@/lib/admin-service";
-import { ServiceItem } from "@/lib/types";
+import { ServiceDetails } from "@/lib/types";
 import { LoadingSpinner } from "@/components/loading-spinner";
 
 export default function ServicesManagement() {
-  const [services, setServices] = useState<ServiceItem[]>([]);
+  const [services, setServices] = useState<ServiceDetails[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentService, setCurrentService] = useState<ServiceItem | null>(null);
+  const [currentService, setCurrentService] = useState<ServiceDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -68,7 +68,7 @@ export default function ServicesManagement() {
     setIsModalOpen(true);
   };
 
-  const handleEdit = (service: ServiceItem) => {
+  const handleEdit = (service: ServiceDetails) => {
     setCurrentService(service);
     setIsModalOpen(true);
   };
@@ -86,9 +86,9 @@ export default function ServicesManagement() {
     }
   };
 
-  const handleSave = async (service: ServiceItem) => {
+  const handleSave = async (service: ServiceDetails) => {
     try {
-      let savedService: ServiceItem;
+      let savedService: ServiceDetails;
       if (currentService) {
         // Update existing item
         savedService = await servicesAdminService.update(service);
@@ -248,13 +248,13 @@ export default function ServicesManagement() {
 }
 
 interface ServiceModalProps {
-  service: ServiceItem | null;
-  onSave: (service: ServiceItem) => void;
+  service: ServiceDetails | null;
+  onSave: (service: ServiceDetails) => void;
   onClose: () => void;
 }
 
 function ServiceModal({ service, onSave, onClose }: ServiceModalProps) {
-  const [formData, setFormData] = useState<ServiceItem>(
+  const [formData, setFormData] = useState<ServiceDetails>(
     service || {
       id: 0,
       title: "",
@@ -264,7 +264,8 @@ function ServiceModal({ service, onSave, onClose }: ServiceModalProps) {
       icon: null,
       order: 0,
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
+      is_featured: false
     }
   );
 

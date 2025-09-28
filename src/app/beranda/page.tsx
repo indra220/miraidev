@@ -1,5 +1,5 @@
 import { Navbar } from "@/components/navbar";
-import { PortfolioItem, ServiceItem, ContactSubmission } from "@/lib/types";
+import { PortfolioItem, ServiceDetails, ContactSubmission } from "@/lib/types";
 import { createClient } from "@supabase/supabase-js";
 import { HeroSection } from "./components/hero-section";
 import { ClientTrustSection } from "./components/client-trust";
@@ -36,7 +36,7 @@ async function getPortfolioData(): Promise<PortfolioItem[]> {
 }
 
 // Fungsi untuk mengambil data services dari API
-async function getServicesData(): Promise<ServiceItem[]> {
+async function getServicesData(): Promise<ServiceDetails[]> {
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -54,7 +54,11 @@ async function getServicesData(): Promise<ServiceItem[]> {
       return [];
     }
     
-    return data as ServiceItem[];
+    // Tambahkan is_featured: false ke setiap item untuk memenuhi tipe ServiceDetails
+    return data.map(service => ({
+      ...service,
+      is_featured: false
+    })) as ServiceDetails[];
   } catch (error) {
     console.error('Error in getServicesData:', error);
     return [];
