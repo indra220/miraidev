@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     siteName: "MiraiDev",
     images: [
       {
-        url: "/og-image.png", // Anda perlu menyediakan gambar ini di folder public
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "MiraiDev - Solusi Pengembangan Website Modern",
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "MiraiDev - Solusi Pengembangan Website Modern",
     description: "MiraiDev menyediakan solusi pengembangan website modern, desain UI/UX, dan layanan pemeliharaan untuk bisnis Anda",
-    images: ["/og-image.png"], // Anda perlu menyediakan gambar ini di folder public
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
@@ -49,13 +49,13 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
   verification: {
-    google: "google-site-verification-code", // Ganti dengan kode verifikasi Anda
+    google: "google-site-verification-code",
   },
   manifest: "/manifest.json",
 };

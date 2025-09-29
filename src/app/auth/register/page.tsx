@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation"; // Pastikan useRouter diimpor
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,11 +10,11 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { FormError } from "@/components/form-error";
 import { LoadingSpinner } from "@/components/loading-spinner";
-import { createSupabaseClient } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
 import { Eye, EyeOff, User, ArrowLeft } from "lucide-react";
 
 export default function RegisterPage() {
-  const router = useRouter();
+  const router = useRouter(); // Inisialisasi router
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,6 +22,7 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ name?: string; email?: string; password?: string; confirmPassword?: string; general?: string }>({});
+  const [success, setSuccess] = useState<string | null>(null);
 
   const validateForm = () => {
     const newErrors: { name?: string; email?: string; password?: string; confirmPassword?: string } = {};
@@ -36,22 +37,26 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    setErrors({});
+    setSuccess(null);
+    
     if (!validateForm()) return;
 
     setIsLoading(true);
-    setErrors({});
 
     try {
-      const supabase = createSupabaseClient();
+      const supabase = createClient();
       
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            name: name,
+            full_name: name,
             role: 'klien'
-          }
+          },
+          emailRedirectTo: `${window.location.origin}/auth/login`
         }
       });
 
@@ -60,27 +65,27 @@ export default function RegisterPage() {
       }
 
       if (data.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: data.user.id,
-            email: data.user.email,
-            full_name: name,
-            role: 'klien'
-          });
+        // PERBAIKAN: Set pesan sukses dan siapkan redirect
+        setSuccess("Registrasi berhasil! Anda akan dialihkan ke halaman login...");
+        
+        setName("");
+        setEmail("");
+        setPassword("");
+        setConfirmPassword("");
 
-        if (profileError) {
-          console.error("Gagal membuat profil pengguna:", profileError.message);
-          throw new Error("Gagal menyelesaikan pendaftaran. Silakan coba lagi.");
-        }
+        // PERBAIKAN: Alihkan ke halaman login setelah 3 detik
+        setTimeout(() => {
+          router.push("/auth/login");
+        }, 3000); // 3000 milidetik = 3 detik
       }
-      
-      alert("Registrasi berhasil! Silakan periksa email Anda untuk verifikasi.");
-      router.push("/auth/login");
 
     } catch (error: unknown) {
       if (error instanceof Error) {
-        setErrors({ general: error.message });
+        if (error.message.includes("User already registered")) {
+          setErrors({ general: "Email ini sudah terdaftar. Silakan gunakan email lain atau masuk." });
+        } else {
+          setErrors({ general: error.message });
+        }
       } else {
         setErrors({ general: "Terjadi kesalahan yang tidak diketahui." });
       }
@@ -102,7 +107,13 @@ export default function RegisterPage() {
       <Card className="bg-white/10 backdrop-blur-md border border-gray-700 shadow-xl rounded-xl overflow-hidden">
         <CardContent className="p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
-             {errors.general && (
+            {success && (
+              <div className="bg-green-500/20 border border-green-500/50 rounded-lg p-3 text-sm text-green-200">
+                {success}
+              </div>
+            )}
+            
+            {errors.general && (
               <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-3 text-sm text-red-200">
                 {errors.general}
               </div>
@@ -137,12 +148,11 @@ export default function RegisterPage() {
             </Button>
           </form>
            <div className="mt-4 text-center text-sm">
-             <p>Sudah punya akun? <a href="/auth/login" className="underline">Masuk di sini</a></p>
+             <p>Sudah punya akun? <Link href="/auth/login" className="underline">Masuk di sini</Link></p>
           </div>
         </CardContent>
       </Card>
 
-      {/* Tombol Kembali ke Beranda */}
       <div className="mt-6 text-center">
         <Button variant="ghost" asChild>
           <Link href="/beranda" className="text-sm text-gray-400 hover:text-white transition-colors">

@@ -1,9 +1,9 @@
-import { createSupabaseClient } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
 
 export async function GET() {
   try {
     // Hanya bisa diakses oleh pengguna yang sudah login
-    const supabase = createSupabaseClient();
+    const supabase = createClient();
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session) {

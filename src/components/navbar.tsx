@@ -12,8 +12,9 @@ import {
   User
 } from "lucide-react";
 import dynamic from "next/dynamic";
-import { createSupabaseClient } from "@/lib/supabase";
-import { isAdmin } from "@/lib/auth-service";
+import { createClient } from "@/lib/supabase/client";
+import { isAdmin, getCurrentUser } from "@/lib/auth-service";
+import { Session } from "@/types/dashboard";
 
 const GlobalSearch = dynamic(() => import("@/components/GlobalSearch"), {
   loading: () => <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">...</div>,
@@ -32,6 +33,7 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // Gunakan null untuk status loading
   const [isAdminUser, setIsAdminUser] = useState<boolean | null>(null);
+  const [currentUser, setCurrentUser] = useState<Session["user"] | null>(null);
   const pathname = usePathname();
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const openMenuButtonRef = useRef<HTMLButtonElement>(null);
@@ -45,13 +47,17 @@ export function Navbar() {
   // Check authentication status on mount and update as needed
   useEffect(() => {
     const checkAuthStatus = async () => {
-      const supabase = createSupabaseClient();
+      const supabase = createClient();
       const { data: { session } } = await supabase.auth.getSession();
       
       // Setelah cek auth pertama kali, baru set state
       setIsAuthenticated(!!session);
       
       if (session) {
+        // Dapatkan informasi pengguna saat ini
+        const user = await getCurrentUser();
+        setCurrentUser(user);
+        
         // Hanya panggil isAdmin jika benar-benar diperlukan
         // Misalnya, hanya di halaman admin atau saat benar-benar perlu memeriksa status admin
         if (isAdminPage && isAdminUser === null) {
@@ -63,15 +69,16 @@ export function Navbar() {
           setIsAdminUser(false);
         }
       } else {
-        // Jika tidak ada session, pastikan tidak admin
+        // Jika tidak ada session, pastikan tidak admin dan tidak ada user
         setIsAdminUser(false);
+        setCurrentUser(null);
       }
     };
     
     checkAuthStatus();
     
     // Listen for auth changes
-    const { data: { subscription } } = createSupabaseClient().auth.onAuthStateChange((event) => {
+    const { data: { subscription } } = createClient().auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
         checkAuthStatus();
       }
@@ -147,7 +154,7 @@ export function Navbar() {
 
   // Function to handle logout
   const handleLogout = async () => {
-    const supabase = createSupabaseClient();
+    const supabase = createClient();
     
     // Lakukan signOut dan tunggu hasilnya
     try {
@@ -277,25 +284,98 @@ export function Navbar() {
                 </Button>
               </div>
             ) : isAuthenticated ? (
-              // User is authenticated - show logout or navigate to user area
+              // User is authenticated - show full user dropdown menu like dashboard
               <div className="flex items-center gap-x-4">
-                {isAdminUser ? (
-                  <Link href="/admin">
-                    <Button variant="outline" className="border border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-sm font-semibold flex items-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900">
-                      <User className="mr-2 h-4 w-4" />
-                      Panel Admin
-                    </Button>
-                  </Link>
-                ) : (
-                  <span className="text-white">Halo, User</span>
-                )}
-                <button
-                  onClick={handleLogout}
-                  className="border border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-sm font-semibold flex items-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900"
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Keluar
-                </button>
+                <div className="relative inline-block text-left">
+                  <div>
+                    <button
+                      type="button"
+                      className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-gray-800 px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-700 hover:bg-gray-700"
+                      id="user-menu"
+                      aria-expanded="false"
+                      aria-haspopup="true"
+                      onClick={() => {
+                        // Toggle dropdown visibility using DOM manipulation
+                        const menu = document.getElementById('user-menu-items');
+                        if (menu) {
+                          menu.classList.toggle('hidden');
+                        }
+                      }}
+                    >
+                      <User className="h-5 w-5" />
+                    </button>
+                  </div>
+                  
+                  <div 
+                    id="user-menu-items"
+                    className="hidden absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-gray-800 shadow-lg ring-1 ring-gray-700 focus:outline-none"
+                    role="menu"
+                    aria-orientation="vertical"
+                    aria-labelledby="user-menu"
+                    tabIndex={-1}
+                  >
+                    <div className="py-1 px-4" role="none">
+                      <div className="flex flex-col space-y-1 pb-2 border-b border-gray-700">
+                        <p className="text-sm font-medium leading-none text-white">
+                          {currentUser?.email || "Nama Pengguna"}
+                        </p>
+                        <p className="text-xs leading-none text-gray-400">
+                          Klien
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="py-1" role="none">
+                      <Link href="/dashboard/account" className="block px-4 py-2 text-sm text-white hover:bg-gray-700" role="menuitem">
+                        <div className="flex items-center">
+                          <User className="mr-2 h-4 w-4" />
+                          <span>Profil</span>
+                        </div>
+                      </Link>
+                      <Link href="/dashboard/account" className="block px-4 py-2 text-sm text-white hover:bg-gray-700" role="menuitem">
+                        <div className="flex items-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.7l-.15.09a2 2 0 0 0-.73 2.72l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.73v-.5a2 2 0 0 1 1-1.7l.15-.09a2 2 0 0 0 .73-2.72l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                            <circle cx="12" cy="12" r="3" />
+                          </svg>
+                          <span>Pengaturan</span>
+                        </div>
+                      </Link>
+                      <Link href="/dashboard" className="block px-4 py-2 text-sm text-white hover:bg-gray-700" role="menuitem">
+                        <div className="flex items-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <rect width="7" height="9" x="3" y="3" rx="1" />
+                            <rect width="7" height="5" x="3" y="14" rx="1" />
+                            <rect width="7" height="5" x="14" y="14" rx="1" />
+                            <rect width="7" height="9" x="14" y="3" rx="1" />
+                          </svg>
+                          <span>Dashboard</span>
+                        </div>
+                      </Link>
+                    </div>
+                    
+                    
+                    
+                    <div className="py-1 border-t border-gray-700" role="none">
+                      <button
+                        onClick={async () => {
+                          const supabase = createClient();
+                          await supabase.auth.signOut();
+                          setIsAuthenticated(false);
+                          setIsAdminUser(false);
+                          window.location.href = '/';
+                        }}
+                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700"
+                        role="menuitem"
+                      >
+                        <div className="flex items-center">
+                          <LogOut className="mr-2 h-4 w-4" />
+                          <span>Keluar</span>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             ) : (
               // User is not authenticated - show login/register buttons
@@ -433,23 +513,100 @@ export function Navbar() {
                       </Button>
                     </div>
                   ) : isAuthenticated ? (
-                    // User is authenticated - show logout or navigate to user area
+                    // User is authenticated - show full user dropdown menu like dashboard
                     <div className="space-y-4">
-                      {isAdminUser && (
-                        <Link href="/admin" onClick={() => setMobileMenuOpen(false)}>
-                          <Button className="w-full border border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900">
-                            <User className="mr-2 h-4 w-4" />
-                            Panel Admin
-                          </Button>
-                        </Link>
-                      )}
-                      <button
-                        onClick={handleLogout}
-                        className="w-full border border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900"
-                      >
-                        <LogOut className="mr-2 h-4 w-4" />
-                        Keluar
-                      </button>
+                      <div className="relative inline-block text-left">
+                        <div>
+                          <button
+                            type="button"
+                            className="w-full inline-flex justify-center gap-x-1.5 rounded-md bg-gray-800 px-3 py-2 text-base font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-700 hover:bg-gray-700"
+                            id="mobile-user-menu"
+                            aria-expanded="false"
+                            aria-haspopup="true"
+                            onClick={() => {
+                              // Toggle dropdown visibility using DOM manipulation
+                              const menu = document.getElementById('mobile-user-menu-items');
+                              if (menu) {
+                                menu.classList.toggle('hidden');
+                              }
+                            }}
+                          >
+                            <User className="mr-2 h-5 w-5" />
+                            Menu Pengguna
+                          </button>
+                        </div>
+                        
+                        <div 
+                          id="mobile-user-menu-items"
+                          className="hidden absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-gray-800 shadow-lg ring-1 ring-gray-700 focus:outline-none"
+                          role="menu"
+                          aria-orientation="vertical"
+                          aria-labelledby="mobile-user-menu"
+                          tabIndex={-1}
+                        >
+                          <div className="py-1 px-4" role="none">
+                            <div className="flex flex-col space-y-1 pb-2 border-b border-gray-700">
+                              <p className="text-sm font-medium leading-none text-white">
+                                {currentUser?.email || "Nama Pengguna"}
+                              </p>
+                              <p className="text-xs leading-none text-gray-400">
+                                Klien
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <div className="py-1" role="none">
+                            <Link href="/dashboard/account" className="block px-4 py-2 text-base text-white hover:bg-gray-700" role="menuitem" onClick={() => setMobileMenuOpen(false)}>
+                              <div className="flex items-center">
+                                <User className="mr-2 h-4 w-4" />
+                                <span>Profil</span>
+                              </div>
+                            </Link>
+                            <Link href="/dashboard/account" className="block px-4 py-2 text-base text-white hover:bg-gray-700" role="menuitem" onClick={() => setMobileMenuOpen(false)}>
+                              <div className="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.7l-.15.09a2 2 0 0 0-.73 2.72l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.73v-.5a2 2 0 0 1 1-1.7l.15-.09a2 2 0 0 0 .73-2.72l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                                  <circle cx="12" cy="12" r="3" />
+                                </svg>
+                                <span>Pengaturan</span>
+                              </div>
+                            </Link>
+                            <Link href="/dashboard" className="block px-4 py-2 text-base text-white hover:bg-gray-700" role="menuitem" onClick={() => setMobileMenuOpen(false)}>
+                              <div className="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <rect width="7" height="9" x="3" y="3" rx="1" />
+                                  <rect width="7" height="5" x="3" y="14" rx="1" />
+                                  <rect width="7" height="5" x="14" y="14" rx="1" />
+                                  <rect width="7" height="9" x="14" y="3" rx="1" />
+                                </svg>
+                                <span>Dashboard</span>
+                              </div>
+                            </Link>
+                          </div>
+                          
+                          
+                          
+                          <div className="py-1 border-t border-gray-700" role="none">
+                            <button
+                              onClick={async () => {
+                                const supabase = createClient();
+                                await supabase.auth.signOut();
+                                setIsAuthenticated(false);
+                                setIsAdminUser(false);
+                                setMobileMenuOpen(false);
+                                window.location.href = '/';
+                              }}
+                              className="block w-full text-left px-4 py-2 text-base text-white hover:bg-gray-700"
+                              role="menuitem"
+                            >
+                              <div className="flex items-center">
+                                <LogOut className="mr-2 h-4 w-4" />
+                                <span>Keluar</span>
+                              </div>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   ) : (
                     // User is not authenticated - show login/register buttons

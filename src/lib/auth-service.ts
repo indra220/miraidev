@@ -1,6 +1,6 @@
 // src/lib/auth-service.ts
 
-import { createSupabaseClient } from "./supabase";
+import { createClient } from "./supabase/client";
 
 // Cache di sisi klien untuk mengurangi panggilan API yang berulang
 const roleCache = {
@@ -27,7 +27,7 @@ async function getRoleFromServer(): Promise<string | null> {
 
 // Fungsi utama untuk memeriksa apakah pengguna adalah admin
 export async function isAdmin(): Promise<boolean> {
-  const supabase = createSupabaseClient();
+  const supabase = createClient();
   const { data: { session } } = await supabase.auth.getSession();
 
   // Jika tidak ada sesi, sudah pasti bukan admin
@@ -52,7 +52,7 @@ export async function isAdmin(): Promise<boolean> {
 
 // Fungsi untuk mendapatkan user saat ini
 export async function getCurrentUser() {
-  const supabase = createSupabaseClient();
+  const supabase = createClient();
   const { data: { session } } = await supabase.auth.getSession();
   
   if (!session) {
@@ -72,7 +72,7 @@ export async function getCurrentUser() {
 
 // Fungsi untuk logout
 export async function logout() {
-  const supabase = createSupabaseClient();
+  const supabase = createClient();
   await supabase.auth.signOut();
   // Kosongkan cache saat logout
   roleCache.role = null;

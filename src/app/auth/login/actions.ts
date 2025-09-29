@@ -61,6 +61,6 @@ export async function loginClient(prevState: FormState, formData: FormData): Pro
     return { error: 'Akun admin tidak dapat login di sini. Silakan gunakan halaman login admin.' };
   }
 
-  // Langkah 4: Jika pengguna bukan admin, arahkan ke halaman beranda
-  redirect('/beranda');
+  // Langkah 4: Jika pengguna bukan admin, arahkan ke halaman utama
+  redirect('/');
 }

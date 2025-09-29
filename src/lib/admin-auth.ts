@@ -1,10 +1,10 @@
 "use client";
 
-import { createSupabaseClient } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
 export async function adminLogout() {
-  const supabase = createSupabaseClient();
+  const supabase = createClient();
   await supabase.auth.signOut();
 }
 

@@ -99,6 +99,7 @@ ANTHROPIC_API_KEY=your_anthropic_api_key_here
 - 📱 Desain responsif dengan TailwindCSS v4
 - 🎨 Font kustom (Geist Sans, Geist Mono)
 - 🎭 Animasi halus dengan Framer Motion
+- 👥 Dashboard khusus klien untuk manajemen proyek dan layanan
 
 ## Struktur Proyek
 
@@ -113,6 +114,13 @@ miraidev/
 │   │   ├── harga/             # Halaman harga
 │   │   ├── tentang/          # Halaman tentang kami
 │   │   ├── kontak/           # Halaman kontak
+│   │   ├── dashboard/         # Dashboard klien
+│   │   │   ├── projects/      # Halaman manajemen proyek
+│   │   │   ├── services/      # Halaman layanan klien
+│   │   │   ├── messages/      # Halaman pesan dan komunikasi
+│   │   │   ├── reports/       # Halaman laporan dan analitik
+│   │   │   ├── support/       # Halaman dukungan dan tiket
+│   │   │   └── account/       # Halaman akun dan pengaturan
 │   │   ├── globals.css       # Style global dengan mode gelap
 │   │   ├── layout.tsx        # Layout root dengan providers
 │   │   └── page.tsx           # Redirect ke beranda
@@ -121,12 +129,28 @@ miraidev/
 │   │   ├── chat.tsx           # Interface chat AI
 │   │   ├── navbar.tsx         # Navigasi website
 │   │   ├── theme-provider.tsx # Context tema
-│   │   └── theme-toggle.tsx   # Toggle mode gelap
+│   │   ├── theme-toggle.tsx   # Toggle mode gelap
+│   │   └── dashboard/         # Komponen dashboard klien
+│   │       ├── Sidebar.tsx    # Sidebar navigasi dashboard
+│   │       ├── Header.tsx     # Header dashboard
+│   │       ├── UserNav.tsx    # Navigasi pengguna
+│   │       ├── ProjectOverview.tsx  # Ringkasan proyek
+│   │       ├── ServiceHistory.tsx   # Riwayat layanan
+│   │       ├── Communication.tsx    # Komunikasi dan pesan
+│   │       ├── Reports.tsx          # Laporan dan analitik
+│   │       ├── SupportTicket.tsx    # Tiket dukungan
+│   │       └── UserProfile.tsx      # Profil pengguna
 │   ├── lib/                   # Fungsi utilitas
 │   │   ├── supabase.ts        # Client Supabase
 │   │   ├── user.ts            # Utilitas pengguna
 │   │   ├── utils.ts           # Utilitas umum
 │   │   └── env-check.ts       # Validasi environment
+│   ├── hooks/                 # React hooks
+│   │   └── useAuth.ts         # Hook otentikasi
+│   ├── types/                 # Tipe TypeScript
+│   │   └── dashboard.ts       # Tipe untuk dashboard
+│   ├── constants/             # Konstanta aplikasi
+│   │   └── dashboard.ts       # Konstanta navigasi dashboard
 │   └── middleware.ts          # Middleware route protection
 ├── supabase/
 │   └── migrations/            # Migrasi database

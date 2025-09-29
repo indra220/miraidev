@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/loading-spinner";
-import { createSupabaseClient } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
 import { getCurrentUser } from "@/lib/auth-service";
 import { User, Mail, Phone, Building2 } from "lucide-react";
 
@@ -50,7 +50,7 @@ export default function ProfilePage() {
         setEmail(formattedUserData.email || "");
         
         // Ambil detail lengkap dari tabel clients
-        const supabase = createSupabaseClient();
+        const supabase = createClient();
         const { data: clientData, error } = await supabase
           .from('clients')
           .select('phone, company')
@@ -80,7 +80,7 @@ export default function ProfilePage() {
     setErrors({});
 
     try {
-      const supabase = createSupabaseClient();
+      const supabase = createClient();
       
       // Update profile di auth
       const { error: authError } = await supabase.auth.updateUser({

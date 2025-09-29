@@ -1,9 +1,10 @@
-import { supabase } from '@/lib/supabase';
+import { createClient } from './supabase/client'; // Menggunakan client-side client
 
 export interface ContactFormData {
   name: string;
   email: string;
   phone?: string;
+  company?: string; // Tambahkan field company
   projectType?: string;
   budget?: string;
   timeline?: string;
@@ -11,13 +12,16 @@ export interface ContactFormData {
 }
 
 export async function submitContactForm(data: ContactFormData) {
+  const supabase = createClient(); // Buat client di dalam fungsi
   try {
     const { error } = await supabase
-      .from('contact')
+      .from('contact_submissions') // Perbaikan: Nama tabel yang benar
       .insert({
         name: data.name,
         email: data.email,
         phone: data.phone,
+        // subject diisi dari nama proyek atau default
+        subject: `Pesan dari ${data.name} tentang ${data.projectType || 'proyek baru'}`,
         project_type: data.projectType,
         budget: data.budget,
         timeline: data.timeline,
