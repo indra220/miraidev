@@ -122,6 +122,7 @@ export default function ClientManagement() {
           role: client.role,
           status: client.status,
           join_date: client.join_date,
+          user_id: null, // Tambahkan user_id karena diperlukan oleh skema database
         });
         setClients([...clients, savedClient]);
       }
@@ -375,7 +376,8 @@ function ClientModal({ client, onSave, onClose }: ClientModalProps) {
       rating: 0,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-      last_contacted: null
+      last_contacted: null,
+      user_id: null
     }
   );
 

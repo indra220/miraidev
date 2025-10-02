@@ -102,6 +102,9 @@ export default function ServicesManagement() {
           features: service.features,
           icon: service.icon,
           order: service.order,
+          is_active: true, // Tambahkan field is_active
+          price: 0, // Tambahkan field price
+          user_id: service.user_id || '', // Tambahkan field user_id
         });
         setServices([...services, savedService]);
       }
@@ -263,6 +266,9 @@ function ServiceModal({ service, onSave, onClose }: ServiceModalProps) {
       features: null,
       icon: null,
       order: 0,
+      is_active: true,
+      price: 0,
+      user_id: "", // Tambahkan field user_id
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       is_featured: false
@@ -372,6 +378,37 @@ function ServiceModal({ service, onSave, onClose }: ServiceModalProps) {
                 onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
                 className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-500"
               />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-gray-300">Status Aktif</Label>
+                <div className="flex items-center mt-1">
+                  <input
+                    type="checkbox"
+                    id="is_active"
+                    name="is_active"
+                    checked={formData.is_active || false}
+                    onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                    className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500"
+                  />
+                  <Label htmlFor="is_active" className="ml-2 text-gray-300">
+                    Layanan Aktif
+                  </Label>
+                </div>
+              </div>
+              
+              <div>
+                <Label htmlFor="price" className="text-gray-300">Harga</Label>
+                <Input
+                  id="price"
+                  name="price"
+                  type="number"
+                  value={formData.price || 0}
+                  onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
+                  className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-500"
+                />
+              </div>
             </div>
             
             <div>

@@ -12,10 +12,10 @@ const nextConfig: NextConfig = {
     ];
   },
   
-  // Optimasi performa
+  // Nonaktifkan React compiler sementara untuk menghindari masalah hydration
   experimental: {
-    // Aktifkan React compiler untuk performa tambahan
-    reactCompiler: true,
+    // Nonaktifkan sementara karena bisa menyebabkan masalah hydration
+    reactCompiler: false,
   },
   
   // Optimasi gambar

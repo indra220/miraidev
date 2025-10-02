@@ -13,18 +13,7 @@ import {
 import { Navbar } from "@/components/navbar";
 import OptimizedMotion from "@/components/OptimizedMotion";
 import { getPortfolioProjects, getAllPortfolioCategories } from "@/lib/portfolio";
-
-interface PortfolioProject {
-  id: number;
-  title: string;
-  category: string;
-  description: string;
-  image: string;
-  tags: string[];
-  client: string;
-  date: string;
-  views: string;
-}
+import { PortfolioItem } from "@/lib/types";
 
 interface Category {
   id: string;
@@ -34,7 +23,7 @@ interface Category {
 
 export default function PortofolioPage() {
   const [activeFilter, setActiveFilter] = useState("all");
-  const [projects, setProjects] = useState<PortfolioProject[]>([]);
+  const [projects, setProjects] = useState<PortfolioItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([
     { id: "all", name: "Semua", icon: <Globe className="w-4 h-4" /> }
   ]);
@@ -66,20 +55,10 @@ export default function PortofolioPage() {
         // Fetch projects
         const projectResult = await getPortfolioProjects();
         if (projectResult.success) {
-          // Transform data to match existing structure
-          const transformedProjects: PortfolioProject[] = projectResult.data.map((project) => ({
-            id: Number(project.id),
-            title: project.title,
-            category: project.category,
-            description: project.description,
-            image: project.image_url || `/placeholder-portfolio-${Math.floor(Math.random() * 6) + 1}.jpg`,
-            tags: project.tags || [],
-            client: project.client,
-            date: new Date(project.date).toLocaleDateString('id-ID', { 
-              year: 'numeric', 
-              month: 'long' 
-            }),
-            views: project.views?.toString() || "0"
+          // Add is_highlighted as false for all items since that's an additional property
+          const transformedProjects: PortfolioItem[] = projectResult.data.map((project) => ({
+            ...project,
+            is_highlighted: false
           }));
           
           setProjects(transformedProjects);
@@ -95,66 +74,90 @@ export default function PortofolioPage() {
             title: "Website Kedai Kopi Lokal",
             category: "UMKM",
             description: "Website profesional untuk kedai kopi lokal dengan menu online, lokasi, dan informasi kontak.",
-            image: "/placeholder-portfolio-1.jpg",
+            image_url: "/placeholder-portfolio-1.jpg",
             tags: ["Next.js", "Tailwind CSS", "Vercel"],
             client: "Kedai Kopi Nusantara",
-            date: "Maret 2024",
-            views: "850"
+            date: new Date('2024-03-15').toISOString(),
+            views: 850,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            case_study_url: "/studi-kasus/kedai-kopi-lokal",
+            is_highlighted: false
           },
           {
             id: 2,
             title: "Portofolio Fotografer Freelance",
             category: "Personal Branding",
             description: "Website portofolio yang menampilkan karya fotografer freelance dengan galeri interaktif.",
-            image: "/placeholder-portfolio-2.jpg",
+            image_url: "/placeholder-portfolio-2.jpg",
             tags: ["React", "Framer Motion", "Cloudinary"],
             client: "Andi Prasetyo Photography",
-            date: "Januari 2024",
-            views: "1.2K"
+            date: new Date('2024-01-20').toISOString(),
+            views: 1200,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            case_study_url: "/studi-kasus/portofolio-fotografer",
+            is_highlighted: false
           },
           {
             id: 3,
             title: "Website Konsultan Finansial",
             category: "Profesional Jasa",
             description: "Website untuk konsultan finansial independen dengan blog, layanan, dan form booking.",
-            image: "/placeholder-portfolio-3.jpg",
+            image_url: "/placeholder-portfolio-3.jpg",
             tags: ["Next.js", "MDX", "Formspree"],
             client: "Rina Financial Consultant",
-            date: "November 2023",
-            views: "950"
+            date: new Date('2023-11-10').toISOString(),
+            views: 950,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            case_study_url: "/studi-kasus/konsultan-finansial",
+            is_highlighted: false
           },
           {
             id: 4,
             title: "Website PPDB SD Negeri 01",
             category: "ppdb",
             description: "Website sistem PPDB online untuk SD Negeri 01 dengan form registrasi dan tracking status pendaftaran.",
-            image: "/placeholder-portfolio-4.jpg",
+            image_url: "/placeholder-portfolio-4.jpg",
             tags: ["Next.js", "Firebase", "Tailwind CSS"],
             client: "SD Negeri 01 Jakarta",
-            date: "September 2023",
-            views: "2.1K"
+            date: new Date('2023-09-05').toISOString(),
+            views: 2100,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            case_study_url: "/studi-kasus/ppdb-sd-negeri",
+            is_highlighted: false
           },
           {
             id: 5,
             title: "Portofolio Developer Freelance",
             category: "Personal Branding",
             description: "Website portofolio profesional untuk developer freelance dengan studi kasus proyek.",
-            image: "/placeholder-portfolio-5.jpg",
+            image_url: "/placeholder-portfolio-5.jpg",
             tags: ["Next.js", "Framer Motion", "MDX"],
             client: "Budi Santoso - Web Developer",
-            date: "Juli 2023",
-            views: "1.5K"
+            date: new Date('2023-07-15').toISOString(),
+            views: 1500,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            case_study_url: "/studi-kasus/portofolio-developer",
+            is_highlighted: false
           },
           {
             id: 6,
             title: "Website PPDB SMA Negeri 5",
             category: "ppdb",
             description: "Website sistem PPDB online untuk SMA Negeri 5 dengan fitur upload berkas dan verifikasi dokumen.",
-            image: "/placeholder-portfolio-6.jpg",
+            image_url: "/placeholder-portfolio-6.jpg",
             tags: ["React", "Node.js", "MongoDB"],
             client: "SMA Negeri 5 Bandung",
-            date: "Mei 2023",
-            views: "3.2K"
+            date: new Date('2023-05-20').toISOString(),
+            views: 3200,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            case_study_url: "/studi-kasus/ppdb-sma-negeri",
+            is_highlighted: false
           }
         ]);
       } finally {
@@ -293,7 +296,7 @@ export default function PortofolioPage() {
                       </div>
                       <div className="absolute bottom-4 left-4">
                         <div className="flex flex-wrap gap-1">
-                          {project.tags.map((tag: string, index: number) => (
+                          {(project.tags || []).map((tag: string, index: number) => (
                             <span key={index} className="bg-gray-900/50 text-xs px-2 py-1 rounded">
                               {tag}
                             </span>
@@ -306,7 +309,7 @@ export default function PortofolioPage() {
                         <h3 className="text-xl font-semibold">{project.title}</h3>
                         <div className="flex gap-2 text-gray-500">
                           <Eye className="w-4 h-4" />
-                          <span className="text-xs">{project.views}</span>
+                          <span className="text-xs">{project.views || 0}</span>
                         </div>
                       </div>
                       <p className="text-gray-400 mb-4 text-sm">{project.description}</p>
@@ -317,7 +320,10 @@ export default function PortofolioPage() {
                         </div>
                         <div className="text-xs text-gray-500 flex items-center">
                           <Calendar className="w-3 h-3 mr-1" />
-                          {project.date}
+                          {project.date ? new Date(project.date).toLocaleDateString('id-ID', { 
+                            year: 'numeric', 
+                            month: 'long' 
+                          }) : 'TBA'}
                         </div>
                       </div>
                       <Button variant="link" className="p-0 text-blue-400 hover:text-blue-300 transition-all duration-300">

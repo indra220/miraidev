@@ -1,8 +1,71 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProjectOverview } from "@/components/dashboard/ProjectOverview";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { dashboardService, DashboardProject } from "@/lib/dashboard-service";
 
 export default function ProjectsPage() {
+  const [projects, setProjects] = useState<DashboardProject[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { session, loading: authLoading } = useAuth();
+  
+  useEffect(() => {
+    if (authLoading) return; // Jika auth masih loading, jangan lanjutkan
+    
+    const fetchProjects = async () => {
+      if (session?.user) {
+        try {
+          const userData = await dashboardService.getDashboardData(session.user.id);
+          setProjects(userData.projects);
+        } catch (error) {
+          console.error("Error fetching projects:", error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+    
+    fetchProjects();
+  }, [session, authLoading]);
+
+  if (loading || authLoading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">Manajemen Proyek</h1>
+          <p className="text-muted-foreground">
+            Pantau dan kelola semua proyek Anda di sini
+          </p>
+        </div>
+        
+        <div className="flex justify-center items-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+            <p className="mt-4 text-muted-foreground">Memuat data proyek...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Filter proyek berdasarkan status
+  const activeProjects = projects.filter(p => 
+    p.status === 'aktif' || p.status === 'development' || p.status === 'on-going'
+  );
+  
+  const completedProjects = projects.filter(p => 
+    p.status === 'completed' || p.status === 'selesai'
+  );
+  
+  const onHoldProjects = projects.filter(p => 
+    p.status === 'on-hold' || p.status === 'ditunda'
+  );
+
   return (
     <div className="space-y-6">
       <div>
@@ -14,57 +77,73 @@ export default function ProjectsPage() {
 
       <Tabs defaultValue="active" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="active">Aktif</TabsTrigger>
-          <TabsTrigger value="completed">Selesai</TabsTrigger>
-          <TabsTrigger value="on-hold">Ditunda</TabsTrigger>
-          <TabsTrigger value="all">Semua</TabsTrigger>
+          <TabsTrigger value="active">Aktif ({activeProjects.length})</TabsTrigger>
+          <TabsTrigger value="completed">Selesai ({completedProjects.length})</TabsTrigger>
+          <TabsTrigger value="on-hold">Ditunda ({onHoldProjects.length})</TabsTrigger>
+          <TabsTrigger value="all">Semua ({projects.length})</TabsTrigger>
         </TabsList>
         
         <TabsContent value="active" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <Card>
-              <CardHeader>
-                <CardTitle>Website E-commerce</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>Proyek website toko online untuk PT. Maju Jaya</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Aplikasi Inventory</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>Sistem manajemen inventaris untuk retail chain</p>
-              </CardContent>
-            </Card>
-          </div>
+          {activeProjects.length > 0 ? (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {activeProjects.map((project) => (
+                <Card key={project.id}>
+                  <CardHeader>
+                    <CardTitle>{project.name}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p>Proyek untuk {project.client}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">Tidak ada proyek aktif</p>
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="completed" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <Card>
-              <CardHeader>
-                <CardTitle>Landing Page Marketing</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>Landing page untuk kampanye digital</p>
-              </CardContent>
-            </Card>
-          </div>
+          {completedProjects.length > 0 ? (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {completedProjects.map((project) => (
+                <Card key={project.id}>
+                  <CardHeader>
+                    <CardTitle>{project.name}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p>Proyek untuk {project.client}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">Tidak ada proyek selesai</p>
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="on-hold" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <Card>
-              <CardHeader>
-                <CardTitle>Sistem ERP</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>Enterprise Resource Planning (ditunda sementara)</p>
-              </CardContent>
-            </Card>
-          </div>
+          {onHoldProjects.length > 0 ? (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {onHoldProjects.map((project) => (
+                <Card key={project.id}>
+                  <CardHeader>
+                    <CardTitle>{project.name}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p>Proyek untuk {project.client}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">Tidak ada proyek ditunda</p>
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="all" className="space-y-4">

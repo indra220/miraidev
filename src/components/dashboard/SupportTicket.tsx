@@ -13,15 +13,17 @@ import {
   SearchIcon,
   CalendarIcon
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { 
+  dashboardService, 
+  DashboardSupportTicket
+} from "@/lib/dashboard-service";
 
 export function SupportTicket() {
-  // Data contoh - nanti akan diganti dengan data dari API
-  const [tickets] = useState([
-    { id: 1, subject: "Kesulitan saat login", status: "dalam proses", priority: "tinggi", date: "2024-10-25" },
-    { id: 2, subject: "Permintaan fitur baru", status: "terbuka", priority: "rendah", date: "2024-10-22" },
-    { id: 3, subject: "Bug pada halaman checkout", status: "selesai", priority: "tinggi", date: "2024-10-20" },
-  ]);
+  const [tickets, setTickets] = useState<DashboardSupportTicket[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { session, loading: authLoading } = useAuth();
 
   const [newTicket, setNewTicket] = useState({
     subject: "",
@@ -29,14 +31,64 @@ export function SupportTicket() {
     priority: "normal"
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (authLoading) return; // Jika auth masih loading, jangan lanjutkan
+    
+    const fetchTickets = async () => {
+      if (session?.user) {
+        try {
+          const ticketsData = await dashboardService.getDashboardData(session.user.id);
+          setTickets(ticketsData.supportTickets);
+        } catch (error) {
+          console.error("Error fetching support tickets:", error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+
+    fetchTickets();
+  }, [session, authLoading]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Implementasi pengiriman tiket dukungan
-    // console.log("Tiket baru:", newTicket);
-    setNewTicket({ subject: "", message: "", priority: "normal" });
+    
+    if (session?.user) {
+      try {
+        // Create the new ticket in the database
+        await dashboardService.createSupportTicket(
+          session.user.id, 
+          newTicket.subject, 
+          newTicket.message, 
+          newTicket.priority
+        );
+        
+        // Refresh the tickets list
+        const updatedData = await dashboardService.getDashboardData(session.user.id);
+        setTickets(updatedData.supportTickets);
+        
+        // Reset the form
+        setNewTicket({ subject: "", message: "", priority: "normal" });
+      } catch (error) {
+        console.error("Error creating support ticket:", error);
+      }
+    }
   };
 
   
+
+  if (loading || authLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Memuat data tiket dukungan...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -105,41 +157,47 @@ export function SupportTicket() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {tickets.map((ticket) => (
-              <div key={ticket.id} className="p-4 border rounded-lg">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center">
-                      <TicketIcon className="h-5 w-5 mr-2 text-muted-foreground" />
-                      <h3 className="font-medium">{ticket.subject}</h3>
+            {tickets.length > 0 ? (
+              tickets.map((ticket) => (
+                <div key={ticket.id} className="p-4 border rounded-lg">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="flex items-center">
+                        <TicketIcon className="h-5 w-5 mr-2 text-muted-foreground" />
+                        <h3 className="font-medium">{ticket.subject}</h3>
+                      </div>
+                      <div className="flex items-center mt-2 space-x-4">
+                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${
+                          ticket.status === 'selesai' ? 'bg-green-100 text-green-800' :
+                          ticket.status === 'dalam proses' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-blue-100 text-blue-800'
+                        }`}>
+                          {ticket.status === 'selesai' ? <CheckCircleIcon className="h-3 w-3 mr-1" /> :
+                           ticket.status === 'dalam proses' ? <ClockIcon className="h-3 w-3 mr-1" /> :
+                           <AlertCircleIcon className="h-3 w-3 mr-1" />}
+                          {ticket.status}
+                        </span>
+                        <span className={`text-xs ${
+                          ticket.priority === 'tinggi' ? 'text-red-600' :
+                          ticket.priority === 'rendah' ? 'text-green-600' : 'text-yellow-600'
+                        }`}>
+                          {ticket.priority}
+                        </span>
+                        <span className="text-sm text-muted-foreground flex items-center">
+                          <CalendarIcon className="h-4 w-4 mr-1" />
+                          {new Date(ticket.date).toLocaleDateString('id-ID')}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center mt-2 space-x-4">
-                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${
-                        ticket.status === 'selesai' ? 'bg-green-100 text-green-800' :
-                        ticket.status === 'dalam proses' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-blue-100 text-blue-800'
-                      }`}>
-                        {ticket.status === 'selesai' ? <CheckCircleIcon className="h-3 w-3 mr-1" /> :
-                         ticket.status === 'dalam proses' ? <ClockIcon className="h-3 w-3 mr-1" /> :
-                         <AlertCircleIcon className="h-3 w-3 mr-1" />}
-                        {ticket.status}
-                      </span>
-                      <span className={`text-xs ${
-                        ticket.priority === 'tinggi' ? 'text-red-600' :
-                        ticket.priority === 'rendah' ? 'text-green-600' : 'text-yellow-600'
-                      }`}>
-                        {ticket.priority}
-                      </span>
-                      <span className="text-sm text-muted-foreground flex items-center">
-                        <CalendarIcon className="h-4 w-4 mr-1" />
-                        {ticket.date}
-                      </span>
-                    </div>
+                    <Button size="sm" variant="outline">Lihat Detail</Button>
                   </div>
-                  <Button size="sm" variant="outline">Lihat Detail</Button>
                 </div>
+              ))
+            ) : (
+              <div className="text-center py-4 text-muted-foreground">
+                Tidak ada tiket dukungan yang terdaftar
               </div>
-            ))}
+            )}
           </div>
         </CardContent>
       </Card>

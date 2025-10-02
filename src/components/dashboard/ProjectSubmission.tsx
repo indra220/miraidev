@@ -13,15 +13,17 @@ import {
   CalendarIcon,
   PlusIcon
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { 
+  dashboardService, 
+  DashboardProjectSubmission
+} from "@/lib/dashboard-service";
 
 export function ProjectSubmission() {
-  // Data contoh - nanti akan diganti dengan data dari API
-  const [projects] = useState([
-    { id: 1, name: "Website E-commerce", status: "dalam proses", type: "website", date: "2024-10-25" },
-    { id: 2, name: "Landing Page Marketing", status: "terkirim", type: "website", date: "2024-10-22" },
-    { id: 3, name: "Sistem Informasi", status: "selesai", type: "aplikasi", date: "2024-10-20" },
-  ]);
+  const [projects, setProjects] = useState<DashboardProjectSubmission[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { session, loading: authLoading } = useAuth();
 
   const [newProject, setNewProject] = useState({
     name: "",
@@ -30,12 +32,63 @@ export function ProjectSubmission() {
     requirements: ""
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (authLoading) return; // Jika auth masih loading, jangan lanjutkan
+    
+    const fetchProjects = async () => {
+      if (session?.user) {
+        try {
+          const projectsData = await dashboardService.getDashboardData(session.user.id);
+          setProjects(projectsData.projectSubmissions);
+        } catch (error) {
+          console.error("Error fetching project submissions:", error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, [session, authLoading]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Implementasi pengajuan proyek baru
-    // console.log("Proyek baru:", newProject);
-    setNewProject({ name: "", description: "", type: "website", requirements: "" });
+    
+    if (session?.user) {
+      try {
+        // Create the new project submission in the database
+        await dashboardService.createProjectSubmission(
+          session.user.id, 
+          newProject.name, 
+          newProject.description, 
+          newProject.type, 
+          newProject.requirements
+        );
+        
+        // Refresh the projects list
+        const updatedData = await dashboardService.getDashboardData(session.user.id);
+        setProjects(updatedData.projectSubmissions);
+        
+        // Reset the form
+        setNewProject({ name: "", description: "", type: "website", requirements: "" });
+      } catch (error) {
+        console.error("Error creating project submission:", error);
+      }
+    }
   };
+
+  if (loading || authLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Memuat data pengajuan proyek...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -67,7 +120,7 @@ export function ProjectSubmission() {
               <select
                 value={newProject.type}
                 onChange={(e) => setNewProject({...newProject, type: e.target.value})}
-                className="w-full border rounded px-3 py-2 text-sm"
+                className="w-full border rounded px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
               >
                 <option value="website">Website</option>
                 <option value="landing-page">Landing Page</option>
@@ -116,36 +169,42 @@ export function ProjectSubmission() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {projects.map((project) => (
-              <div key={project.id} className="p-4 border rounded-lg">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center">
-                      <FileTextIcon className="h-5 w-5 mr-2 text-muted-foreground" />
-                      <h3 className="font-medium">{project.name}</h3>
+            {projects.length > 0 ? (
+              projects.map((project) => (
+                <div key={project.id} className="p-4 border rounded-lg">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="flex items-center">
+                        <FileTextIcon className="h-5 w-5 mr-2 text-muted-foreground" />
+                        <h3 className="font-medium">{project.name}</h3>
+                      </div>
+                      <div className="flex items-center mt-2 space-x-4">
+                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${
+                          project.status === 'selesai' ? 'bg-green-100 text-green-800' :
+                          project.status === 'dalam proses' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-blue-100 text-blue-800'
+                        }`}>
+                          {project.status === 'selesai' ? <CheckCircleIcon className="h-3 w-3 mr-1" /> :
+                           project.status === 'dalam proses' ? <ClockIcon className="h-3 w-3 mr-1" /> :
+                           <AlertCircleIcon className="h-3 w-3 mr-1" />}
+                          {project.status}
+                        </span>
+                        <span className="text-sm text-muted-foreground capitalize">{project.type}</span>
+                        <span className="text-sm text-muted-foreground flex items-center">
+                          <CalendarIcon className="h-4 w-4 mr-1" />
+                          {new Date(project.date).toLocaleDateString('id-ID')}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center mt-2 space-x-4">
-                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${
-                        project.status === 'selesai' ? 'bg-green-100 text-green-800' :
-                        project.status === 'dalam proses' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-blue-100 text-blue-800'
-                      }`}>
-                        {project.status === 'selesai' ? <CheckCircleIcon className="h-3 w-3 mr-1" /> :
-                         project.status === 'dalam proses' ? <ClockIcon className="h-3 w-3 mr-1" /> :
-                         <AlertCircleIcon className="h-3 w-3 mr-1" />}
-                        {project.status}
-                      </span>
-                      <span className="text-sm text-muted-foreground capitalize">{project.type}</span>
-                      <span className="text-sm text-muted-foreground flex items-center">
-                        <CalendarIcon className="h-4 w-4 mr-1" />
-                        {project.date}
-                      </span>
-                    </div>
+                    <Button size="sm" variant="outline">Lihat Detail</Button>
                   </div>
-                  <Button size="sm" variant="outline">Lihat Detail</Button>
                 </div>
+              ))
+            ) : (
+              <div className="text-center py-4 text-muted-foreground">
+                Tidak ada pengajuan proyek yang terdaftar
               </div>
-            ))}
+            )}
           </div>
         </CardContent>
       </Card>

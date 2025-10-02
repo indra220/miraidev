@@ -1,19 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
+import { PortfolioItem } from './types';
 const supabase = createClient();
-
-export interface PortfolioProject {
-  id: string;
-  title: string;
-  category: string;
-  description: string;
-  image_url: string;
-  tags: string[];
-  client: string;
-  date: string;
-  views: number;
-  created_at: string;
-  updated_at: string;
-}
 
 export async function getPortfolioProjects(category?: string) {
   try {
@@ -32,16 +19,22 @@ export async function getPortfolioProjects(category?: string) {
       throw new Error(error.message);
     }
 
+    // Tambahkan is_highlighted sebagai false secara default karena itu adalah properti tambahan
+    const portfolioItems = data.map(item => ({
+      ...item,
+      is_highlighted: false
+    })) as PortfolioItem[];
+
     return { 
       success: true, 
-      data: data as PortfolioProject[] 
+      data: portfolioItems 
     };
   } catch (error) {
     console.error('Error fetching portfolio projects:', error);
     return { 
       success: false, 
       error: error instanceof Error ? error.message : 'Terjadi kesalahan saat mengambil data portofolio',
-      data: [] as PortfolioProject[]
+      data: []
     };
   }
 }

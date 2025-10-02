@@ -13,30 +13,72 @@ import {
   CameraIcon,
   CalendarIcon
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { dashboardService, DashboardProfile } from "@/lib/dashboard-service";
 
 export function UserProfile() {
-  const [profile, setProfile] = useState({
-    name: "Nama Klien",
-    email: "email@klien.com",
-    phone: "+62 812-3456-7890",
-    company: "Nama Perusahaan",
-    joinDate: "2024-01-15",
+  const [profile, setProfile] = useState<DashboardProfile>({
+    name: "",
+    email: "",
+    phone: "",
+    company: "",
+    joinDate: "",
     avatar: "/placeholder-avatar.jpg"
   });
-
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const { session, loading: authLoading } = useAuth();
 
-  const handleSave = () => {
+  useEffect(() => {
+    if (authLoading) return; // Jika auth masih loading, jangan lanjutkan
+    
+    const fetchProfile = async () => {
+      if (session?.user) {
+        try {
+          const userProfile = await dashboardService.getDashboardData(session.user.id);
+          setProfile(userProfile.profile);
+        } catch (error) {
+          console.error("Error fetching profile:", error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [session, authLoading]);
+
+  const handleSave = async () => {
     setIsEditing(false);
-    // Implementasi penyimpanan perubahan profil
-    // console.log("Profil disimpan:", profile);
+    if (session?.user) {
+      // Implementasi penyimpanan perubahan profil ke database
+      try {
+        console.log("Profil disimpan:", profile);
+        // Tambahkan logika untuk menyimpan ke database di sini
+      } catch (error) {
+        console.error("Error saving profile:", error);
+      }
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setProfile(prev => ({ ...prev, [name]: value }));
   };
+
+  if (loading || authLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Memuat data profil...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -49,7 +91,22 @@ export function UserProfile() {
         <CardHeader className="flex items-center justify-center pb-2">
           <div className="relative">
             <div className="w-24 h-24 rounded-full bg-gray-200 border-4 border-white dark:border-gray-800 flex items-center justify-center overflow-hidden">
-              <UserIcon className="w-12 h-12 text-gray-500" />
+              <img 
+                src={profile.avatar} 
+                alt="Avatar" 
+                className="w-full h-full object-cover rounded-full"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  // Cek apakah ini sudah merupakan placeholder
+                  if (target.src.includes('/placeholder-avatar.jpg')) {
+                    // Jika placeholder juga gagal, gunakan SVG inline sebagai fallback
+                    target.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNkMWQ1ZGIiLz48Y2lyY2xlIGN4PSI1MCIgY3k9IjQwIiByPSIxNSIgZmlsbD0iIzg4OCIvPjxwYXRoIGQ9Ik0yNSA4MGMyMCAyMCA2MCAyMCA4MCAwIiBzdHJva2U9IiM4ODgiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==';
+                  } else {
+                    // Jika bukan placeholder, arahkan ke placeholder
+                    target.src = "/placeholder-avatar.jpg";
+                  }
+                }}
+              />
             </div>
             <Button size="icon" variant="secondary" className="absolute bottom-0 right-0 rounded-full">
               <CameraIcon className="w-4 h-4" />
@@ -129,7 +186,7 @@ export function UserProfile() {
                 <CalendarIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input 
                   id="joinDate" 
-                  value={profile.joinDate} 
+                  value={profile.joinDate ? new Date(profile.joinDate).toLocaleDateString('id-ID') : ''} 
                   disabled={true}
                   className="pl-9"
                 />

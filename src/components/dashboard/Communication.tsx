@@ -6,21 +6,52 @@ import {
   UserIcon,
   CalendarIcon 
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { 
+  dashboardService, 
+  DashboardMessage, 
+  DashboardConversation 
+} from "@/lib/dashboard-service";
 
 export function Communication() {
-  // Data contoh - nanti akan diganti dengan data dari API
-  const [messages] = useState([
-    { id: 1, sender: "Admin", subject: "Pertanyaan tentang fitur login", date: "2024-10-25", read: true },
-    { id: 2, sender: "Admin", subject: "Update status proyek Anda", date: "2024-10-20", read: false },
-    { id: 3, sender: "Admin", subject: "Permintaan revisi desain", date: "2024-10-18", read: true },
-    { id: 4, sender: "Admin", subject: "Konfirmasi pembayaran selesai", date: "2024-10-15", read: false },
-  ]);
+  const [messages, setMessages] = useState<DashboardMessage[]>([]);
+  const [conversations, setConversations] = useState<DashboardConversation[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { session, loading: authLoading } = useAuth();
 
-  const [conversations] = useState([
-    { id: 1, project: "Website E-commerce", participants: 2, lastMessage: "Apakah Anda puas dengan hasilnya?", lastActivity: "2 jam yang lalu" },
-    { id: 2, project: "Aplikasi Mobile", participants: 2, lastMessage: "Revisi UI telah selesai", lastActivity: "1 hari yang lalu" },
-  ]);
+  useEffect(() => {
+    if (authLoading) return; // Jika auth masih loading, jangan lanjutkan
+    
+    const fetchCommunication = async () => {
+      if (session?.user) {
+        try {
+          const commData = await dashboardService.getDashboardData(session.user.id);
+          setMessages(commData.messages);
+          setConversations(commData.conversations);
+        } catch (error) {
+          console.error("Error fetching communication data:", error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+
+    fetchCommunication();
+  }, [session, authLoading]);
+
+  if (loading || authLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Memuat data komunikasi...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -38,21 +69,30 @@ export function Communication() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {messages.map((message) => (
-              <div key={message.id} className={`p-3 rounded-lg ${!message.read ? 'bg-blue-50 dark:bg-blue-950' : 'bg-muted'}`}>
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center">
-                    <UserIcon className="h-4 w-4 mr-2 text-muted-foreground" />
-                    <span className="font-medium">{message.sender}</span>
+            {messages.length > 0 ? (
+              messages.map((message) => (
+                <div 
+                  key={message.id} 
+                  className={`p-3 rounded-lg ${!message.read ? 'bg-blue-50 dark:bg-blue-950' : 'bg-muted'}`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center">
+                      <UserIcon className="h-4 w-4 mr-2 text-muted-foreground" />
+                      <span className="font-medium">{message.sender}</span>
+                    </div>
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <CalendarIcon className="h-4 w-4 mr-1" />
+                      {new Date(message.date).toLocaleDateString('id-ID')}
+                    </div>
                   </div>
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <CalendarIcon className="h-4 w-4 mr-1" />
-                    {message.date}
-                  </div>
+                  <h3 className="font-medium mt-2">{message.subject}</h3>
                 </div>
-                <h3 className="font-medium mt-2">{message.subject}</h3>
+              ))
+            ) : (
+              <div className="text-center py-4 text-muted-foreground">
+                Tidak ada pesan baru
               </div>
-            ))}
+            )}
           </CardContent>
         </Card>
 
@@ -61,21 +101,27 @@ export function Communication() {
             <CardTitle>Forum Diskusi Proyek</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {conversations.map((conversation) => (
-              <div key={conversation.id} className="p-3 border rounded-lg">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-medium">{conversation.project}</h3>
-                  <span className="text-xs bg-muted px-2 py-1 rounded-full">
-                    {conversation.participants} peserta
-                  </span>
+            {conversations.length > 0 ? (
+              conversations.map((conversation) => (
+                <div key={conversation.id} className="p-3 border rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-medium">{conversation.project}</h3>
+                    <span className="text-xs bg-muted px-2 py-1 rounded-full">
+                      {conversation.participants} peserta
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-2">{conversation.lastMessage}</p>
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="text-xs text-muted-foreground">{conversation.lastActivity}</span>
+                    <Button size="sm">Gabung</Button>
+                  </div>
                 </div>
-                <p className="text-sm text-muted-foreground mt-2">{conversation.lastMessage}</p>
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-xs text-muted-foreground">{conversation.lastActivity}</span>
-                  <Button size="sm">Gabung</Button>
-                </div>
+              ))
+            ) : (
+              <div className="text-center py-4 text-muted-foreground">
+                Tidak ada forum diskusi aktif
               </div>
-            ))}
+            )}
           </CardContent>
         </Card>
       </div>
