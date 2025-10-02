@@ -20,27 +20,31 @@ import {
   Settings
 } from "lucide-react";
 
-interface SeoSettings {
+
+
+interface FormSeoSettings {
+  id: number;
   page: string;
-  title: string;
-  description: string;
-  keywords: string;
-  ogTitle: string;
-  ogDescription: string;
-  ogImage: string;
-  twitterTitle: string;
-  twitterDescription: string;
-  twitterImage: string;
-  canonicalUrl: string;
-  robotsIndex: boolean;
-  robotsFollow: boolean;
-  sitemapPriority: number;
-  lastModified: string;
+  title: string | null;
+  description: string | null;
+  keywords: string | null;
+  ogTitle: string | null;
+  ogDescription: string | null;
+  ogImage: string | null;
+  twitterTitle: string | null;
+  twitterDescription: string | null;
+  twitterImage: string | null;
+  canonicalUrl: string | null;
+  robotsIndex: boolean | null;
+  robotsFollow: boolean | null;
+  sitemapPriority: number | null;
+  lastModified: string | null;
 }
 
 export default function SeoManagement() {
-  const [seoData, setSeoData] = useState<SeoSettings[]>([
+  const [seoData, setSeoData] = useState<FormSeoSettings[]>([
     {
+      id: 1,
       page: "/",
       title: "MiraiDev - Agen Web Development Modern",
       description: "Kami menyediakan layanan pembuatan website profesional, e-commerce, dan aplikasi web modern untuk bisnis Anda.",
@@ -58,6 +62,7 @@ export default function SeoManagement() {
       lastModified: "2024-09-25"
     },
     {
+      id: 2,
       page: "/layanan",
       title: "Layanan Pengembangan Website - MiraiDev",
       description: "Layanan pengembangan website profesional dari MiraiDev: website kustom, e-commerce, redesign, dan pemeliharaan.",
@@ -75,6 +80,7 @@ export default function SeoManagement() {
       lastModified: "2024-09-20"
     },
     {
+      id: 3,
       page: "/portofolio",
       title: "Portofolio Proyek Web - MiraiDev",
       description: "Lihat portofolio proyek web development terbaik kami. Temukan contoh karya dan solusi yang telah kami buat.",
@@ -94,10 +100,10 @@ export default function SeoManagement() {
   ]);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState<SeoSettings | null>(null);
+  const [currentPage, setCurrentPage] = useState<FormSeoSettings | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  const handleEdit = (page: SeoSettings) => {
+  const handleEdit = (page: FormSeoSettings) => {
     setCurrentPage(page);
     setIsEditing(true);
   };
@@ -120,8 +126,8 @@ export default function SeoManagement() {
 
   const filteredPages = seoData.filter(page =>
     page.page.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    page.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    page.description.toLowerCase().includes(searchTerm.toLowerCase())
+    (page.title || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (page.description || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -159,23 +165,23 @@ export default function SeoManagement() {
                       <div className="bg-gray-700/50 p-2 rounded-lg">
                         <Globe className="h-5 w-5 text-blue-400" />
                       </div>
-                      <h3 className="text-lg font-bold text-white">{page.title}</h3>
+                      <h3 className="text-lg font-bold text-white">{page.title || "Untitled"}</h3>
                       <Badge variant="outline" className="border-gray-600 text-gray-300">
                         {page.page}
                       </Badge>
                     </div>
                     
-                    <p className="text-gray-400 mb-4">{page.description}</p>
+                    <p className="text-gray-400 mb-4">{page.description || "No description"}</p>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-4">
                       <div>
                         <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Meta Keywords</h4>
-                        <p className="text-gray-300">{page.keywords}</p>
+                        <p className="text-gray-300">{page.keywords || "No keywords"}</p>
                       </div>
                       
                       <div>
                         <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Canonical URL</h4>
-                        <p className="text-blue-400">{page.canonicalUrl}</p>
+                        <p className="text-blue-400">{page.canonicalUrl || "No canonical URL"}</p>
                       </div>
                     </div>
                     
@@ -193,11 +199,11 @@ export default function SeoManagement() {
                         {page.robotsFollow ? "Follow" : "No Follow"}
                       </Badge>
                       <Badge variant="outline" className="border-gray-600 text-gray-300">
-                        Prioritas: {page.sitemapPriority}
+                        Prioritas: {page.sitemapPriority || 0}
                       </Badge>
                       <Badge variant="outline" className="border-gray-600 text-gray-300 flex items-center">
                         <Calendar className="h-3 w-3 mr-1" />
-                        {page.lastModified}
+                        {page.lastModified || "Not specified"}
                       </Badge>
                     </div>
                   </div>
@@ -251,7 +257,7 @@ export default function SeoManagement() {
                     <Label htmlFor="title" className="text-gray-300">Judul Halaman (Title)</Label>
                     <Input
                       id="title"
-                      value={currentPage.title}
+                      value={currentPage.title || ""}
                       onChange={(e) => setCurrentPage({...currentPage, title: e.target.value})}
                       className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-500"
                     />
@@ -262,7 +268,7 @@ export default function SeoManagement() {
                     <Label htmlFor="canonicalUrl" className="text-gray-300">Canonical URL</Label>
                     <Input
                       id="canonicalUrl"
-                      value={currentPage.canonicalUrl}
+                      value={currentPage.canonicalUrl || ""}
                       onChange={(e) => setCurrentPage({...currentPage, canonicalUrl: e.target.value})}
                       className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-500"
                     />
@@ -274,7 +280,7 @@ export default function SeoManagement() {
                   <Label htmlFor="description" className="text-gray-300">Deskripsi Meta</Label>
                   <Textarea
                     id="description"
-                    value={currentPage.description}
+                    value={currentPage.description || ""}
                     onChange={(e) => setCurrentPage({...currentPage, description: e.target.value})}
                     rows={3}
                     className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-500"
@@ -286,7 +292,7 @@ export default function SeoManagement() {
                   <Label htmlFor="keywords" className="text-gray-300">Meta Keywords</Label>
                   <Input
                     id="keywords"
-                    value={currentPage.keywords}
+                    value={currentPage.keywords || ""}
                     onChange={(e) => setCurrentPage({...currentPage, keywords: e.target.value})}
                     className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-500"
                   />
@@ -305,7 +311,7 @@ export default function SeoManagement() {
                     <Label htmlFor="ogTitle" className="text-gray-300">OG Title</Label>
                     <Input
                       id="ogTitle"
-                      value={currentPage.ogTitle}
+                      value={currentPage.ogTitle || ""}
                       onChange={(e) => setCurrentPage({...currentPage, ogTitle: e.target.value})}
                       className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-500"
                     />
@@ -315,7 +321,7 @@ export default function SeoManagement() {
                     <Label htmlFor="ogImage" className="text-gray-300">OG Image URL</Label>
                     <Input
                       id="ogImage"
-                      value={currentPage.ogImage}
+                      value={currentPage.ogImage || ""}
                       onChange={(e) => setCurrentPage({...currentPage, ogImage: e.target.value})}
                       className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-500"
                     />
@@ -326,7 +332,7 @@ export default function SeoManagement() {
                   <Label htmlFor="ogDescription" className="text-gray-300">OG Description</Label>
                   <Textarea
                     id="ogDescription"
-                    value={currentPage.ogDescription}
+                    value={currentPage.ogDescription || ""}
                     onChange={(e) => setCurrentPage({...currentPage, ogDescription: e.target.value})}
                     rows={2}
                     className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-500"
@@ -338,7 +344,7 @@ export default function SeoManagement() {
                     <Label htmlFor="twitterTitle" className="text-gray-300">Twitter Title</Label>
                     <Input
                       id="twitterTitle"
-                      value={currentPage.twitterTitle}
+                      value={currentPage.twitterTitle || ""}
                       onChange={(e) => setCurrentPage({...currentPage, twitterTitle: e.target.value})}
                       className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-500"
                     />
@@ -348,7 +354,7 @@ export default function SeoManagement() {
                     <Label htmlFor="twitterImage" className="text-gray-300">Twitter Image URL</Label>
                     <Input
                       id="twitterImage"
-                      value={currentPage.twitterImage}
+                      value={currentPage.twitterImage || ""}
                       onChange={(e) => setCurrentPage({...currentPage, twitterImage: e.target.value})}
                       className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-500"
                     />
@@ -359,7 +365,7 @@ export default function SeoManagement() {
                   <Label htmlFor="twitterDescription" className="text-gray-300">Twitter Description</Label>
                   <Textarea
                     id="twitterDescription"
-                    value={currentPage.twitterDescription}
+                    value={currentPage.twitterDescription || ""}
                     onChange={(e) => setCurrentPage({...currentPage, twitterDescription: e.target.value})}
                     rows={2}
                     className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-500"
@@ -381,7 +387,7 @@ export default function SeoManagement() {
                     </div>
                     <input
                       type="checkbox"
-                      checked={currentPage.robotsIndex}
+                      checked={!!currentPage.robotsIndex}
                       onChange={(e) => setCurrentPage({...currentPage, robotsIndex: e.target.checked})}
                       className="h-5 w-5 rounded border-gray-600 bg-gray-800/50 text-blue-600 focus:ring-blue-500"
                     />
@@ -394,7 +400,7 @@ export default function SeoManagement() {
                     </div>
                     <input
                       type="checkbox"
-                      checked={currentPage.robotsFollow}
+                      checked={!!currentPage.robotsFollow}
                       onChange={(e) => setCurrentPage({...currentPage, robotsFollow: e.target.checked})}
                       className="h-5 w-5 rounded border-gray-600 bg-gray-800/50 text-blue-600 focus:ring-blue-500"
                     />
@@ -403,7 +409,7 @@ export default function SeoManagement() {
                   <div>
                     <Label htmlFor="sitemapPriority" className="text-gray-300">Prioritas Sitemap</Label>
                     <Select 
-                      value={currentPage.sitemapPriority.toString()} 
+                      value={currentPage.sitemapPriority?.toString() || "0.5"} 
                       onValueChange={(value) => setCurrentPage({...currentPage, sitemapPriority: parseFloat(value)})}
                     >
                       <SelectTrigger className="bg-gray-800/50 border-gray-600 text-white">

@@ -19,22 +19,26 @@ import {
   Bell
 } from "lucide-react";
 
-interface GeneralSettings {
-  siteName: string;
-  siteDescription: string;
-  siteUrl: string;
-  adminEmail: string;
-  contactEmail: string;
-  phone: string;
-  address: string;
-  maintenanceMode: boolean;
-  analyticsEnabled: boolean;
-  theme: string;
-  maxUploadSize: number;
+
+
+interface FormGeneralSettings {
+  id: number;
+  siteName: string | null;
+  siteDescription: string | null;
+  siteUrl: string | null;
+  adminEmail: string | null;
+  contactEmail: string | null;
+  phone: string | null;
+  address: string | null;
+  maintenanceMode: boolean | null;
+  analyticsEnabled: boolean | null;
+  theme: string | null;
+  maxUploadSize: number | null;
 }
 
 export default function GeneralSettingsPage() {
-  const [settings, setSettings] = useState<GeneralSettings>({
+  const [settings, setSettings] = useState<FormGeneralSettings>({
+    id: 1,
     siteName: "MiraiDev",
     siteDescription: "Agensi pengembangan website modern dan inovatif",
     siteUrl: "https://miraidev.id",
@@ -55,8 +59,15 @@ export default function GeneralSettingsPage() {
     setSettings({ ...settings, [name]: value });
   };
 
-  const handleSwitchChange = (name: keyof GeneralSettings) => {
-    setSettings({ ...settings, [name]: !settings[name] });
+  const handleSwitchChange = (name: keyof FormGeneralSettings) => {
+    const currentValue = settings[name];
+    if (typeof currentValue === 'boolean') {
+      setSettings({ ...settings, [name]: !currentValue });
+    } else if (currentValue === null || currentValue === undefined) {
+      setSettings({ ...settings, [name]: true });
+    } else {
+      setSettings({ ...settings, [name]: !currentValue });
+    }
   };
 
   const handleSave = () => {
@@ -138,7 +149,7 @@ export default function GeneralSettingsPage() {
                 <Input
                   id="siteName"
                   name="siteName"
-                  value={settings.siteName}
+                  value={settings.siteName || ""}
                   onChange={handleInputChange}
                   className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-500"
                 />
@@ -150,7 +161,7 @@ export default function GeneralSettingsPage() {
                 <Input
                   id="siteUrl"
                   name="siteUrl"
-                  value={settings.siteUrl}
+                  value={settings.siteUrl || ""}
                   onChange={handleInputChange}
                   className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-500"
                 />
@@ -163,7 +174,7 @@ export default function GeneralSettingsPage() {
               <Textarea
                 id="siteDescription"
                 name="siteDescription"
-                value={settings.siteDescription}
+                value={settings.siteDescription || ""}
                 onChange={handleInputChange}
                 rows={3}
                 className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-500"
@@ -178,7 +189,7 @@ export default function GeneralSettingsPage() {
                   id="adminEmail"
                   name="adminEmail"
                   type="email"
-                  value={settings.adminEmail}
+                  value={settings.adminEmail || ""}
                   onChange={handleInputChange}
                   className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-500"
                 />
@@ -191,7 +202,7 @@ export default function GeneralSettingsPage() {
                   id="contactEmail"
                   name="contactEmail"
                   type="email"
-                  value={settings.contactEmail}
+                  value={settings.contactEmail || ""}
                   onChange={handleInputChange}
                   className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-500"
                 />
@@ -205,7 +216,7 @@ export default function GeneralSettingsPage() {
                 <Input
                   id="phone"
                   name="phone"
-                  value={settings.phone}
+                  value={settings.phone || ""}
                   onChange={handleInputChange}
                   className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-500"
                 />
@@ -217,7 +228,7 @@ export default function GeneralSettingsPage() {
                 <Input
                   id="address"
                   name="address"
-                  value={settings.address}
+                  value={settings.address || ""}
                   onChange={handleInputChange}
                   className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-500"
                 />
@@ -234,7 +245,7 @@ export default function GeneralSettingsPage() {
                 <p className="text-xs text-gray-500">Nonaktifkan situs untuk perawatan</p>
               </div>
               <Switch
-                checked={settings.maintenanceMode}
+                checked={!!settings.maintenanceMode}
                 onCheckedChange={() => handleSwitchChange("maintenanceMode")}
               />
             </div>
@@ -248,7 +259,7 @@ export default function GeneralSettingsPage() {
                 <p className="text-xs text-gray-500">Kumpulkan data analitik pengunjung</p>
               </div>
               <Switch
-                checked={settings.analyticsEnabled}
+                checked={!!settings.analyticsEnabled}
                 onCheckedChange={() => handleSwitchChange("analyticsEnabled")}
               />
             </div>
@@ -268,7 +279,7 @@ export default function GeneralSettingsPage() {
                 <div className="grid grid-cols-2 gap-4 mt-2">
                   <button 
                     className={`flex flex-col items-center justify-center p-4 rounded-lg border ${
-                      settings.theme === "dark" 
+                      (settings.theme || "") === "dark" 
                         ? "border-blue-500 bg-blue-900/20" 
                         : "border-gray-600 bg-gray-800/50"
                     }`}
@@ -279,7 +290,7 @@ export default function GeneralSettingsPage() {
                   </button>
                   <button 
                     className={`flex flex-col items-center justify-center p-4 rounded-lg border ${
-                      settings.theme === "light" 
+                      (settings.theme || "") === "light" 
                         ? "border-blue-500 bg-blue-900/20" 
                         : "border-gray-600 bg-gray-800/50"
                     }`}
@@ -295,7 +306,7 @@ export default function GeneralSettingsPage() {
                 <Label className="text-gray-300">Ukuran Maks Upload (MB)</Label>
                 <Input
                   type="number"
-                  value={settings.maxUploadSize}
+                  value={settings.maxUploadSize || 0}
                   onChange={(e) => setSettings({...settings, maxUploadSize: parseInt(e.target.value) || 0})}
                   className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-500"
                 />

@@ -2,90 +2,83 @@
 // Kode perbaikan dengan path yang jelas dan tidak ambigu
 import type { Database } from './supabase-types/supabase';
 
-// --- TIPE DASAR (ROW ALIASES) ---
-// Membuat alias untuk setiap tipe 'Row' agar lebih mudah digunakan.
+// 2. Alias untuk Tipe Baris (Row) dari Setiap Tabel
+// Ini membuat penggunaan tipe dari Supabase menjadi lebih singkat dan rapi.
 type ProfileRow = Database['public']['Tables']['profiles']['Row'];
 type ServiceRow = Database['public']['Tables']['services']['Row'];
 type PortfolioRow = Database['public']['Tables']['portfolio']['Row'];
 type ClientRow = Database['public']['Tables']['clients']['Row'];
 type ProjectRow = Database['public']['Tables']['projects']['Row'];
+type ReportRow = Database['public']['Tables']['reports']['Row'];
+type SupportTicketRow = Database['public']['Tables']['support_tickets']['Row'];
 type ContactSubmissionRow = Database['public']['Tables']['contact_submissions']['Row'];
 type AnalyticsDataRow = Database['public']['Tables']['analytics_data']['Row'];
+type SettingRow = Database['public']['Tables']['settings']['Row'];
 type SeoSettingRow = Database['public']['Tables']['seo_settings']['Row'];
 type NewsletterSubscriptionRow = Database['public']['Tables']['newsletter_subscriptions']['Row'];
 type UserSessionRow = Database['public']['Tables']['user_sessions']['Row'];
 type NotificationRow = Database['public']['Tables']['notifications']['Row'];
 
+
+// 3. Alias untuk Tipe Enum
+// Mengambil definisi ENUM langsung dari skema database.
+export type AppRole = Database['public']['Enums']['app_role'];
+export type ReportType = Database['public']['Enums']['report_type'];
+export type TicketStatus = Database['public']['Enums']['ticket_status'];
+export type TicketPriority = Database['public']['Enums']['ticket_priority'];
+
+
+// 4. Tipe yang Diekspor untuk Digunakan di Seluruh Aplikasi
+// Di sini kita bisa memilih untuk langsung mengekspor tipe baris,
+// atau memperkayanya dengan properti khusus sisi klien.
+
 // --- PROFILES ---
 // Tipe untuk data profil pengguna yang diperkaya dengan state di sisi klien.
 export interface UserProfile extends ProfileRow {
-  is_logged_in: boolean;
-  last_activity: Date;
-}
-
-// --- SERVICES ---
-// Tipe dasar untuk daftar layanan.
-// Tipe ini sekarang secara otomatis memiliki properti 'is_active' dan 'price'.
-export type ServiceItem = ServiceRow;
-
-// Tipe untuk detail layanan, misalnya saat ditampilkan di halaman detail.
-// Tipe ini juga otomatis memiliki 'is_active' dan 'price'.
-export interface ServiceDetails extends ServiceRow {
-  is_featured: boolean;
-}
-
-// --- PORTFOLIO ---
-// Tipe untuk item portofolio yang diperkaya dengan state UI.
-export interface PortfolioItem extends PortfolioRow {
-  is_highlighted: boolean;
-}
-
-// --- CLIENTS ---
-// Tipe dasar untuk data klien, langsung dari database.
-export type Client = ClientRow;
-
-// Tipe data klien yang diperkaya dengan metadata untuk CRM atau manajemen.
-export interface ClientData extends ClientRow {
-    last_contacted: Date | null;
+  is_logged_in?: boolean; // Properti khusus UI
 }
 
 // --- PROJECTS ---
-// Tipe dasar untuk data proyek.
+// Tipe dasar untuk proyek, langsung dari database.
 export type Project = ProjectRow;
 
-// Tipe data proyek yang diperkaya dengan state sisi klien.
-export interface ProjectDetails extends ProjectRow {
-    progress: number; // Contoh: progress dalam persentase (0-100)
-    is_archived: boolean;
+// --- SERVICES ---
+// Tipe dasar untuk layanan, langsung dari database.
+export type ServiceItem = ServiceRow;
+
+// Interface untuk data layanan dengan properti tambahan
+export interface ServiceDetails extends ServiceRow {
+  is_featured?: boolean; // Properti tambahan untuk UI
+}
+
+// --- REPORTS ---
+// Tipe dasar untuk laporan, langsung dari database.
+export type Report = ReportRow;
+
+// --- SUPPORT TICKETS ---
+// Tipe dasar untuk tiket dukungan, langsung dari database.
+export type SupportTicket = SupportTicketRow;
+
+// --- CLIENTS ---
+// Tipe dasar untuk klien, langsung dari database.
+export type Client = ClientRow;
+
+// Interface untuk data klien dengan properti tambahan
+export interface ClientData extends ClientRow {
+  last_contacted?: string | null; // Properti tambahan untuk UI
 }
 
 // --- NOTIFICATIONS ---
-// Tipe dasar untuk data notifikasi, langsung dari database.
-export type Notification = NotificationRow;
-
-// Tipe data notifikasi yang diperkaya dengan data sisi klien.
+// Tipe notifikasi yang diperkaya dengan properti UI
 export interface NotificationDetails extends NotificationRow {
-    relative_time: string; // Contoh: "5 menit yang lalu"
+  relative_time?: string; // Contoh: "5 menit yang lalu"
 }
 
-// --- CONTACT SUBMISSIONS ---
-// Tipe untuk data formulir kontak, tidak memerlukan properti tambahan.
+// --- Tipe Lainnya (langsung ekspor dari database) ---
+export type PortfolioItem = PortfolioRow;
 export type ContactSubmission = ContactSubmissionRow;
-
-// --- ANALYTICS ---
-// Tipe untuk data analitik, biasanya hanya untuk ditampilkan.
 export type AnalyticsData = AnalyticsDataRow;
-
-// --- SEO SETTINGS ---
-// Tipe untuk pengaturan SEO, tidak perlu properti tambahan di klien.
+export type Setting = SettingRow;
 export type SeoSetting = SeoSettingRow;
-
-// --- NEWSLETTER SUBSCRIPTIONS ---
-// Tipe untuk pelanggan newsletter.
 export type NewsletterSubscription = NewsletterSubscriptionRow;
-
-// --- USER SESSIONS ---
-// Tipe untuk sesi pengguna, diperkaya untuk menandai sesi yang aktif.
-export interface UserSession extends UserSessionRow {
-    is_current_session: boolean;
-}
+export type UserSession = UserSessionRow;

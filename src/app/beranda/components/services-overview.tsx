@@ -1,11 +1,11 @@
 "use client";
 
 import OptimizedMotion from "@/components/OptimizedMotion";
-import { ServiceDetails } from "@/lib/types";
+import { ServiceItem } from "@/lib/types";
 import { ServiceCard } from "./service-card";
 
 interface ServicesOverviewProps {
-  services: ServiceDetails[];
+  services: ServiceItem[];
 }
 
 export function ServicesOverview({ services }: ServicesOverviewProps) {

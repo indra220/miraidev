@@ -22,16 +22,18 @@ import {
   Star
 } from "lucide-react";
 import { clientsAdminService } from "@/lib/admin-service";
-import { ClientData } from "@/lib/types";
+import { Client } from "@/lib/types";
 import { LoadingSpinner } from "@/components/loading-spinner";
+import { Label } from "@/components/ui/label";
+import { X } from "lucide-react";
 
 export default function ClientManagement() {
-  const [clients, setClients] = useState<ClientData[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("semua");
   const [roleFilter, setRoleFilter] = useState<string>("semua");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentClient, setCurrentClient] = useState<ClientData | null>(null);
+  const [currentClient, setCurrentClient] = useState<Client | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -71,7 +73,7 @@ export default function ClientManagement() {
     setIsModalOpen(true);
   };
 
-  const handleEdit = (client: ClientData) => {
+  const handleEdit = (client: Client) => {
     setCurrentClient(client);
     setIsModalOpen(true);
   };
@@ -105,9 +107,9 @@ export default function ClientManagement() {
     }
   };
 
-  const handleSave = async (client: ClientData) => {
+  const handleSave = async (client: Client) => {
     try {
-      let savedClient: ClientData;
+      let savedClient: Client;
       if (currentClient) {
         // Update existing client
         savedClient = await clientsAdminService.update(client);
@@ -356,13 +358,13 @@ export default function ClientManagement() {
 }
 
 interface ClientModalProps {
-  client: ClientData | null;
-  onSave: (client: ClientData) => void;
+  client: Client | null;
+  onSave: (client: Client) => void;
   onClose: () => void;
 }
 
 function ClientModal({ client, onSave, onClose }: ClientModalProps) {
-  const [formData, setFormData] = useState<ClientData>(
+  const [formData, setFormData] = useState<Client>(
     client || {
       id: 0,
       name: "",
@@ -376,7 +378,6 @@ function ClientModal({ client, onSave, onClose }: ClientModalProps) {
       rating: 0,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-      last_contacted: null,
       user_id: null
     }
   );
@@ -505,6 +506,3 @@ function ClientModal({ client, onSave, onClose }: ClientModalProps) {
     </div>
   );
 }
-
-import { Label } from "@/components/ui/label";
-import { X } from "lucide-react";

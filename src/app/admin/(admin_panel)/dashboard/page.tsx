@@ -8,79 +8,104 @@ import {
   BarChart3,
   MessageSquare
 } from "lucide-react";
+import { useRealtimeDashboard } from "@/hooks/useRealtimeDashboard";
+import { PortfolioItem } from "@/lib/types";
 
 export default function AdminDashboard() {
+  const { stats: realtimeStats, recentProjects, loading, error } = useRealtimeDashboard();
+
+  // Convert stats to the format expected by the UI
   const stats = [
     {
       title: "Total Proyek",
-      value: "24",
+      value: realtimeStats.totalProjects.toString(),
       icon: FolderOpen,
-      change: "+12% dari bulan lalu",
+      change: "+0% dari bulan lalu",
       color: "bg-blue-500"
     },
     {
       title: "Klien Aktif",
-      value: "18",
+      value: realtimeStats.activeClients.toString(),
       icon: Users,
-      change: "+8% dari bulan lalu",
+      change: "+0% dari bulan lalu",
       color: "bg-green-500"
     },
     {
       title: "Total Views",
-      value: "12.4K",
+      value: realtimeStats.totalViews.toLocaleString(),
       icon: Eye,
-      change: "+24% dari bulan lalu",
+      change: "+0% dari bulan lalu",
       color: "bg-purple-500"
     },
     {
       title: "Pesan Baru",
-      value: "7",
+      value: realtimeStats.unreadMessages.toString(),
       icon: MessageSquare,
-      change: "3 belum dibaca",
+      change: `${realtimeStats.unreadMessages} belum dibaca`,
       color: "bg-yellow-500"
     }
   ];
 
-  const recentProjects = [
-    {
-      id: 1,
-      title: "Website Kedai Kopi Lokal",
-      client: "Kedai Kopi Nusantara",
-      status: "Selesai",
-      date: "15 Mar 2024",
-      views: "850"
-    },
-    {
-      id: 2,
-      title: "Portofolio Fotografer",
-      client: "Andi Prasetyo",
-      status: "Dalam Pengerjaan",
-      date: "10 Mar 2024",
-      views: "1.2K"
-    },
-    {
-      id: 3,
-      title: "Website PPDB SD 01",
-      client: "SD Negeri 01 Jakarta",
-      status: "Selesai",
-      date: "5 Mar 2024",
-      views: "2.1K"
-    },
-    {
-      id: 4,
-      title: "Website Salon Kecantikan",
-      client: "Salon Cantik Sejahtera",
-      status: "Revisi",
-      date: "1 Mar 2024",
-      views: "420"
-    }
-  ];
+  interface RecentProjectUI {
+    id: number;
+    title: string;
+    client: string;
+    status: string;
+    date: string;
+    views: string;
+  }
+
+  const formattedRecentProjects: RecentProjectUI[] = recentProjects.map((item: PortfolioItem) => ({
+    id: item.id,
+    title: item.title,
+    client: item.client || "Klien Tidak Diketahui",
+    status: item.category || "Status Tidak Diketahui",
+    date: new Date(item.created_at).toLocaleDateString('id-ID', { 
+      day: '2-digit', 
+      month: 'short', 
+      year: 'numeric' 
+    }),
+    views: (item.views || 0).toLocaleString()
+  }));
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
+          <h1 className="text-3xl font-bold text-white">Dashboard Admin</h1>
+          <p className="text-gray-400 mt-2">Memuat data dashboard real-time...</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map((i) => (
+            <Card key={i} className="p-6 bg-white/5 backdrop-blur-sm border border-gray-700/50">
+              <div className="animate-pulse">
+                <div className="h-4 bg-gray-700 rounded w-3/4 mb-4"></div>
+                <div className="h-8 bg-gray-700 rounded w-1/2 mb-2"></div>
+                <div className="h-3 bg-gray-700 rounded w-full"></div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-gradient-to-r from-red-600/10 to-purple-600/10 p-6 rounded-xl">
+          <h1 className="text-3xl font-bold text-white">Dashboard Admin</h1>
+          <p className="text-red-400 mt-2">Error: {error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
         <h1 className="text-3xl font-bold text-white">Dashboard Admin</h1>
-        <p className="text-gray-400 mt-2">Selamat datang di panel admin MiraiDev</p>
+        <p className="text-gray-400 mt-2">Selamat datang di panel admin MiraiDev (Real-time)</p>
       </div>
 
       {/* Stats Cards */}
@@ -114,30 +139,36 @@ export default function AdminDashboard() {
             </button>
           </div>
           <div className="space-y-4">
-            {recentProjects.map((project) => (
-              <div 
-                key={project.id} 
-                className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg border border-gray-700/30 hover:bg-gray-800 transition-colors"
-              >
-                <div>
-                  <h3 className="font-medium text-white">{project.title}</h3>
-                  <p className="text-sm text-gray-400">{project.client}</p>
+            {formattedRecentProjects.length > 0 ? (
+              formattedRecentProjects.map((project) => (
+                <div 
+                  key={project.id} 
+                  className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg border border-gray-700/30 hover:bg-gray-800 transition-colors"
+                >
+                  <div>
+                    <h3 className="font-medium text-white">{project.title}</h3>
+                    <p className="text-sm text-gray-400">{project.client}</p>
+                  </div>
+                  <div className="text-right">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      project.status === "Selesai" || project.status === "aktif" || project.status === "website"
+                        ? "bg-green-900/30 text-green-400 border border-green-900/50" 
+                        : project.status === "Dalam Pengerjaan" || project.status === "pengerjaan"
+                          ? "bg-blue-900/30 text-blue-400 border border-blue-900/50" 
+                          : "bg-yellow-900/30 text-yellow-400 border border-yellow-900/50"
+                    }`}>
+                      {project.status}
+                    </span>
+                    <p className="text-xs text-gray-500 mt-1">{project.date}</p>
+                    <p className="text-xs text-gray-500 mt-1">Dilihat: {project.views}</p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    project.status === "Selesai" 
-                      ? "bg-green-900/30 text-green-400 border border-green-900/50" 
-                      : project.status === "Dalam Pengerjaan" 
-                        ? "bg-blue-900/30 text-blue-400 border border-blue-900/50" 
-                        : "bg-yellow-900/30 text-yellow-400 border border-yellow-900/50"
-                  }`}>
-                    {project.status}
-                  </span>
-                  <p className="text-xs text-gray-500 mt-1">{project.date}</p>
-                  <p className="text-xs text-gray-500 mt-1">Dilihat: {project.views}</p>
-                </div>
+              ))
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                Tidak ada proyek yang ditemukan
               </div>
-            ))}
+            )}
           </div>
         </Card>
 

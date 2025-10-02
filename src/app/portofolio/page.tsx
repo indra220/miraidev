@@ -81,8 +81,7 @@ export default function PortofolioPage() {
             views: 850,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
-            case_study_url: "/studi-kasus/kedai-kopi-lokal",
-            is_highlighted: false
+            case_study_url: null
           },
           {
             id: 2,
@@ -96,8 +95,7 @@ export default function PortofolioPage() {
             views: 1200,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
-            case_study_url: "/studi-kasus/portofolio-fotografer",
-            is_highlighted: false
+            case_study_url: null
           },
           {
             id: 3,
@@ -111,8 +109,7 @@ export default function PortofolioPage() {
             views: 950,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
-            case_study_url: "/studi-kasus/konsultan-finansial",
-            is_highlighted: false
+            case_study_url: null
           },
           {
             id: 4,
@@ -126,8 +123,7 @@ export default function PortofolioPage() {
             views: 2100,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
-            case_study_url: "/studi-kasus/ppdb-sd-negeri",
-            is_highlighted: false
+            case_study_url: null
           },
           {
             id: 5,
@@ -141,8 +137,7 @@ export default function PortofolioPage() {
             views: 1500,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
-            case_study_url: "/studi-kasus/portofolio-developer",
-            is_highlighted: false
+            case_study_url: null
           },
           {
             id: 6,
@@ -156,8 +151,7 @@ export default function PortofolioPage() {
             views: 3200,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
-            case_study_url: "/studi-kasus/ppdb-sma-negeri",
-            is_highlighted: false
+            case_study_url: null
           }
         ]);
       } finally {
@@ -326,10 +320,16 @@ export default function PortofolioPage() {
                           }) : 'TBA'}
                         </div>
                       </div>
-                      <Button variant="link" className="p-0 text-blue-400 hover:text-blue-300 transition-all duration-300">
-                        Lihat Studi Kasus
-                        <ArrowRight className="ml-1 w-4 h-4" />
-                      </Button>
+                      {project.case_study_url ? (
+                        <Button variant="link" className="p-0 text-blue-400 hover:text-blue-300 transition-all duration-300">
+                          Lihat Studi Kasus
+                          <ArrowRight className="ml-1 w-4 h-4" />
+                        </Button>
+                      ) : (
+                        <Button variant="link" disabled className="p-0 text-gray-500 cursor-not-allowed transition-all duration-300">
+                          Studi Kasus Tidak Tersedia
+                        </Button>
+                      )}
                     </div>
                   </Card>
                 </OptimizedMotion>

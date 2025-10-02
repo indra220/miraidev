@@ -101,7 +101,6 @@ export default function PortfolioManagement() {
           image_url: item.image_url,
           tags: item.tags,
           case_study_url: item.case_study_url,
-          is_highlighted: item.is_highlighted || false,
         });
         setPortfolioItems([...portfolioItems, savedItem]);
       }
@@ -261,7 +260,6 @@ function PortfolioModal({ item, onSave, onClose }: PortfolioModalProps) {
       tags: null,
       image_url: null,
       case_study_url: null,
-      is_highlighted: false,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     }

@@ -21,14 +21,14 @@ import {
   Settings
 } from "lucide-react";
 import { servicesAdminService } from "@/lib/admin-service";
-import { ServiceDetails } from "@/lib/types";
+import { ServiceItem } from "@/lib/types";
 import { LoadingSpinner } from "@/components/loading-spinner";
 
 export default function ServicesManagement() {
-  const [services, setServices] = useState<ServiceDetails[]>([]);
+  const [services, setServices] = useState<ServiceItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentService, setCurrentService] = useState<ServiceDetails | null>(null);
+  const [currentService, setCurrentService] = useState<ServiceItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -68,7 +68,7 @@ export default function ServicesManagement() {
     setIsModalOpen(true);
   };
 
-  const handleEdit = (service: ServiceDetails) => {
+  const handleEdit = (service: ServiceItem) => {
     setCurrentService(service);
     setIsModalOpen(true);
   };
@@ -86,9 +86,9 @@ export default function ServicesManagement() {
     }
   };
 
-  const handleSave = async (service: ServiceDetails) => {
+  const handleSave = async (service: ServiceItem) => {
     try {
-      let savedService: ServiceDetails;
+      let savedService: ServiceItem;
       if (currentService) {
         // Update existing item
         savedService = await servicesAdminService.update(service);
@@ -251,13 +251,13 @@ export default function ServicesManagement() {
 }
 
 interface ServiceModalProps {
-  service: ServiceDetails | null;
-  onSave: (service: ServiceDetails) => void;
+  service: ServiceItem | null;
+  onSave: (service: ServiceItem) => void;
   onClose: () => void;
 }
 
 function ServiceModal({ service, onSave, onClose }: ServiceModalProps) {
-  const [formData, setFormData] = useState<ServiceDetails>(
+  const [formData, setFormData] = useState<ServiceItem>(
     service || {
       id: 0,
       title: "",
@@ -270,8 +270,7 @@ function ServiceModal({ service, onSave, onClose }: ServiceModalProps) {
       price: 0,
       user_id: "", // Tambahkan field user_id
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      is_featured: false
+      updated_at: new Date().toISOString()
     }
   );
 
