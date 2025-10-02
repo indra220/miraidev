@@ -153,8 +153,8 @@ export const useRealtimeDashboard = () => {
           schema: 'public',
           table: 'portfolio'
         },
-        (payload) => {
-          console.log('Portfolio change received:', payload);
+        () => {
+          // Portfolio change received
           updateStats();
           fetchInitialData(); // Refresh recent projects
         }
@@ -170,8 +170,8 @@ export const useRealtimeDashboard = () => {
           schema: 'public',
           table: 'clients'
         },
-        (payload) => {
-          console.log('Clients change received:', payload);
+        () => {
+          // Clients change received
           updateStats();
         }
       )
@@ -186,8 +186,8 @@ export const useRealtimeDashboard = () => {
           schema: 'public',
           table: 'contact_submissions'
         },
-        (payload) => {
-          console.log('Contact change received:', payload);
+        () => {
+          // Contact change received
           updateStats();
         }
       )

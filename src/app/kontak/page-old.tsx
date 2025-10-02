@@ -59,7 +59,6 @@ export default function KontakPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle form submission
-    console.log("Form submitted:", formData);
     alert("Terima kasih! Pesan Anda telah dikirim. Kami akan merespons dalam 24 jam kerja.");
     setFormData({
       name: "",

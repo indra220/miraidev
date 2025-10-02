@@ -103,7 +103,6 @@ export function Navbar() {
   useEffect(() => {
     return () => {
       // Bersihkan state ketika komponen di-unmount
-      console.log("Navbar unmounting, cleaning up state");
       setIsAuthenticated(null);
       setIsAdminUser(null);
     };
@@ -162,7 +161,7 @@ export function Navbar() {
       if (error) {
         console.error("Error during logout:", error);
       } else {
-        console.log("User logged out successfully");
+        // User logged out successfully
       }
     } catch (error) {
       console.error("Error during logout:", error);

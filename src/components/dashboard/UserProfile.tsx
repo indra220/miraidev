@@ -56,7 +56,6 @@ export function UserProfile() {
     if (session?.user) {
       // Implementasi penyimpanan perubahan profil ke database
       try {
-        console.log("Profil disimpan:", profile);
         // Tambahkan logika untuk menyimpan ke database di sini
       } catch (error) {
         console.error("Error saving profile:", error);
