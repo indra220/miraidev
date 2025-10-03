@@ -25,6 +25,10 @@ import { ServiceItem } from "@/lib/types";
 import { LoadingSpinner } from "@/components/loading-spinner";
 
 export default function ServicesManagement() {
+  useEffect(() => {
+    document.title = "Manajemen Layanan | MiraiDev";
+  }, []);
+
   const [services, setServices] = useState<ServiceItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);

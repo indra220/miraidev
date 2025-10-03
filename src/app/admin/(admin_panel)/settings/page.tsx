@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +9,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 
 export default function SettingsPage() {
+  useEffect(() => {
+    document.title = "Pengaturan | MiraiDev";
+  }, []);
+
   const [settings, setSettings] = useState({
     siteName: "MiraiDev",
     siteDescription: "Solusi pengembangan website modern untuk UMKM dan profesional lokal",

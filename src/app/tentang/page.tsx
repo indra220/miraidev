@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { 
@@ -15,6 +16,10 @@ import { Navbar } from "@/components/navbar";
 import OptimizedMotion from "@/components/OptimizedMotion";
 
 export default function TentangPage() {
+  useEffect(() => {
+    document.title = "Tentang Kami | MiraiDev";
+  }, []);
+
   const values = [
     {
       icon: <Target className="w-6 h-6" />,

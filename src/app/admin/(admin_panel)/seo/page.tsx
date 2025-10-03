@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -19,8 +19,6 @@ import {
   Eye,
   Settings
 } from "lucide-react";
-
-
 
 interface FormSeoSettings {
   id: number;
@@ -42,6 +40,10 @@ interface FormSeoSettings {
 }
 
 export default function SeoManagement() {
+  useEffect(() => {
+    document.title = "Manajemen SEO | MiraiDev";
+  }, []);
+
   const [seoData, setSeoData] = useState<FormSeoSettings[]>([
     {
       id: 1,

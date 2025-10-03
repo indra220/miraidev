@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { 
@@ -16,6 +17,10 @@ import Link from "next/link";
 import DynamicPriceCalculator from "@/components/DynamicPriceCalculator";
 
 export default function LayananPage() {
+  useEffect(() => {
+    document.title = "Layanan Kami | MiraiDev";
+  }, []);
+
   const services = [
     {
       icon: <Globe className="w-12 h-12 text-blue-400" />,

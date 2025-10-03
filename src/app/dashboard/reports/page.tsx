@@ -1,4 +1,10 @@
 import { Reports } from "@/components/dashboard/Reports";
+import type { Metadata } from "next";
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const metadata: Metadata = {
+  title: "Laporan & Analitik",
+};
 
 export default function ReportsPage() {
   return (

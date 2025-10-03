@@ -32,7 +32,7 @@ export function SupportTicket() {
   });
 
   useEffect(() => {
-    if (authLoading) return; // Jika auth masih loading, jangan lanjutkan
+    if (authLoading) return;
     
     const fetchTickets = async () => {
       if (session?.user) {
@@ -57,7 +57,6 @@ export function SupportTicket() {
     
     if (session?.user) {
       try {
-        // Create the new ticket in the database
         await dashboardService.createSupportTicket(
           session.user.id, 
           newTicket.subject, 
@@ -65,19 +64,15 @@ export function SupportTicket() {
           newTicket.priority
         );
         
-        // Refresh the tickets list
         const updatedData = await dashboardService.getDashboardData(session.user.id);
         setTickets(updatedData.supportTickets);
         
-        // Reset the form
         setNewTicket({ subject: "", message: "", priority: "normal" });
       } catch (error) {
         console.error("Error creating support ticket:", error);
       }
     }
   };
-
-  
 
   if (loading || authLoading) {
     return (

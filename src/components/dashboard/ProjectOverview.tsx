@@ -20,7 +20,7 @@ export function ProjectOverview() {
   const { session, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    if (authLoading) return; // Jika auth masih loading, jangan lanjutkan
+    if (authLoading) return;
     
     const fetchProjects = async () => {
       if (session?.user) {

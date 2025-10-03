@@ -8,6 +8,12 @@ import { FeaturedPortfolio } from "./components/featured-portfolio";
 import { WhyChooseUsSection } from "./components/why-choose-us";
 import { Testimonials } from "./components/testimonials";
 import { FinalCtaSection } from "./components/final-cta";
+import type { Metadata } from "next";
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const metadata: Metadata = {
+  title: "Beranda",
+};
 
 // Fungsi untuk mengambil data portfolio dari API
 async function getPortfolioData(): Promise<PortfolioItem[]> {

@@ -31,45 +31,35 @@ const navigation = [
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // Gunakan null untuk status loading
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [isAdminUser, setIsAdminUser] = useState<boolean | null>(null);
   const [currentUser, setCurrentUser] = useState<Session["user"] | null>(null);
   const pathname = usePathname();
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const openMenuButtonRef = useRef<HTMLButtonElement>(null);
   
-  // Check if we're on an admin page
   const isAdminPage = pathname.startsWith('/admin');
   
-  // Check if we just came from logout
   const cameFromLogout = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('logged_out') === 'true';
 
-  // Check authentication status on mount and update as needed
   useEffect(() => {
     const checkAuthStatus = async () => {
       const supabase = createClient();
       const { data: { session } } = await supabase.auth.getSession();
       
-      // Setelah cek auth pertama kali, baru set state
       setIsAuthenticated(!!session);
       
       if (session) {
-        // Dapatkan informasi pengguna saat ini
         const user = await getCurrentUser();
         setCurrentUser(user);
         
-        // Hanya panggil isAdmin jika benar-benar diperlukan
-        // Misalnya, hanya di halaman admin atau saat benar-benar perlu memeriksa status admin
         if (isAdminPage && isAdminUser === null) {
           const admin = await isAdmin();
           setIsAdminUser(admin);
         } else if (!isAdminPage) {
-          // Untuk halaman publik, kita tidak perlu memeriksa apakah user adalah admin
-          // Kita hanya perlu tahu bahwa user terautentikasi
           setIsAdminUser(false);
         }
       } else {
-        // Jika tidak ada session, pastikan tidak admin dan tidak ada user
         setIsAdminUser(false);
         setCurrentUser(null);
       }
@@ -77,7 +67,6 @@ export function Navbar() {
     
     checkAuthStatus();
     
-    // Listen for auth changes
     const { data: { subscription } } = createClient().auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
         checkAuthStatus();
@@ -89,31 +78,25 @@ export function Navbar() {
     };
   }, [isAdminUser, isAdminPage]);
   
-  // Bersihkan parameter logged_out dari URL setelah digunakan
   useEffect(() => {
     if (cameFromLogout && typeof window !== 'undefined') {
-      // Hapus parameter logged_out dari URL
       const url = new URL(window.location.href);
       url.searchParams.delete('logged_out');
       window.history.replaceState({}, '', url.toString());
     }
   }, [cameFromLogout]);
 
-  // Bersihkan state ketika komponen di-unmount
   useEffect(() => {
     return () => {
-      // Bersihkan state ketika komponen di-unmount
       setIsAuthenticated(null);
       setIsAdminUser(null);
     };
   }, []);
 
-  // Close mobile menu when pathname changes
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [pathname]);
 
-  // Handle Escape key to close mobile menu
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -124,7 +107,6 @@ export function Navbar() {
 
     if (mobileMenuOpen) {
       document.addEventListener("keydown", handleEscape);
-      // Focus the mobile menu when opened
       mobileMenuRef.current?.focus();
     }
 
@@ -133,7 +115,6 @@ export function Navbar() {
     };
   }, [mobileMenuOpen]);
 
-  // Handle click outside to close mobile menu
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (mobileMenuOpen && mobileMenuRef.current && !mobileMenuRef.current.contains(e.target as Node)) {
@@ -151,30 +132,20 @@ export function Navbar() {
     };
   }, [mobileMenuOpen]);
 
-  // Function to handle logout
   const handleLogout = async () => {
     const supabase = createClient();
     
-    // Lakukan signOut dan tunggu hasilnya
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error("Error during logout:", error);
-      } else {
-        // User logged out successfully
-      }
+      await supabase.auth.signOut();
     } catch (error) {
       console.error("Error during logout:", error);
     }
     
-    // Tunggu sebentar untuk memastikan session benar-benar dihapus
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    // Bersihkan state lokal secara langsung
     setIsAuthenticated(false);
     setIsAdminUser(false);
     
-    // Redirect ke halaman login dengan parameter logged_out=true
     window.location.href = "/auth/login?logged_out=true";
   };
 
@@ -265,7 +236,6 @@ export function Navbar() {
         <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:gap-x-4">
           {!isAdminPage && <GlobalSearch />}
           {isAdminPage ? (
-            // Admin logout button
             <button
               onClick={handleLogout}
               className="border border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-sm font-semibold flex items-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900"
@@ -274,16 +244,13 @@ export function Navbar() {
               Keluar
             </button>
           ) : (
-            // Tampilkan loading state sementara status belum diketahui
             isAuthenticated === null ? (
-              // Tampilkan placeholder atau loading state
               <div className="flex items-center gap-x-4">
                 <Button variant="outline" className="border border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-sm font-semibold" disabled>
                   Memuat...
                 </Button>
               </div>
             ) : isAuthenticated ? (
-              // User is authenticated - show full user dropdown menu like dashboard
               <div className="flex items-center gap-x-4">
                 <div className="relative inline-block text-left">
                   <div>
@@ -294,7 +261,6 @@ export function Navbar() {
                       aria-expanded="false"
                       aria-haspopup="true"
                       onClick={() => {
-                        // Toggle dropdown visibility using DOM manipulation
                         const menu = document.getElementById('user-menu-items');
                         if (menu) {
                           menu.classList.toggle('hidden');
@@ -377,7 +343,6 @@ export function Navbar() {
                 </div>
               </div>
             ) : (
-              // User is not authenticated - show login/register buttons
               <div className="flex items-center gap-x-4">
                 <Link href="/auth/login">
                   <Button variant="outline" className="border border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-sm font-semibold">
@@ -396,7 +361,6 @@ export function Navbar() {
         </div>
       </nav>
       
-      {/* Mobile menu */}
       <div 
         ref={mobileMenuRef}
         id="mobile-menu"
@@ -504,7 +468,6 @@ export function Navbar() {
                     Keluar
                   </button>
                 ) : (
-                  // Tampilkan loading state sementara status belum diketahui
                   isAuthenticated === null ? (
                     <div className="space-y-4">
                       <Button className="w-full border border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900" disabled>
@@ -512,7 +475,6 @@ export function Navbar() {
                       </Button>
                     </div>
                   ) : isAuthenticated ? (
-                    // User is authenticated - show full user dropdown menu like dashboard
                     <div className="space-y-4">
                       <div className="relative inline-block text-left">
                         <div>
@@ -523,7 +485,6 @@ export function Navbar() {
                             aria-expanded="false"
                             aria-haspopup="true"
                             onClick={() => {
-                              // Toggle dropdown visibility using DOM manipulation
                               const menu = document.getElementById('mobile-user-menu-items');
                               if (menu) {
                                 menu.classList.toggle('hidden');
@@ -608,7 +569,6 @@ export function Navbar() {
                       </div>
                     </div>
                   ) : (
-                    // User is not authenticated - show login/register buttons
                     <div className="space-y-4">
                       <Link href="/auth/login" onClick={() => setMobileMenuOpen(false)}>
                         <Button className="w-full border border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900">

@@ -1,7 +1,7 @@
 // src/app/admin/login/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from 'next/link';
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,10 @@ import { createClient } from "@/lib/supabase/client";
 import { Eye, EyeOff, Lock, ArrowLeft } from "lucide-react";
 
 export default function AdminLoginPage() {
+  useEffect(() => {
+    document.title = "Admin Login | MiraiDev";
+  }, []);
+
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

@@ -21,6 +21,10 @@ import { PortfolioItem } from "@/lib/types";
 import { LoadingSpinner } from "@/components/loading-spinner";
 
 export default function PortfolioManagement() {
+  useEffect(() => {
+    document.title = "Manajemen Portofolio | MiraiDev";
+  }, []);
+
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);

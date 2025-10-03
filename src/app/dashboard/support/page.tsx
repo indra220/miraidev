@@ -1,4 +1,10 @@
 import { SupportTicket } from "@/components/dashboard/SupportTicket";
+import type { Metadata } from "next";
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const metadata: Metadata = {
+  title: "Dukungan & Bantuan",
+};
 
 export default function SupportPage() {
   return (

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { 
   FolderOpen, 
@@ -12,6 +13,10 @@ import { useRealtimeDashboard } from "@/hooks/useRealtimeDashboard";
 import { PortfolioItem } from "@/lib/types";
 
 export default function AdminDashboard() {
+  useEffect(() => {
+    document.title = "Dashboard Admin | MiraiDev";
+  }, []);
+
   const { stats: realtimeStats, recentProjects, loading, error } = useRealtimeDashboard();
 
   // Convert stats to the format expected by the UI

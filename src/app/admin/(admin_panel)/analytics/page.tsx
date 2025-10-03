@@ -48,6 +48,10 @@ interface BrowserData {
 }
 
 export default function AnalyticsDashboard() {
+  useEffect(() => {
+    document.title = "Analitik Website | MiraiDev";
+  }, []);
+
   const [timeRange, setTimeRange] = useState<string>("7d");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

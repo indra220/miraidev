@@ -13,7 +13,8 @@ const CACHE_DURATION = 2 * 60 * 1000; // 2 menit
 async function getRoleFromServer(): Promise<string | null> {
   try {
     // Panggilan ini terjadi di browser, memanggil API route kita
-    const response = await fetch('/api/auth/get-my-role', { cache: 'no-store' });
+    // PERBAIKAN: Menggunakan path API yang benar sesuai file yang diunggah
+    const response = await fetch('/api/user/role', { cache: 'no-store' });
     if (!response.ok) {
       return null;
     }

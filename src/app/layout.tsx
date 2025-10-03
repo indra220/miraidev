@@ -4,7 +4,9 @@ import { metadata } from "./metadata";
 import "./globals.css";
 import ScrollToTop from "@/components/ScrollToTop";
 import RegisterSW from "@/components/RegisterSW";
+import SessionProvider from "@/components/SessionProvider";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export { metadata };
 
 export default function RootLayout({
@@ -23,6 +25,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <SessionProvider />
           <RegisterSW />
           {children}
           <ScrollToTop />

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { createClient } from '@/lib/supabase/client'; // Pastikan import dari client
+import { createClient } from '@/lib/supabase/client';
 import { 
   LayoutDashboard as Dashboard,
   FolderOpen, 

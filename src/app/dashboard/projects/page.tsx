@@ -1,13 +1,17 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProjectOverview } from "@/components/dashboard/ProjectOverview";
-import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { dashboardService, DashboardProject } from "@/lib/dashboard-service";
 
 export default function ProjectsPage() {
+  useEffect(() => {
+    document.title = "Manajemen Proyek | MiraiDev";
+  }, []);
+
   const [projects, setProjects] = useState<DashboardProject[]>([]);
   const [loading, setLoading] = useState(true);
   const { session, loading: authLoading } = useAuth();

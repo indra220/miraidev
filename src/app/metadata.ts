@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: {
     default: "MiraiDev - Solusi Pengembangan Website Modern",
-    template: "%s | MiraiDev"
+    template: "%s | MiraiDev" // <-- Template ini akan digunakan di semua halaman
   },
   description: "MiraiDev menyediakan solusi pengembangan website modern, desain UI/UX, dan layanan pemeliharaan untuk bisnis Anda",
   keywords: ["website", "development", "UMKM", "digital", "solution", "Indonesia"],

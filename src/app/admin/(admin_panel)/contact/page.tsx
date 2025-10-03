@@ -22,6 +22,10 @@ import { ContactSubmission } from "@/lib/types";
 import { LoadingSpinner } from "@/components/loading-spinner";
 
 export default function ContactManagement() {
+  useEffect(() => {
+    document.title = "Manajemen Pesan Kontak | MiraiDev";
+  }, []);
+
   const [messages, setMessages] = useState<ContactSubmission[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("semua");

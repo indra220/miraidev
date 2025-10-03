@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -28,6 +27,10 @@ import { LoadingSpinner } from "@/components/loading-spinner";
 import { submitContactForm } from "@/lib/contact";
 
 export default function KontakPage() {
+  useEffect(() => {
+    document.title = "Kontak | MiraiDev";
+  }, []);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",

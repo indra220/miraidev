@@ -31,7 +31,7 @@ export function UserProfile() {
   const { session, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    if (authLoading) return; // Jika auth masih loading, jangan lanjutkan
+    if (authLoading) return;
     
     const fetchProfile = async () => {
       if (session?.user) {
@@ -54,9 +54,8 @@ export function UserProfile() {
   const handleSave = async () => {
     setIsEditing(false);
     if (session?.user) {
-      // Implementasi penyimpanan perubahan profil ke database
       try {
-        // Tambahkan logika untuk menyimpan ke database di sini
+        // Logika untuk menyimpan ke database di sini
       } catch (error) {
         console.error("Error saving profile:", error);
       }
@@ -96,12 +95,7 @@ export function UserProfile() {
                 className="w-full h-full object-cover rounded-full"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
-                  // Cek apakah ini sudah merupakan placeholder
-                  if (target.src.includes('/placeholder-avatar.jpg')) {
-                    // Jika placeholder juga gagal, gunakan SVG inline sebagai fallback
-                    target.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNkMWQ1ZGIiLz48Y2lyY2xlIGN4PSI1MCIgY3k9IjQwIiByPSIxNSIgZmlsbD0iIzg4OCIvPjxwYXRoIGQ9Ik0yNSA4MGMyMCAyMCA2MCAyMCA4MCAwIiBzdHJva2U9IiM4ODgiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==';
-                  } else {
-                    // Jika bukan placeholder, arahkan ke placeholder
+                  if (!target.src.includes('/placeholder-avatar.jpg')) {
                     target.src = "/placeholder-avatar.jpg";
                   }
                 }}

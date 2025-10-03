@@ -1,4 +1,10 @@
 import { Communication } from "@/components/dashboard/Communication";
+import type { Metadata } from "next";
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const metadata: Metadata = {
+  title: "Pesan & Komunikasi",
+};
 
 export default function MessagesPage() {
   return (

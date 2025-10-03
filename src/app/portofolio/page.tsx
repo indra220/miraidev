@@ -15,6 +15,9 @@ import OptimizedMotion from "@/components/OptimizedMotion";
 import { getPortfolioProjects, getAllPortfolioCategories } from "@/lib/portfolio";
 import { PortfolioItem } from "@/lib/types";
 
+// Since this is a client component, we'll handle the title differently.
+// For simplicity in this case, we can set the document title directly.
+
 interface Category {
   id: string;
   name: string;
@@ -22,6 +25,10 @@ interface Category {
 }
 
 export default function PortofolioPage() {
+  useEffect(() => {
+    document.title = "Portofolio | MiraiDev";
+  }, []);
+
   const [activeFilter, setActiveFilter] = useState("all");
   const [projects, setProjects] = useState<PortfolioItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([

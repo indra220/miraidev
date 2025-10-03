@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProjectOverview } from "@/components/dashboard/ProjectOverview";
@@ -10,6 +11,10 @@ import { SupportTicket } from "@/components/dashboard/SupportTicket";
 import { UserProfile } from "@/components/dashboard/UserProfile";
 
 export default function DashboardPage() {
+  useEffect(() => {
+    document.title = "Dashboard Klien | MiraiDev";
+  }, []);
+
   return (
     <div className="space-y-6">
       <div>

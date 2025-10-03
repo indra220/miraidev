@@ -1,4 +1,10 @@
 import { ProjectSubmission } from "@/components/dashboard/ProjectSubmission";
+import type { Metadata } from "next";
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const metadata: Metadata = {
+  title: "Pengajuan Proyek",
+};
 
 export default function ServicesPage() {
   return (

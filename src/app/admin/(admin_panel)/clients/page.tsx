@@ -28,6 +28,10 @@ import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
 
 export default function ClientManagement() {
+  useEffect(() => {
+    document.title = "Manajemen Klien | MiraiDev";
+  }, []);
+
   const [clients, setClients] = useState<Client[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("semua");

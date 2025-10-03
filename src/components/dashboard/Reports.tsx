@@ -25,7 +25,7 @@ export function Reports() {
   const { session, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    if (authLoading) return; // Jika auth masih loading, jangan lanjutkan
+    if (authLoading) return;
     
     const fetchReports = async () => {
       if (session?.user) {
