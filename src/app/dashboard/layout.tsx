@@ -30,10 +30,10 @@ export default function DashboardLayout({
 
   return (
     // Hapus SessionTimeoutProvider yang lama
-    <div className="flex min-h-screen w-full bg-gray-50 dark:bg-gray-900">
+    <div className="flex h-screen w-full bg-gray-50 dark:bg-gray-900">
       <SessionTimeoutHandler /> {/* <-- Tambahkan handler di sini */}
       <Sidebar pathname={pathname} />
-      <div className="flex flex-col flex-1 min-h-screen">
+      <div className="flex flex-col flex-1 min-h-screen overflow-y-auto">
         <Header session={session} />
         <main className="flex-1 p-6 mt-16">{children}</main>
       </div>

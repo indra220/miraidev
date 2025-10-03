@@ -20,12 +20,26 @@ import {
 import { contactAdminService } from "@/lib/admin-service";
 import { ContactSubmission } from "@/lib/types";
 import { LoadingSpinner } from "@/components/loading-spinner";
+import { AlertDialog, AlertDialogResult } from "@/components/AlertDialog";
+import { useDialog } from "@/hooks/useDialog";
 
 export default function ContactManagement() {
   useEffect(() => {
     document.title = "Manajemen Pesan Kontak | MiraiDev";
   }, []);
 
+  const { 
+    alertDialogState, 
+    showAlertDialog, 
+    closeAlertDialog,
+    alertResultState,
+    showAlertResult,
+    closeAlertResult
+  } = useDialog();
+  
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _showAlertDialog = showAlertDialog; // Gunakan variabel untuk menghindari error ESLint
+  
   const [messages, setMessages] = useState<ContactSubmission[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("semua");
@@ -77,9 +91,10 @@ export default function ContactManagement() {
       setMessages(messages.map(msg => 
         msg.id === id ? updatedMessage : msg
       ));
+      showAlertResult("Berhasil", `Status pesan berhasil diperbarui menjadi ${newStatus}.`);
     } catch (err) {
       console.error('Error updating message status:', err);
-      alert('Gagal memperbarui status pesan. Silakan coba lagi.');
+      showAlertResult("Gagal", "Gagal memperbarui status pesan. Silakan coba lagi.");
     }
   };
 
@@ -96,9 +111,10 @@ export default function ContactManagement() {
       setMessages(messages.map(msg => 
         msg.id === id ? updatedMessage : msg
       ));
+      showAlertResult("Berhasil", "Pesan berhasil diarsipkan.");
     } catch (err) {
       console.error('Error archiving message:', err);
-      alert('Gagal mengarsipkan pesan. Silakan coba lagi.');
+      showAlertResult("Gagal", "Gagal mengarsipkan pesan. Silakan coba lagi.");
     }
   };
 
@@ -306,6 +322,27 @@ export default function ContactManagement() {
           ))
         )}
       </div>
+      
+      {/* AlertDialog for confirmations */}
+      <AlertDialog
+        isOpen={alertDialogState.isOpen}
+        title={alertDialogState.title}
+        description={alertDialogState.description}
+        onConfirm={() => {
+          if (alertDialogState.onConfirm) alertDialogState.onConfirm();
+          closeAlertDialog();
+        }}
+        onClose={closeAlertDialog}
+        variant={alertDialogState.variant}
+      />
+      
+      {/* AlertDialog for results/notifications */}
+      <AlertDialogResult
+        isOpen={alertResultState.isOpen}
+        title={alertResultState.title}
+        description={alertResultState.description}
+        onClose={closeAlertResult}
+      />
     </div>
   );
 }

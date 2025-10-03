@@ -23,12 +23,23 @@ import {
 import { servicesAdminService } from "@/lib/admin-service";
 import { ServiceItem } from "@/lib/types";
 import { LoadingSpinner } from "@/components/loading-spinner";
+import { AlertDialog, AlertDialogResult } from "@/components/AlertDialog";
+import { useDialog } from "@/hooks/useDialog";
 
 export default function ServicesManagement() {
   useEffect(() => {
     document.title = "Manajemen Layanan | MiraiDev";
   }, []);
 
+  const { 
+    alertDialogState, 
+    showAlertDialog, 
+    closeAlertDialog,
+    alertResultState,
+    showAlertResult,
+    closeAlertResult
+  } = useDialog();
+  
   const [services, setServices] = useState<ServiceItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -78,16 +89,22 @@ export default function ServicesManagement() {
   };
 
   const handleDelete = async (id: number) => {
-    if (confirm("Apakah Anda yakin ingin menghapus layanan ini?")) {
-      try {
-        await servicesAdminService.delete(id);
-        // Hapus item dari state
-        setServices(services.filter(service => service.id !== id));
-      } catch (err) {
-        console.error('Error deleting service:', err);
-        alert('Gagal menghapus layanan. Silakan coba lagi.');
-      }
-    }
+    showAlertDialog(
+      "Konfirmasi Penghapusan",
+      "Apakah Anda yakin ingin menghapus layanan ini? Tindakan ini tidak dapat dibatalkan.",
+      async () => {
+        try {
+          await servicesAdminService.delete(id);
+          // Hapus item dari state
+          setServices(services.filter(service => service.id !== id));
+          showAlertResult("Berhasil", "Layanan telah dihapus.");
+        } catch (err) {
+          console.error('Error deleting service:', err);
+          showAlertResult("Gagal", "Gagal menghapus layanan. Silakan coba lagi.");
+        }
+      },
+      "destructive"
+    );
   };
 
   const handleSave = async (service: ServiceItem) => {
@@ -97,6 +114,7 @@ export default function ServicesManagement() {
         // Update existing item
         savedService = await servicesAdminService.update(service);
         setServices(services.map(s => s.id === service.id ? savedService : s));
+        showAlertResult("Berhasil", "Layanan berhasil diperbarui.");
       } else {
         // Add new item
         savedService = await servicesAdminService.create({
@@ -111,11 +129,12 @@ export default function ServicesManagement() {
           user_id: service.user_id || '', // Tambahkan field user_id
         });
         setServices([...services, savedService]);
+        showAlertResult("Berhasil", "Layanan baru berhasil ditambahkan.");
       }
       setIsModalOpen(false);
     } catch (err) {
       console.error('Error saving service:', err);
-      alert('Gagal menyimpan layanan. Silakan coba lagi.');
+      showAlertResult("Gagal", "Gagal menyimpan layanan. Silakan coba lagi.");
     }
   };
 
@@ -250,6 +269,27 @@ export default function ServicesManagement() {
           onClose={() => setIsModalOpen(false)}
         />
       )}
+      
+      {/* AlertDialog for confirmations */}
+      <AlertDialog
+        isOpen={alertDialogState.isOpen}
+        title={alertDialogState.title}
+        description={alertDialogState.description}
+        onConfirm={() => {
+          if (alertDialogState.onConfirm) alertDialogState.onConfirm();
+          closeAlertDialog();
+        }}
+        onClose={closeAlertDialog}
+        variant={alertDialogState.variant}
+      />
+      
+      {/* AlertDialog for results/notifications */}
+      <AlertDialogResult
+        isOpen={alertResultState.isOpen}
+        title={alertResultState.title}
+        description={alertResultState.description}
+        onClose={closeAlertResult}
+      />
     </div>
   );
 }

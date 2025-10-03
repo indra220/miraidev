@@ -19,6 +19,8 @@ import {
   Eye,
   Settings
 } from "lucide-react";
+import { AlertDialog, AlertDialogResult } from "@/components/AlertDialog";
+import { useDialog } from "@/hooks/useDialog";
 
 interface FormSeoSettings {
   id: number;
@@ -44,6 +46,18 @@ export default function SeoManagement() {
     document.title = "Manajemen SEO | MiraiDev";
   }, []);
 
+  const { 
+    alertDialogState, 
+    showAlertDialog, 
+    closeAlertDialog,
+    alertResultState,
+    showAlertResult,
+    closeAlertResult
+  } = useDialog();
+  
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _showAlertDialog = showAlertDialog; // Gunakan variabel untuk menghindari error ESLint
+  
   const [seoData, setSeoData] = useState<FormSeoSettings[]>([
     {
       id: 1,
@@ -115,15 +129,20 @@ export default function SeoManagement() {
       setSeoData(seoData.map(p => p.page === currentPage.page ? currentPage : p));
       setIsEditing(false);
       setCurrentPage(null);
-      alert("SEO settings berhasil disimpan!");
+      showAlertResult("Berhasil", "SEO settings berhasil disimpan!");
     }
   };
 
   const handleReset = () => {
-    if (confirm("Apakah Anda yakin ingin mengembalikan ke pengaturan awal?")) {
-      // Reset ke nilai awal (simulasi)
-      alert("Pengaturan SEO telah dikembalikan ke nilai awal");
-    }
+    showAlertDialog(
+      "Konfirmasi Reset",
+      "Apakah Anda yakin ingin mengembalikan ke pengaturan awal? Tindakan ini tidak dapat dibatalkan.",
+      () => {
+        // Reset ke nilai awal (simulasi)
+        showAlertResult("Berhasil", "Pengaturan SEO telah dikembalikan ke nilai awal");
+      },
+      "destructive"
+    );
   };
 
   const filteredPages = seoData.filter(page =>
@@ -456,6 +475,27 @@ export default function SeoManagement() {
           )}
         </Card>
       )}
+      
+      {/* AlertDialog for confirmations */}
+      <AlertDialog
+        isOpen={alertDialogState.isOpen}
+        title={alertDialogState.title}
+        description={alertDialogState.description}
+        onConfirm={() => {
+          if (alertDialogState.onConfirm) alertDialogState.onConfirm();
+          closeAlertDialog();
+        }}
+        onClose={closeAlertDialog}
+        variant={alertDialogState.variant}
+      />
+      
+      {/* AlertDialog for results/notifications */}
+      <AlertDialogResult
+        isOpen={alertResultState.isOpen}
+        title={alertResultState.title}
+        description={alertResultState.description}
+        onClose={closeAlertResult}
+      />
     </div>
   );
 }

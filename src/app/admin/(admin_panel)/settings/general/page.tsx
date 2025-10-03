@@ -18,6 +18,8 @@ import {
   Lock,
   Bell
 } from "lucide-react";
+import { AlertDialog, AlertDialogResult } from "@/components/AlertDialog";
+import { useDialog } from "@/hooks/useDialog";
 
 
 
@@ -37,6 +39,18 @@ interface FormGeneralSettings {
 }
 
 export default function GeneralSettingsPage() {
+  const { 
+    alertDialogState, 
+    showAlertDialog, 
+    closeAlertDialog,
+    alertResultState,
+    showAlertResult,
+    closeAlertResult
+  } = useDialog();
+  
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _showAlertDialog = showAlertDialog; // Gunakan variabel untuk menghindari error ESLint
+  
   const [settings, setSettings] = useState<FormGeneralSettings>({
     id: 1,
     siteName: "MiraiDev",
@@ -74,7 +88,7 @@ export default function GeneralSettingsPage() {
     // Simulasi penyimpanan pengaturan
     
     // Tampilkan notifikasi sukses
-    alert("Pengaturan berhasil disimpan!");
+    showAlertResult("Berhasil", "Pengaturan berhasil disimpan!");
   };
 
   return (
@@ -458,6 +472,27 @@ export default function GeneralSettingsPage() {
           </Button>
         </div>
       </Card>
+      
+      {/* AlertDialog for confirmations */}
+      <AlertDialog
+        isOpen={alertDialogState.isOpen}
+        title={alertDialogState.title}
+        description={alertDialogState.description}
+        onConfirm={() => {
+          if (alertDialogState.onConfirm) alertDialogState.onConfirm();
+          closeAlertDialog();
+        }}
+        onClose={closeAlertDialog}
+        variant={alertDialogState.variant}
+      />
+      
+      {/* AlertDialog for results/notifications */}
+      <AlertDialogResult
+        isOpen={alertResultState.isOpen}
+        title={alertResultState.title}
+        description={alertResultState.description}
+        onClose={closeAlertResult}
+      />
     </div>
   );
 }

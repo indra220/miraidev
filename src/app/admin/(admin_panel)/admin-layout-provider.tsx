@@ -1,20 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from '@/lib/supabase/client';
 import { 
-  LayoutDashboard as Dashboard,
-  FolderOpen, 
-  Settings,
   LogOut,
   Menu,
-  X,
-  MessageSquare,
-  Users,
-  BarChart3
+  X
 } from "lucide-react";
+import { AdminMenuItem, getUserMenu } from '@/constants/admin-menu';
 
 interface AdminLayoutProviderProps {
   children: React.ReactNode;
@@ -24,6 +19,35 @@ export default function AdminLayoutProvider({ children }: AdminLayoutProviderPro
   const router = useRouter();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userRole, setUserRole] = useState<string>('admin'); // Default role
+  const [menuItems, setMenuItems] = useState<AdminMenuItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Ambil informasi user dan role
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          // Ambil role dari user_metadata atau gunakan default
+          const role = user.user_metadata?.role || 'admin';
+          setUserRole(role);
+          setMenuItems(getUserMenu(role));
+        } else {
+          // Jika tidak ada user, redirect ke login
+          router.push('/admin/login');
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching user info:', error);
+        router.push('/admin/login');
+      }
+    };
+
+    fetchUserRole();
+  }, [router]);
 
   const handleLogout = async () => {
     const supabase = createClient();
@@ -32,16 +56,15 @@ export default function AdminLayoutProvider({ children }: AdminLayoutProviderPro
     router.refresh();
   };
 
-  const menuItems = [
-    { href: "/admin/dashboard", label: "Dasbor", icon: Dashboard },
-    { href: "/admin/analytics", label: "Analitik", icon: BarChart3 },
-    { href: "/admin/portfolio", label: "Portofolio", icon: FolderOpen },
-    { href: "/admin/services", label: "Layanan", icon: FolderOpen },
-    { href: "/admin/contact", label: "Kontak", icon: MessageSquare },
-    { href: "/admin/clients", label: "Klien", icon: Users },
-    { href: "/admin/seo", label: "SEO", icon: BarChart3 },
-    { href: "/admin/settings", label: "Pengaturan", icon: Settings },
-  ];
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-gray-200 flex">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-white">Memuat...</div>
+        </div>
+      </div>
+    );
+  }
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
@@ -49,24 +72,30 @@ export default function AdminLayoutProvider({ children }: AdminLayoutProviderPro
         <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center mr-3">
           <span className="font-bold text-white">M</span>
         </div>
-        <h1 className="text-xl font-bold">MiraiDev Admin</h1>
+        <div>
+          <h1 className="text-xl font-bold">MiraiDev Admin</h1>
+          <p className="text-sm text-gray-400">Role: {userRole}</p>
+        </div>
       </div>
       <nav className="flex-grow">
-        {menuItems.map((item) => (
-          <Link 
-            key={item.href}
-            href={item.href}
-            onClick={() => mobileMenuOpen && setMobileMenuOpen(false)}
-            className={`flex items-center px-4 py-3 rounded-lg mb-2 transition-colors ${
-              pathname === item.href 
-                ? 'bg-blue-600 text-white' 
-                : 'text-gray-300 hover:bg-gray-700'
-            }`}
-          >
-            <item.icon className="h-5 w-5 mr-3" />
-            <span>{item.label}</span>
-          </Link>
-        ))}
+        {menuItems.map((item) => {
+          const ItemIcon = item.icon;
+          return (
+            <Link 
+              key={item.id}
+              href={item.href}
+              onClick={() => mobileMenuOpen && setMobileMenuOpen(false)}
+              className={`flex items-center px-4 py-3 rounded-lg mb-2 transition-colors ${
+                pathname === item.href 
+                  ? 'bg-blue-600 text-white' 
+                  : 'text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              <ItemIcon className="h-5 w-5 mr-3" />
+              <span>{item.label}</span>
+            </Link>
+          );
+        })}
       </nav>
       <div className="mt-auto">
         <button
@@ -81,8 +110,8 @@ export default function AdminLayoutProvider({ children }: AdminLayoutProviderPro
   );
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-200 flex">
-      <aside className="hidden md:flex flex-col w-64 bg-gray-800 text-white p-4 border-r border-gray-700">
+    <div className="flex h-screen bg-gray-900 text-gray-200">
+      <aside className="hidden md:flex flex-col w-64 bg-gray-800 text-white p-4 border-r border-gray-700 fixed h-full">
         {sidebarContent}
       </aside>
 
@@ -102,7 +131,7 @@ export default function AdminLayoutProvider({ children }: AdminLayoutProviderPro
         {sidebarContent}
       </aside>
       
-      <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto">
+      <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto md:ml-64">
         {children}
       </main>
     </div>

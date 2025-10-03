@@ -22,16 +22,27 @@ import {
   Star
 } from "lucide-react";
 import { clientsAdminService } from "@/lib/admin-service";
-import { Client } from "@/lib/types";
+import { Client, ClientData } from "@/lib/types";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
+import { AlertDialog, AlertDialogResult } from "@/components/AlertDialog";
+import { useDialog } from "@/hooks/useDialog";
 
 export default function ClientManagement() {
   useEffect(() => {
     document.title = "Manajemen Klien | MiraiDev";
   }, []);
 
+  const { 
+    alertDialogState, 
+    showAlertDialog, 
+    closeAlertDialog,
+    alertResultState,
+    showAlertResult,
+    closeAlertResult
+  } = useDialog();
+  
   const [clients, setClients] = useState<Client[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("semua");
@@ -83,16 +94,22 @@ export default function ClientManagement() {
   };
 
   const handleDelete = async (id: number) => {
-    if (confirm("Apakah Anda yakin ingin menghapus klien ini?")) {
-      try {
-        await clientsAdminService.delete(id);
-        // Hapus item dari state
-        setClients(clients.filter(client => client.id !== id));
-      } catch (err) {
-        console.error('Error deleting client:', err);
-        alert('Gagal menghapus klien. Silakan coba lagi.');
-      }
-    }
+    showAlertDialog(
+      "Konfirmasi Penghapusan",
+      "Apakah Anda yakin ingin menghapus klien ini? Tindakan ini tidak dapat dibatalkan.",
+      async () => {
+        try {
+          await clientsAdminService.delete(id);
+          // Hapus item dari state
+          setClients(clients.filter(client => client.id !== id));
+          showAlertResult("Berhasil", "Klien telah dihapus.");
+        } catch (err) {
+          console.error('Error deleting client:', err);
+          showAlertResult("Gagal", "Gagal menghapus klien. Silakan coba lagi.");
+        }
+      },
+      "destructive"
+    );
   };
 
   const handleStatusChange = async (id: number, newStatus: 'aktif' | 'tidak aktif' | 'pending') => {
@@ -107,35 +124,44 @@ export default function ClientManagement() {
       ));
     } catch (err) {
       console.error('Error updating client status:', err);
-      alert('Gagal memperbarui status klien. Silakan coba lagi.');
+      showAlertResult("Gagal", "Gagal memperbarui status klien. Silakan coba lagi.");
     }
   };
 
-  const handleSave = async (client: Client) => {
+  const handleSave = async (clientData: ClientData) => {
     try {
-      let savedClient: Client;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { last_contacted, ...clientDbData } = { ...clientData };
+      let savedClient: ClientData;
+      
       if (currentClient) {
         // Update existing client
-        savedClient = await clientsAdminService.update(client);
-        setClients(clients.map(c => c.id === client.id ? savedClient : c));
+        const updatedClient = await clientsAdminService.update(clientDbData);
+        // Tambahkan kembali field last_contacted setelah update
+        savedClient = { ...updatedClient, last_contacted: null };
+        setClients(clients.map(c => c.id === clientData.id ? savedClient : c));
+        showAlertResult("Berhasil", "Klien berhasil diperbarui.");
       } else {
         // Add new client
-        savedClient = await clientsAdminService.create({
-          name: client.name,
-          email: client.email,
-          phone: client.phone,
-          company: client.company,
-          role: client.role,
-          status: client.status,
-          join_date: client.join_date,
+        const newClient = await clientsAdminService.create({
+          name: clientDbData.name,
+          email: clientDbData.email,
+          phone: clientDbData.phone,
+          company: clientDbData.company,
+          role: clientDbData.role,
+          status: clientDbData.status,
+          join_date: clientDbData.join_date,
           user_id: null, // Tambahkan user_id karena diperlukan oleh skema database
         });
+        // Tambahkan field last_contacted setelah create
+        savedClient = { ...newClient, last_contacted: null };
         setClients([...clients, savedClient]);
+        showAlertResult("Berhasil", "Klien baru berhasil ditambahkan.");
       }
       setIsModalOpen(false);
     } catch (err) {
       console.error('Error saving client:', err);
-      alert('Gagal menyimpan klien. Silakan coba lagi.');
+      showAlertResult("Gagal", "Gagal menyimpan klien. Silakan coba lagi.");
     }
   };
 
@@ -357,13 +383,34 @@ export default function ClientManagement() {
           onClose={() => setIsModalOpen(false)}
         />
       )}
+      
+      {/* AlertDialog for confirmations */}
+      <AlertDialog
+        isOpen={alertDialogState.isOpen}
+        title={alertDialogState.title}
+        description={alertDialogState.description}
+        onConfirm={() => {
+          if (alertDialogState.onConfirm) alertDialogState.onConfirm();
+          closeAlertDialog();
+        }}
+        onClose={closeAlertDialog}
+        variant={alertDialogState.variant}
+      />
+      
+      {/* AlertDialog for results/notifications */}
+      <AlertDialogResult
+        isOpen={alertResultState.isOpen}
+        title={alertResultState.title}
+        description={alertResultState.description}
+        onClose={closeAlertResult}
+      />
     </div>
   );
 }
 
 interface ClientModalProps {
-  client: Client | null;
-  onSave: (client: Client) => void;
+  client: ClientData | null;
+  onSave: (client: ClientData) => void;
   onClose: () => void;
 }
 
@@ -375,8 +422,8 @@ function ClientModal({ client, onSave, onClose }: ClientModalProps) {
       email: "",
       phone: null,
       company: null,
-      role: "klien",
-      status: "aktif",
+      role: "klien" as const,
+      status: "aktif" as const,
       join_date: new Date().toISOString().split('T')[0],
       project_count: 0,
       rating: 0,

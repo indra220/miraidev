@@ -19,12 +19,23 @@ import {
 import { portfolioAdminService } from "@/lib/admin-service";
 import { PortfolioItem } from "@/lib/types";
 import { LoadingSpinner } from "@/components/loading-spinner";
+import { AlertDialog, AlertDialogResult } from "@/components/AlertDialog";
+import { useDialog } from "@/hooks/useDialog";
 
 export default function PortfolioManagement() {
   useEffect(() => {
     document.title = "Manajemen Portofolio | MiraiDev";
   }, []);
 
+  const { 
+    alertDialogState, 
+    showAlertDialog, 
+    closeAlertDialog,
+    alertResultState,
+    showAlertResult,
+    closeAlertResult
+  } = useDialog();
+  
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -74,16 +85,22 @@ export default function PortfolioManagement() {
   };
 
   const handleDelete = async (id: number) => {
-    if (confirm("Apakah Anda yakin ingin menghapus item ini?")) {
-      try {
-        await portfolioAdminService.delete(id);
-        // Hapus item dari state
-        setPortfolioItems(portfolioItems.filter(item => item.id !== id));
-      } catch (err) {
-        console.error('Error deleting portfolio item:', err);
-        alert('Gagal menghapus item portofolio. Silakan coba lagi.');
-      }
-    }
+    showAlertDialog(
+      "Konfirmasi Penghapusan",
+      "Apakah Anda yakin ingin menghapus item portofolio ini? Tindakan ini tidak dapat dibatalkan.",
+      async () => {
+        try {
+          await portfolioAdminService.delete(id);
+          // Hapus item dari state
+          setPortfolioItems(portfolioItems.filter(item => item.id !== id));
+          showAlertResult("Berhasil", "Item portofolio telah dihapus.");
+        } catch (err) {
+          console.error('Error deleting portfolio item:', err);
+          showAlertResult("Gagal", "Gagal menghapus item portofolio. Silakan coba lagi.");
+        }
+      },
+      "destructive"
+    );
   };
 
   const handleSave = async (item: PortfolioItem) => {
@@ -93,6 +110,7 @@ export default function PortfolioManagement() {
         // Update existing item
         savedItem = await portfolioAdminService.update(item);
         setPortfolioItems(portfolioItems.map(p => p.id === item.id ? savedItem : p));
+        showAlertResult("Berhasil", "Item portofolio berhasil diperbarui.");
       } else {
         // Add new item
         savedItem = await portfolioAdminService.create({
@@ -107,11 +125,12 @@ export default function PortfolioManagement() {
           case_study_url: item.case_study_url,
         });
         setPortfolioItems([...portfolioItems, savedItem]);
+        showAlertResult("Berhasil", "Item portofolio baru berhasil ditambahkan.");
       }
       setIsModalOpen(false);
     } catch (err) {
       console.error('Error saving portfolio item:', err);
-      alert('Gagal menyimpan item portofolio. Silakan coba lagi.');
+      showAlertResult("Gagal", "Gagal menyimpan item portofolio. Silakan coba lagi.");
     }
   };
 
@@ -241,6 +260,27 @@ export default function PortfolioManagement() {
           onClose={() => setIsModalOpen(false)}
         />
       )}
+      
+      {/* AlertDialog for confirmations */}
+      <AlertDialog
+        isOpen={alertDialogState.isOpen}
+        title={alertDialogState.title}
+        description={alertDialogState.description}
+        onConfirm={() => {
+          if (alertDialogState.onConfirm) alertDialogState.onConfirm();
+          closeAlertDialog();
+        }}
+        onClose={closeAlertDialog}
+        variant={alertDialogState.variant}
+      />
+      
+      {/* AlertDialog for results/notifications */}
+      <AlertDialogResult
+        isOpen={alertResultState.isOpen}
+        title={alertResultState.title}
+        description={alertResultState.description}
+        onClose={closeAlertResult}
+      />
     </div>
   );
 }
