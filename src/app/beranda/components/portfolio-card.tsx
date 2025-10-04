@@ -23,10 +23,10 @@ export function PortfolioCard({ item, index }: PortfolioCardProps) {
       className="transition-all duration-200"
     >
       <Card className="bg-gray-800/50 border-gray-700 overflow-hidden group h-full cursor-pointer">
-        <Link href="/portofolio" className="block h-full">
+        <Link href={`/portofolio/${item.id}`} className="block h-full">
           <div className="relative h-48 overflow-hidden">
             <Image
-              src={item.image_url || "/placeholder-portfolio.jpg"}
+              src={item.image_urls && item.image_urls.length > 0 ? item.image_urls[0] : "/placeholder-portfolio.jpg"}
               alt={item.title}
               fill
               className="object-cover"

@@ -1,9 +1,12 @@
+// src/app/api/portfolio/[id]/increment-view/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+// Perbaikan tipe untuk Next.js 13+ App Router
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -15,18 +18,20 @@ export async function POST(
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
-    // PERBAIKAN: Mengambil 'id' langsung dari params
-    const { id } = params;
+    // Menunggu resolusi params dari Promise
+    const resolvedParams = await params;
+    const portfolioId = resolvedParams.id;
 
-    if (!id) {
-      return new NextResponse(JSON.stringify({ error: 'Portfolio ID is required' }), {
+    if (!portfolioId || isNaN(parseInt(portfolioId))) {
+      return new NextResponse(JSON.stringify({ error: 'Valid Portfolio ID is required' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
       });
     }
 
+    // Panggil fungsi RPC dengan portfolioId
     const { error } = await supabase.rpc('increment_portfolio_view', {
-      portfolio_id: parseInt(id),
+      portfolio_id: parseInt(portfolioId),
     });
 
     if (error) {
@@ -34,13 +39,15 @@ export async function POST(
       throw new Error(error.message);
     }
 
+    // Kode ini sekarang akan berjalan dan mengirim respons sukses
     return new NextResponse(JSON.stringify({ message: 'View count incremented successfully' }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
     console.error('Error incrementing view count:', error);
-    return new NextResponse(JSON.stringify({ error: 'Internal server error' }), {
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
+    return new NextResponse(JSON.stringify({ error: errorMessage }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
