@@ -54,16 +54,15 @@ export default function AdminDashboard() {
   interface RecentProjectUI {
     id: number;
     title: string;
-    client: string;
     status: string;
     date: string;
     views: string;
   }
 
+  // PERBAIKAN: Menghapus 'client' dari data yang akan ditampilkan
   const formattedRecentProjects: RecentProjectUI[] = recentProjects.map((item: PortfolioItem) => ({
     id: item.id,
     title: item.title,
-    client: item.client || "Klien Tidak Diketahui",
     status: item.category || "Status Tidak Diketahui",
     date: new Date(item.created_at).toLocaleDateString('id-ID', { 
       day: '2-digit', 
@@ -152,7 +151,7 @@ export default function AdminDashboard() {
                 >
                   <div>
                     <h3 className="font-medium text-white">{project.title}</h3>
-                    <p className="text-sm text-gray-400">{project.client}</p>
+                     {/* PERBAIKAN: Baris yang menampilkan nama klien dihapus */}
                   </div>
                   <div className="text-right">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${

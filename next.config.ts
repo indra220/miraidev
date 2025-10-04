@@ -12,28 +12,46 @@ const nextConfig: NextConfig = {
     ];
   },
   
-  // Nonaktifkan React compiler sementara untuk menghindari masalah hydration
   experimental: {
-    // Nonaktifkan sementara karena bisa menyebabkan masalah hydration
     reactCompiler: false,
   },
   
-  // Optimasi gambar
   images: {
-    domains: ["localhost", "www.mirai.dev", "cdn.discordapp.com"],
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.mirai.dev',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.discordapp.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'indra220.github.io',
+      },
+      {
+        protocol: 'https',
+        hostname: 'raw.githubusercontent.com',
+      },
+      {
+        // PERBAIKAN: Menambahkan hostname baru
+        protocol: 'https',
+        hostname: 'github.com',
+      },
+    ],
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 60 * 60 * 24, // 24 jam cache
   },
   
-  // Optimasi output
   output: "standalone",
   
-  // Optimasi kompilasi untuk development
-  // Hanya kompilasi halaman yang benar-benar dibutuhkan
   onDemandEntries: {
-    // Waktu maksimal halaman tetap di memori (detik)
     maxInactiveAge: 60 * 1000,
-    // Jumlah maksimal halaman yang bisa dikeep di memori
     pagesBufferLength: 2,
   },
 };
