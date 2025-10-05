@@ -19,7 +19,6 @@ import {
   Building,
   Smartphone
 } from "lucide-react";
-import { Navbar } from "@/components/navbar";
 import OptimizedMotion from "@/components/OptimizedMotion";
 import { useState } from "react";
 import { FormError } from "@/components/form-error";
@@ -225,7 +224,6 @@ export default function KontakPage() {
       [id]: value
     }));
     
-    // Clear error when user starts typing
     if (errors[id]) {
       setErrors(prev => {
         const newErrors = { ...prev };
@@ -242,7 +240,6 @@ export default function KontakPage() {
       projectType: value
     }));
     
-    // Clear error when user selects project type
     if (errors.projectType) {
       setErrors(prev => {
         const newErrors = { ...prev };
@@ -251,7 +248,6 @@ export default function KontakPage() {
       });
     }
 
-    // Show estimation when project type is selected
     if (value && packages[value]) {
       setEstimation({
         show: true,
@@ -274,11 +270,9 @@ export default function KontakPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Reset previous messages
     setSuccess("");
     setErrors({});
     
-    // Validate form
     if (!validateForm()) {
       return;
     }
@@ -320,12 +314,9 @@ export default function KontakPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
-      <Navbar />
-      
+    <div>
       {/* Hero Section */}
       <div className="relative overflow-hidden pt-16">
-        <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10"></div>
         <div className="container mx-auto px-4 py-24 sm:py-32 relative">
           <div className="max-w-3xl mx-auto text-center">
             <OptimizedMotion

@@ -10,7 +10,6 @@ import {
   Search,
   FolderOpen
 } from "lucide-react";
-import { Navbar } from "@/components/navbar";
 import OptimizedMotion from "@/components/OptimizedMotion";
 import { getPortfolioProjects, getAllPortfolioCategories } from "@/lib/portfolio";
 import { PortfolioItem } from "@/lib/types";
@@ -125,11 +124,8 @@ export default function PortofolioPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
-      <Navbar />
-      
+    <div>
       <div className="relative overflow-hidden pt-16">
-        <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10"></div>
         <div className="container mx-auto px-4 py-24 sm:py-32 relative">
           <div className="max-w-4xl mx-auto text-center">
             <OptimizedMotion 
@@ -254,7 +250,6 @@ export default function PortofolioPage() {
                         </div>
                     </div>
                     
-                    {/* PERBAIKAN FINAL DI SINI */}
                     <div className="flex w-full gap-2">
                       <Button 
                         className="flex-1 bg-blue-600 hover:bg-blue-700"

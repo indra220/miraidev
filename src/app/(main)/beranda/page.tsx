@@ -1,6 +1,3 @@
-import { Navbar } from "@/components/navbar";
-import { PortfolioItem, ContactSubmission, ServiceItem } from "@/lib/types";
-import { createClient } from "@supabase/supabase-js";
 import { HeroSection } from "./components/hero-section";
 import { ClientTrustSection } from "./components/client-trust";
 import { ServicesOverview } from "./components/services-overview";
@@ -9,6 +6,8 @@ import { WhyChooseUsSection } from "./components/why-choose-us";
 import { Testimonials } from "./components/testimonials";
 import { FinalCtaSection } from "./components/final-cta";
 import type { Metadata } from "next";
+import { createClient } from "@supabase/supabase-js";
+import { PortfolioItem, ServiceItem, ContactSubmission } from "@/lib/types";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const metadata: Metadata = {
@@ -116,9 +115,7 @@ export default async function HomePage() {
   }));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
-      <Navbar />
-      
+    <div>
       <HeroSection />
       
       <ClientTrustSection />

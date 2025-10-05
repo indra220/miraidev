@@ -12,7 +12,6 @@ import {
   Code,
   Sparkles
 } from "lucide-react";
-import { Navbar } from "@/components/navbar";
 import OptimizedMotion from "@/components/OptimizedMotion";
 
 export default function TentangPage() {
@@ -53,12 +52,9 @@ export default function TentangPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
-      <Navbar />
-      
+    <div>
       {/* Hero Section */}
       <div className="relative overflow-hidden pt-16">
-        <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10"></div>
         <div className="container mx-auto px-4 py-24 sm:py-32 relative">
           <div className="max-w-4xl mx-auto text-center">
             <OptimizedMotion 

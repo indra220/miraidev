@@ -15,6 +15,7 @@ import dynamic from "next/dynamic";
 import { createClient } from "@/lib/supabase/client";
 import { isAdmin, getCurrentUser } from "@/lib/auth-service";
 import { Session } from "@/types/dashboard";
+import Image from "next/image"; // Import Image component
 
 const GlobalSearch = dynamic(() => import("@/components/GlobalSearch"), {
   loading: () => <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">...</div>,
@@ -155,10 +156,14 @@ export function Navbar() {
         <div className="flex lg:flex-1">
           <Link href={isAdminPage ? "/admin/dashboard" : "/"} className="-m-1.5 p-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md">
             <span className="sr-only">MiraiDev</span>
-            <div className="flex items-center">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center mr-3">
-                <span className="font-bold text-white">M</span>
-              </div>
+            <div className="flex items-center gap-2">
+              <Image
+                src="/images/logo-rebg.png"
+                alt="MiraiDev Logo"
+                width={64}
+                height={64}
+                priority
+              />
               <span className="text-xl font-bold">MiraiDev</span>
             </div>
           </Link>
@@ -375,10 +380,13 @@ export function Navbar() {
           <div className="flex items-center justify-between">
             <Link href={isAdminPage ? "/admin/dashboard" : "/"} className="-m-1.5 p-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md">
               <span className="sr-only">MiraiDev</span>
-              <div className="flex items-center">
-                <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center mr-3">
-                  <span className="font-bold text-white">M</span>
-                </div>
+              <div className="flex items-center gap-2">
+                <Image
+                  src="/images/logo-rebg.png"
+                  alt="MiraiDev Logo"
+                  width={64}
+                  height={64}
+                />
                 <span className="text-xl font-bold">MiraiDev</span>
               </div>
             </Link>
