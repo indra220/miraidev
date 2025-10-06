@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -26,9 +26,165 @@ import { LoadingSpinner } from "@/components/loading-spinner";
 import { submitContactForm } from "@/lib/contact";
 
 export default function KontakPage() {
+  const [searchParams, setSearchParams] = useState<URLSearchParams | null>(null);
+  const [isClient, setIsClient] = useState(false);
+
   useEffect(() => {
     document.title = "Kontak | MiraiDev";
+    setIsClient(true);
+    // Inisialisasi searchParams di client-side
+    if (typeof window !== 'undefined') {
+      setSearchParams(new URLSearchParams(window.location.search));
+    }
   }, []);
+
+  // Helper functions untuk mendapatkan informasi paket
+  const getProjectTypeName = useCallback((projectTypeId: string) => {
+    const projectTypeNames: Record<string, string> = {
+      landing: "Landing Page",
+      business: "Website Bisnis",
+      ecommerce: "Toko Online",
+      custom: "Solusi Kustom"
+    };
+    return projectTypeNames[projectTypeId] || "Proyek";
+  }, []);
+
+  // Fungsi khusus untuk menghasilkan estimasi dari kalkulator harga
+  const generateEstimationFromCalculator = useCallback((data: {
+    originalProjectType: string;
+    pages: string;
+    features: string;
+    complexity: string;
+    estimatedPrice: string;
+  }) => {
+    const { originalProjectType, pages, features, complexity, estimatedPrice } = data;
+    
+    // Parse fitur dari string ke array
+    const featureArray = features ? features.split(',') : [];
+    
+    // Hitung harga dalam format IDR
+    const price = parseInt(estimatedPrice || '0');
+    const formattedPrice = price.toLocaleString('id-ID', { 
+      style: 'currency', 
+      currency: 'IDR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    });
+    
+    // Buat daftar fitur berdasarkan input dari kalkulator
+    const baseFeatures = [
+      `Jenis Proyek: ${originalProjectType ? getProjectTypeName(originalProjectType) : 'Tidak ditentukan'}`,
+      `Jumlah Halaman: ${pages || '1'} halaman`,
+      `Tingkat Kompleksitas: ${complexity || 'Menengah'}`,
+      "Konsultasi mendalam",
+      "Perencanaan proyek",
+      "Pengembangan kustom",
+      "Testing dan debugging",
+      "Dokumentasi lengkap",
+      "Dukungan pasca-pengembangan"
+    ];
+    
+    // Tambahkan fitur tambahan yang dipilih di kalkulator
+    const additionalFeatures = featureArray.map(featureId => {
+      const featureMap: Record<string, string> = {
+        cms: "Sistem Manajemen Konten (CMS)",
+        blog: "Blog/Artikel",
+        gallery: "Galeri Foto",
+        booking: "Sistem Booking",
+        payment: "Integrasi Pembayaran",
+        multilingual: "Dukungan Multi Bahasa",
+        seo: "Optimasi SEO",
+        analytics: "Integrasi Analytics"
+      };
+      return featureMap[featureId] || featureId;
+    });
+    
+    const allFeatures = [...baseFeatures, ...additionalFeatures];
+    
+    return {
+      show: true,
+      package: `Estimasi ${originalProjectType ? getProjectTypeName(originalProjectType) : 'Proyek Kustom'}`,
+      price: formattedPrice,
+      description: `Estimasi harga berdasarkan pilihan Anda di kalkulator untuk proyek ${originalProjectType ? getProjectTypeName(originalProjectType) : 'kustom'} dengan ${pages || '1'} halaman dan tingkat kompleksitas ${complexity || 'menengah'}.`,
+      features: allFeatures
+    };
+  }, [getProjectTypeName]);
+
+  const [estimation, setEstimation] = useState({
+    show: false,
+    package: "",
+    price: "",
+    description: "",
+    features: [] as string[]
+  });
+
+
+
+  // Fungsi untuk menghasilkan estimasi harga berdasarkan data dari kalkulator
+  const generateBudgetEstimation = (estimatedPrice: string) => {
+    const price = parseInt(estimatedPrice || '0');
+    
+    // Tentukan range budget berdasarkan harga estimasi
+    if (price <= 3000000) {
+      return "small"; // Rp 1.000.000 - Rp 3.000.000
+    } else if (price <= 10000000) {
+      return "medium"; // Rp 3.000.000 - Rp 10.000.000
+    } else if (price <= 50000000) {
+      return "large"; // Rp 10.000.000+
+    } else {
+      return "large"; // Untuk harga di atas 50 juta, tetap kategorikan sebagai large
+    }
+  };
+
+  // Cek apakah ada data dari kalkulator harga
+  useEffect(() => {
+    if (searchParams) {
+      const fromCalculator = searchParams.get('fromCalculator');
+      if (fromCalculator === 'true') {
+        const projectTypeParam = searchParams.get('projectType') || '';
+        const originalProjectType = searchParams.get('originalProjectType') || '';
+        const pages = searchParams.get('pages') || '';
+        const features = searchParams.get('features') || '';
+        const complexity = searchParams.get('complexity') || '';
+        const timeline = searchParams.get('timeline') || ''; // Ambil parameter timeline dari kalkulator
+        const estimatedPrice = searchParams.get('estimatedPrice') || '';
+
+        // Simpan data estimasi dari kalkulator
+        setCalculatorEstimation({
+          fromCalculator: true,
+          originalProjectType,
+          pages,
+          features,
+          complexity,
+          timeline,
+          estimatedPrice
+        });
+
+        // Auto-fill form dengan data dari kalkulator
+        setFormData(prev => ({
+          ...prev,
+          projectType: projectTypeParam,
+          timeline: timeline, // Isi field timeline dari kalkulator
+          budget: generateBudgetEstimation(estimatedPrice), // Set budget berdasarkan estimasi harga
+          message: `Saya tertarik dengan estimasi proyek ${originalProjectType ? getProjectTypeName(originalProjectType) : 'custom'} dengan estimasi harga ${parseInt(estimatedPrice || '0').toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}.`
+        }));
+
+        // Tampilkan estimasi harga jika ada data
+        if (projectTypeParam && estimatedPrice) {
+          // Gunakan fungsi khusus untuk menghasilkan estimasi dari kalkulator
+          const estimationData = generateEstimationFromCalculator({
+            originalProjectType,
+            pages,
+            features,
+            complexity,
+            estimatedPrice
+          });
+          
+          setEstimation(estimationData);
+        }
+      }
+    }
+  }, [searchParams, generateEstimationFromCalculator, getProjectTypeName]);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -44,13 +200,19 @@ export default function KontakPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState("");
-  const [estimation, setEstimation] = useState({
-    show: false,
-    package: "",
-    price: "",
-    description: "",
-    features: [] as string[]
-  });
+  
+  // State untuk menyimpan data estimasi dari kalkulator (tidak perlu disimpan ke variabel karena tidak digunakan)
+  const [, setCalculatorEstimation] = useState<{
+    fromCalculator: boolean;
+    originalProjectType: string;
+    pages: string;
+    features: string;
+    complexity: string;
+    timeline: string;
+    estimatedPrice: string;
+  } | null>(null);
+  
+
 
   const contactInfo = [
     {
@@ -218,6 +380,8 @@ export default function KontakPage() {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
     const { id, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -234,6 +398,8 @@ export default function KontakPage() {
   };
 
   const handleProjectTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
     const value = e.target.value;
     setFormData(prev => ({
       ...prev,
@@ -313,6 +479,15 @@ export default function KontakPage() {
     }
   };
 
+  if (!isClient) {
+    // Tampilkan placeholder sementara selama proses SSR
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <p className="text-gray-400">Memuat halaman kontak...</p>
+      </div>
+    );
+  }
+
   return (
     <div>
       {/* Hero Section */}
@@ -321,9 +496,8 @@ export default function KontakPage() {
           <div className="max-w-3xl mx-auto text-center">
             <OptimizedMotion
               initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
             >
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
                 Hubungi <span className="text-blue-400">Kami</span>
@@ -331,9 +505,8 @@ export default function KontakPage() {
             </OptimizedMotion>
             <OptimizedMotion
               initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              viewport={{ once: true }}
             >
               <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
                 Punya pertanyaan atau ingin diskusi proyek? Kami siap membantu Anda mewujudkan visi digital Anda
@@ -349,9 +522,8 @@ export default function KontakPage() {
             {/* Contact Form */}
             <OptimizedMotion
               initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
             >
               <Card className="bg-gray-800/50 border-gray-700 p-8">
                 <h2 className="text-3xl font-bold mb-6">Konsultasi Gratis</h2>
@@ -359,7 +531,10 @@ export default function KontakPage() {
                   Ceritakan proyek Anda dan dapatkan estimasi harga yang sesuai dengan kebutuhan Anda.
                 </p>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSubmit(e);
+                }} className="space-y-6">
                   {errors.general && (
                     <div className="bg-destructive/20 border border-destructive/30 rounded-md p-3 text-sm text-destructive">
                       {errors.general}
@@ -458,7 +633,11 @@ export default function KontakPage() {
                         <select
                           id="projectType"
                           value={formData.projectType}
-                          onChange={handleProjectTypeChange}
+                          onChange={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleProjectTypeChange(e);
+                          }}
                           className="w-full bg-gray-700/50 border-gray-600 pl-10 pr-10 py-6 rounded-md focus:border-blue-500 text-white appearance-none"
                           aria-invalid={!!errors.projectType}
                           aria-describedby={errors.projectType ? "project-type-error" : undefined}
@@ -484,7 +663,11 @@ export default function KontakPage() {
                         <select
                           id="budget"
                           value={formData.budget}
-                          onChange={handleInputChange}
+                          onChange={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleInputChange(e);
+                          }}
                           className="w-full bg-gray-700/50 border-gray-600 pl-10 pr-10 py-6 rounded-md focus:border-blue-500 text-white appearance-none"
                           aria-invalid={!!errors.budget}
                           aria-describedby={errors.budget ? "budget-error" : undefined}
@@ -511,7 +694,11 @@ export default function KontakPage() {
                       <select
                         id="timeline"
                         value={formData.timeline}
-                        onChange={handleInputChange}
+                        onChange={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleInputChange(e);
+                        }}
                         className="w-full bg-gray-700/50 border-gray-600 pl-10 pr-10 py-6 rounded-md focus:border-blue-500 text-white appearance-none"
                         aria-invalid={!!errors.timeline}
                         aria-describedby={errors.timeline ? "timeline-error" : undefined}
@@ -573,9 +760,8 @@ export default function KontakPage() {
             <div>
               <OptimizedMotion
                 initial={{ opacity: 0, x: 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5 }}
-                viewport={{ once: true }}
                 className="mb-12"
               >
                 <Card className="bg-gray-800/50 border-gray-700 p-8">
@@ -600,14 +786,14 @@ export default function KontakPage() {
                         <div className="border-t border-gray-700 pt-4">
                           <h4 className="font-semibold mb-2">Fitur Utama:</h4>
                           <ul className="space-y-2">
-                            {estimation.features.slice(0, 4).map((feature, index) => (
+                            {estimation.features.slice(0, 6).map((feature, index) => (
                               <li key={index} className="flex items-start">
                                 <div className="w-2 h-2 rounded-full bg-blue-400 mt-2 mr-3"></div>
                                 <span className="text-gray-300">{feature}</span>
                               </li>
                             ))}
-                            {estimation.features.length > 4 && (
-                              <li className="text-gray-400 text-sm">+ {estimation.features.length - 4} fitur lainnya</li>
+                            {estimation.features.length > 6 && (
+                              <li className="text-gray-400 text-sm">+ {estimation.features.length - 6} fitur lainnya</li>
                             )}
                           </ul>
                         </div>
@@ -616,7 +802,7 @@ export default function KontakPage() {
                       <div className="bg-gray-700/50 rounded-xl p-6">
                         <h4 className="font-semibold mb-3">Catatan:</h4>
                         <p className="text-gray-300 text-sm">
-                          Harga di atas adalah estimasi awal. Kami akan memberikan penawaran yang lebih akurat setelah 
+                          Harga di atas adalah estimasi dari kalkulator harga berdasarkan pilihan Anda. Kami akan memberikan penawaran yang lebih akurat setelah 
                           melakukan konsultasi mendalam tentang kebutuhan spesifik proyek Anda.
                         </p>
                       </div>
@@ -637,9 +823,8 @@ export default function KontakPage() {
 
               <OptimizedMotion
                 initial={{ opacity: 0, x: 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                viewport={{ once: true }}
               >
                 <Card className="bg-gray-800/50 border-gray-700 p-8">
                   <h2 className="text-2xl font-bold mb-6">Informasi Kontak</h2>
@@ -669,17 +854,15 @@ export default function KontakPage() {
                 <OptimizedMotion
                   className="text-3xl font-bold text-center mb-8"
                   initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5 }}
-                  viewport={{ once: true }}
                 >
                   Lokasi Kami
                 </OptimizedMotion>
                 <OptimizedMotion
                   initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.1 }}
-                  viewport={{ once: true }}
                   whileHover={{ scale: 1.02 }}
                 >
                   <Card className="bg-gray-800/50 border-gray-700 overflow-hidden">
@@ -699,9 +882,8 @@ export default function KontakPage() {
           <OptimizedMotion
             className="max-w-4xl mx-auto text-center bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-2xl p-12 border border-gray-700 mt-20"
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
             whileHover={{ scale: 1.02 }}
           >
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Siap Memulai Proyek Anda?</h2>
