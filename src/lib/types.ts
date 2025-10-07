@@ -1,9 +1,10 @@
 // Di file types.ts Anda
 // Kode perbaikan dengan path yang jelas dan tidak ambigu
 import type { Database } from './supabase-types/supabase';
-
 // 2. Alias untuk Tipe Baris (Row) dari Setiap Tabel
 // Ini membuat penggunaan tipe dari Supabase menjadi lebih singkat dan rapi.
+
+// --- Tabel Eksisting ---
 type ProfileRow = Database['public']['Tables']['profiles']['Row'];
 type ServiceRow = Database['public']['Tables']['services']['Row'];
 type PortfolioRow = Database['public']['Tables']['portfolio']['Row'];
@@ -19,6 +20,16 @@ type NewsletterSubscriptionRow = Database['public']['Tables']['newsletter_subscr
 type UserSessionRow = Database['public']['Tables']['user_sessions']['Row'];
 type NotificationRow = Database['public']['Tables']['notifications']['Row'];
 
+// --- Tabel Baru untuk Harga Dinamis ---
+type ProjectTypeRow = Database['public']['Tables']['project_types']['Row'];
+type FeaturePriceRow = Database['public']['Tables']['feature_prices']['Row'];
+type PagePriceRow = Database['public']['Tables']['page_prices']['Row'];
+type TimelinePriceRow = Database['public']['Tables']['timeline_prices']['Row'];
+type ComplexityPriceRow = Database['public']['Tables']['complexity_prices']['Row'];
+type PricingPackageRow = Database['public']['Tables']['pricing_packages']['Row'];
+type PackageFeatureRow = Database['public']['Tables']['package_features']['Row'];
+type PricingLogRow = Database['public']['Tables']['pricing_logs']['Row'];
+
 
 // 3. Alias untuk Tipe Enum
 // Mengambil definisi ENUM langsung dari skema database.
@@ -26,6 +37,8 @@ export type AppRole = Database['public']['Enums']['app_role'];
 export type ReportType = Database['public']['Enums']['report_type'];
 export type TicketStatus = Database['public']['Enums']['ticket_status'];
 export type TicketPriority = Database['public']['Enums']['ticket_priority'];
+export type ClientStatus = Database['public']['Enums']['client_status'];
+export type SubmissionStatus = Database['public']['Enums']['submission_status'];
 
 
 // 4. Tipe yang Diekspor untuk Digunakan di Seluruh Aplikasi
@@ -40,7 +53,10 @@ export interface UserProfile extends ProfileRow {
 
 // --- PROJECTS ---
 // Tipe dasar untuk proyek, langsung dari database.
-export type Project = ProjectRow;
+// Kita bisa menambahkan relasi ke project_types di sini jika diperlukan
+export interface Project extends ProjectRow {
+    project_type?: ProjectType; // Relasi opsional di sisi klien
+}
 
 // --- SERVICES ---
 // Tipe dasar untuk layanan, langsung dari database.
@@ -73,6 +89,35 @@ export interface ClientData extends ClientRow {
 export interface NotificationDetails extends NotificationRow {
   relative_time?: string; // Contoh: "5 menit yang lalu"
 }
+
+// --- Tipe Baru untuk Harga Dinamis ---
+
+// Tipe untuk jenis proyek
+export type ProjectType = ProjectTypeRow;
+
+// Tipe untuk harga fitur
+export type FeaturePrice = FeaturePriceRow;
+
+// Tipe untuk harga halaman
+export type PagePrice = PagePriceRow;
+
+// Tipe untuk harga berdasarkan waktu
+export type TimelinePrice = TimelinePriceRow;
+
+// Tipe untuk harga berdasarkan kompleksitas
+export type ComplexityPrice = ComplexityPriceRow;
+
+// Tipe untuk fitur dalam sebuah paket
+export type PackageFeature = PackageFeatureRow;
+
+// Tipe untuk paket harga yang diperkaya dengan daftar fiturnya
+export interface PricingPackage extends PricingPackageRow {
+    features?: PackageFeature[]; // Daftar fitur yang termasuk dalam paket
+}
+
+// Tipe untuk log perubahan harga
+export type PricingLog = PricingLogRow;
+
 
 // --- Tipe Lainnya (langsung ekspor dari database) ---
 export type PortfolioItem = PortfolioRow;
