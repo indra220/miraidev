@@ -6,7 +6,8 @@ import {
   BarChart3,
   Briefcase,
   Mail,
-  Globe
+  Globe,
+  Tag
 } from "lucide-react";
 
 // Tipe untuk item menu
@@ -69,6 +70,13 @@ export const adminMenuConfig: AdminMenuItem[] = [
     href: "/admin/seo",
     icon: Globe,
     roles: ["admin", "pegawai"],
+  },
+  {
+    id: "pricing",
+    label: "Pengaturan Harga",
+    href: "/admin/pricing",
+    icon: Tag,
+    roles: ["admin"],
   },
   {
     id: "settings",
