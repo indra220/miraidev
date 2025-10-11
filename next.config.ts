@@ -1,5 +1,11 @@
 import type { NextConfig } from "next";
 
+// Beritahu ESLint untuk mengabaikan aturan 'require' khusus untuk baris di bawah ini
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+
 const nextConfig: NextConfig = {
   /* config options here */
   async redirects() {
@@ -39,7 +45,6 @@ const nextConfig: NextConfig = {
         hostname: 'raw.githubusercontent.com',
       },
       {
-        // PERBAIKAN: Menambahkan hostname baru
         protocol: 'https',
         hostname: 'github.com',
       },
@@ -54,6 +59,8 @@ const nextConfig: NextConfig = {
     maxInactiveAge: 60 * 1000,
     pagesBufferLength: 2,
   },
+  
+  outputFileTracingRoot: process.cwd(),
 };
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);

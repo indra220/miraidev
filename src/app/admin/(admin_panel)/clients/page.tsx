@@ -93,7 +93,7 @@ export default function ClientManagement() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     showAlertDialog(
       "Konfirmasi Penghapusan",
       "Apakah Anda yakin ingin menghapus klien ini? Tindakan ini tidak dapat dibatalkan.",
@@ -112,7 +112,7 @@ export default function ClientManagement() {
     );
   };
 
-  const handleStatusChange = async (id: number, newStatus: 'aktif' | 'tidak aktif' | 'pending') => {
+  const handleStatusChange = async (id: string, newStatus: 'aktif' | 'tidak aktif' | 'pending') => {
     try {
       const updatedClient = await clientsAdminService.update({
         ...clients.find(c => c.id === id)!,
@@ -417,7 +417,7 @@ interface ClientModalProps {
 function ClientModal({ client, onSave, onClose }: ClientModalProps) {
   const [formData, setFormData] = useState<Client>(
     client || {
-      id: 0,
+      id: "",
       name: "",
       email: "",
       phone: null,

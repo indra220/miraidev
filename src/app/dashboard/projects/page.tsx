@@ -1,3 +1,5 @@
+// src/app/dashboard/projects/page.tsx
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -79,13 +81,15 @@ export default function ProjectsPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="active" className="space-y-4">
+      {/* --- PERUBAHAN URUTAN DAN DEFAULT VALUE DIMULAI DI SINI --- */}
+      <Tabs defaultValue="all" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="active">Aktif ({activeProjects.length})</TabsTrigger>
-          <TabsTrigger value="completed">Selesai ({completedProjects.length})</TabsTrigger>
-          <TabsTrigger value="on-hold">Ditunda ({onHoldProjects.length})</TabsTrigger>
           <TabsTrigger value="all">Semua ({projects.length})</TabsTrigger>
+          <TabsTrigger value="active">Aktif ({activeProjects.length})</TabsTrigger>
+          <TabsTrigger value="on-hold">Ditunda ({onHoldProjects.length})</TabsTrigger>
+          <TabsTrigger value="completed">Selesai ({completedProjects.length})</TabsTrigger>
         </TabsList>
+      {/* --- AKHIR PERUBAHAN --- */}
         
         <TabsContent value="active" className="space-y-4">
           {activeProjects.length > 0 ? (

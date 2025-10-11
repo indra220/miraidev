@@ -125,7 +125,7 @@ export const clientsAdminService = {
   },
 
   // Mendapatkan klien berdasarkan ID
-  getById: async (id: number): Promise<ClientData | null> => {
+  getById: async (id: string): Promise<ClientData | null> => {
     const allItems = await clientsAdminService.getAll();
     const item = allItems.find(item => item.id === id) || null;
     // Tambahkan default value untuk last_contacted karena itu adalah properti tambahan
@@ -157,7 +157,7 @@ export const clientsAdminService = {
   },
 
   // Menghapus klien
-  delete: async (id: number): Promise<void> => {
+  delete: async (id: string): Promise<void> => {
     await makeApiCall(`/clients?id=${id}`, {
       method: 'DELETE',
     });

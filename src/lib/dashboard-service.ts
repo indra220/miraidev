@@ -1,3 +1,5 @@
+// src/lib/dashboard-service.ts
+
 import { createClient } from './supabase/client';
 import { Project, ServiceItem, ContactSubmission, UserProfile } from './types';
 
@@ -8,13 +10,16 @@ export interface DashboardProject {
   client: string;
   status: string;
   progress: number;
-  timeline: {
-    start: string;
-    expected: string;
-    actual?: string;
-  };
+  description: string | null; // Deskripsi proyek
+  features: string[] | null; // Fitur-fitur proyek
+  startDate: string | null; // Tanggal mulai proyek
+  endDate: string | null; // Tanggal selesai proyek
+  estimasiWaktuPengerjaan: string | null; // Ganti timeline dengan estimasi waktu pengerjaan
+  tanggalPembuatan: string; // Tambahkan tanggal pembuatan
   team: string;
   latestUpdate: string;
+  price: number | null; // <-- Penambahan field harga
+  complexity: string | null; // <-- Penambahan field kompleksitas
 }
 
 // Interface untuk data layanan yang ditampilkan di dashboard
@@ -76,11 +81,12 @@ export interface DashboardSupportTicket {
 
 // Interface untuk data pengajuan proyek
 export interface DashboardProjectSubmission {
-  id: number;
+  id: string; // <-- Perbaikan tipe dari number ke string
   name: string;
   status: string;
   type: string;
   date: string;
+  progress: number;
 }
 
 // Interface untuk data analitik laporan
@@ -104,7 +110,8 @@ export const projectDashboardService = {
   async getUserProjects(userId: string): Promise<DashboardProject[]> {
     const supabase = createClient();
 
-    const { data, error } = await supabase
+    // Ambil data proyek dari tabel projects
+    const { data: projectsData, error } = await supabase
       .from('projects')
       .select('*')
       .eq('user_id', userId)
@@ -116,19 +123,91 @@ export const projectDashboardService = {
     }
 
     // Konversi data proyek ke format dashboard
-    return data.map((project: Project) => ({
+    return projectsData.map((project) => {
+      // Dengan struktur database yang diperbarui:
+      // - Kolom 'price' menyimpan harga proyek baik dari paket maupun dari kalkulator
+      // - Kolom 'complexity' menyimpan kompleksitas proyek
+      
+      // Gunakan harga dari kolom price jika tersedia
+      const finalPrice = project.price;
+      
+      // Gunakan kompleksitas dari kolom complexity jika tersedia, jika tidak gunakan default
+      const complexityLabel = project.complexity || 'Sedang';
+
+      return {
+        id: project.id || '',
+        name: project.title || 'Proyek tanpa judul',
+        client: project.user_id || '', // Field ini sebenarnya adalah creator id, bukan client id
+        status: project.status || 'baru',
+        progress: 
+          project.status === 'terkirim' || project.status === 'planning' ? 0 : 
+          project.status === 'development' || project.status === 'on-going' ? 50 : 
+          project.status === 'selesai' ? 100 : 30, // Default untuk status lainnya
+        description: project.description || null,
+        features: project.features || null,
+        startDate: project.start_date || null,
+        endDate: project.end_date || null,
+        estimasiWaktuPengerjaan: project.timeline_estimate || null, // Gunakan estimasi waktu dari kolom timeline_estimate
+        tanggalPembuatan: project.created_at || new Date().toISOString(), // Gunakan tanggal pembuatan dari kolom created_at
+        team: 'Tim Pengembangan',
+        latestUpdate: 'Pembaruan terbaru belum tersedia',
+        price: finalPrice,
+        complexity: complexityLabel,
+      };
+    });
+  },
+
+  // Mendapatkan satu proyek berdasarkan ID
+  async getUserProjectById(userId: string, projectId: string): Promise<DashboardProject | null> {
+    const supabase = createClient();
+    // Ambil data proyek dari tabel projects
+    const { data: projectData, error } = await supabase
+      .from('projects')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('id', projectId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching single project:', error);
+      if (error.code === 'PGRST116') return null; // Not found
+      throw new Error(error.message);
+    }
+
+    if (!projectData) return null;
+
+    // Sekarang dengan struktur database yang diperbarui:
+    // - Kolom 'price' menyimpan harga proyek baik dari paket maupun dari kalkulator
+    // - Kolom 'complexity' menyimpan kompleksitas proyek
+    // - Kolom 'features' menyimpan daftar fitur proyek
+    
+    // Gunakan harga dari kolom price jika tersedia
+    const finalPrice = projectData.price;
+    
+    // Gunakan kompleksitas dari kolom complexity jika tersedia, jika tidak gunakan default
+    const complexityLabel = projectData.complexity || 'Sedang';
+
+    const project: Project = projectData;
+    return {
       id: project.id || '',
       name: project.title || 'Proyek tanpa judul',
-      client: project.user_id || '', // Field ini sebenarnya adalah creator id, bukan client id
+      client: project.user_id || '',
       status: project.status || 'baru',
-      progress: 30, // Nilai default sementara, nanti bisa dihitung dari tahapan
-      timeline: {
-        start: project.start_date || new Date().toISOString(),
-        expected: project.end_date || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 hari dari sekarang
-      },
+      progress: 
+        project.status === 'terkirim' || project.status === 'planning' ? 0 : 
+        project.status === 'development' || project.status === 'on-going' ? 50 : 
+        project.status === 'selesai' ? 100 : 30, // Default untuk status lainnya
+      description: project.description || null,
+      features: project.features || null,
+      startDate: project.start_date || null,
+      endDate: project.end_date || null,
+      estimasiWaktuPengerjaan: project.timeline_estimate || null, // Gunakan estimasi waktu dari kolom timeline_estimate
+      tanggalPembuatan: project.created_at || new Date().toISOString(), // Gunakan tanggal pembuatan dari kolom created_at
       team: 'Tim Pengembangan',
-      latestUpdate: 'Pembaruan terbaru belum tersedia'
-    }));
+      latestUpdate: 'Pembaruan terbaru belum tersedia',
+      price: finalPrice,
+      complexity: complexityLabel,
+    };
   },
 
   // Mendapatkan ringkasan proyek (aktif, selesai, ditunda)
@@ -136,7 +215,7 @@ export const projectDashboardService = {
     const projects = await projectDashboardService.getUserProjects(userId);
     
     return {
-      active: projects.filter(p => p.status === 'aktif' || p.status === 'development').length,
+      active: projects.filter(p => p.status === 'aktif' || p.status === 'development' || p.status === 'on-going').length,
       completed: projects.filter(p => p.status === 'completed' || p.status === 'selesai').length,
       onHold: projects.filter(p => p.status === 'on-hold' || p.status === 'ditunda').length,
       total: projects.length
@@ -454,7 +533,6 @@ export const projectSubmissionDashboardService = {
   async getUserProjectSubmissions(userId: string): Promise<DashboardProjectSubmission[]> {
     const supabase = createClient();
 
-    // Using the existing projects table for project submissions
     const { data, error } = await supabase
       .from('projects')
       .select('*')
@@ -468,11 +546,12 @@ export const projectSubmissionDashboardService = {
 
     // Convert project data to dashboard format
     return data.map(project => ({
-      id: parseInt(project.id) || 0,
+      id: project.id || '', // Perbaikan tipe ID
       name: project.title || 'Proyek tanpa nama',
       status: project.status || 'terkirim',
       type: project.category || 'website',
-      date: project.created_at || new Date().toISOString()
+      date: project.created_at || new Date().toISOString(),
+      progress: project.progress || 0
     }));
   },
 
@@ -488,7 +567,7 @@ export const projectSubmissionDashboardService = {
         description: description,
         category: type,
         additional_requirements: requirements,
-        status: 'terkirim' // Initial status for new submissions
+        status: 'terkirim' // Status awal ketika proyek diajukan
       }])
       .select()
       .single();
@@ -544,7 +623,6 @@ export const dashboardService = {
         projectSubmissions
       };
     } catch (error) {
-      // PERBAIKAN: Menangani error dengan type-safe
       if (error instanceof Error) {
         console.error('Error fetching dashboard data:', error.message);
         throw new Error(`Failed to fetch dashboard data: ${error.message}`);
@@ -553,6 +631,11 @@ export const dashboardService = {
         throw new Error(`An unexpected error occurred: ${String(error)}`);
       }
     }
+  },
+
+  // Menambahkan fungsi untuk mengambil satu proyek
+  async getUserProjectById(userId: string, projectId: string) {
+    return await projectDashboardService.getUserProjectById(userId, projectId);
   },
 
   // Wrapper untuk create support ticket

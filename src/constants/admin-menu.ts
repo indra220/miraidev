@@ -7,7 +7,8 @@ import {
   Briefcase,
   Mail,
   Globe,
-  Tag
+  Tag,
+  FileText
 } from "lucide-react";
 
 // Tipe untuk item menu
@@ -77,6 +78,13 @@ export const adminMenuConfig: AdminMenuItem[] = [
     href: "/admin/pricing",
     icon: Tag,
     roles: ["admin"],
+  },
+  {
+    id: "projects",
+    label: "Proyek",
+    href: "/admin/projects",
+    icon: FileText,
+    roles: ["admin", "pegawai"],
   },
   {
     id: "settings",

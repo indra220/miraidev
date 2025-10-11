@@ -1698,6 +1698,9 @@ function PackagePricingTab({
         price: packageForm.price,
         is_active: packageForm.isActive,
         is_popular: packageForm.isPopular,
+        complexity_id: null,
+        timeline_id: null,
+        features: [],
         created_by: null,
         updated_by: null,
       });

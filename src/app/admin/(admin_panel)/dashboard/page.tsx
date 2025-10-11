@@ -155,7 +155,7 @@ export default function AdminDashboard() {
                   </div>
                   <div className="text-right">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      project.status === "Selesai" || project.status === "aktif" || project.status === "website"
+                      project.status === "Selesai" || project.status === "aktif" || project.status === "website" || project.status === "development" || project.status === "on-going"
                         ? "bg-green-900/30 text-green-400 border border-green-900/50" 
                         : project.status === "Dalam Pengerjaan" || project.status === "pengerjaan"
                           ? "bg-blue-900/30 text-blue-400 border border-blue-900/50" 
