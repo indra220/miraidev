@@ -8,9 +8,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { dashboardService, DashboardProject } from "@/lib/dashboard-service";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/loading-spinner";
-import { AlertCircle, Calendar, CheckCircle, Clock, Users, MessageSquare, ArrowLeft, DollarSign, Layers } from "lucide-react";
+import { AlertCircle, Calendar, CheckCircle, Clock, Users, MessageSquare, ArrowLeft, DollarSign, Layers, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
 
 export default function ProjectDetailPage() {
   const params = useParams();
@@ -69,6 +71,47 @@ export default function ProjectDetailPage() {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [fetchProjectDetails, authLoading, session]);
+
+  // Fungsi untuk membatalkan proyek
+  const cancelProject = async () => {
+    if (!session?.user || !project) {
+      toast.error("Anda harus login untuk membatalkan proyek");
+      return;
+    }
+
+    if (!window.confirm("Apakah Anda yakin ingin membatalkan proyek ini? Aksi ini tidak dapat dibatalkan.")) {
+      return;
+    }
+
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from('projects')
+        .update({ status: 'dibatalkan', progress: 0 })
+        .eq('id', project.id)
+        .eq('user_id', session.user.id);
+
+      if (error) {
+        console.error('Error cancelling project:', error);
+        throw error;
+      }
+
+      // Perbarui data proyek setelah pembatalan
+      const projectData = await dashboardService.getUserProjectById(session.user.id, project.id);
+      if (projectData) {
+        setProject(projectData);
+      }
+
+      toast.success("Proyek Berhasil Dibatalkan", {
+        description: "Proyek telah dibatalkan dan statusnya telah diperbarui."
+      });
+    } catch (error: unknown) {
+      console.error("Error cancelling project:", error);
+      toast.error("Gagal Membatalkan Proyek", {
+        description: (error as Error).message || "Terjadi kesalahan yang tidak diketahui."
+      });
+    }
+  };
 
   if (loading || authLoading) {
     return (
@@ -142,6 +185,21 @@ export default function ProjectDetailPage() {
                 <p className="font-semibold capitalize">{project.status}</p>
               </div>
             </div>
+            
+            {/* Tombol batalkan muncul jika status terkirim atau planning */}
+            {(project.status === 'terkirim' || project.status === 'planning') && (
+              <div className="flex items-center">
+                <Button 
+                  variant="destructive" 
+                  size="sm"
+                  onClick={cancelProject}
+                  className="flex items-center"
+                >
+                  <XCircle className="h-4 w-4 mr-2" />
+                  Batalkan Proyek
+                </Button>
+              </div>
+            )}
              <div className="flex items-center">
               <Users className="h-4 w-4 mr-2 text-muted-foreground" />
               <div>
