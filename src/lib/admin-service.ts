@@ -1,5 +1,21 @@
 import { PortfolioItem, ServiceDetails, ClientData, ContactSubmission } from "./types";
 import type { Database } from './supabase-types/supabase';
+import { createClient } from './supabase/client';
+
+// Interface untuk riwayat percakapan
+interface MessageThreadItem {
+  id: string;
+  message: string;
+  sender_type: string;
+  created_at: string;
+  name?: string;
+  email?: string;
+}
+
+interface ReplyResponse {
+  message: string;
+  originalMessage: ContactSubmission;
+}
 
 // Fungsi untuk membuat panggilan API ke endpoint admin
 const makeApiCall = async (endpoint: string, options: RequestInit = {}) => {
@@ -133,14 +149,10 @@ export const clientsAdminService = {
   },
 
   // Menambahkan klien
-  create: async (client: Omit<ClientData, 'id' | 'created_at' | 'updated_at' | 'project_count' | 'rating' | 'last_contacted'>): Promise<ClientData> => {
+  create: async (client: Omit<ClientData, 'id' | 'created_at' | 'updated_at' | 'last_contacted'>): Promise<ClientData> => {
     const response = await makeApiCall('/clients', {
       method: 'POST',
-      body: JSON.stringify({
-        ...client,
-        project_count: 0,
-        rating: 0
-      }),
+      body: JSON.stringify(client),
     });
     // Tambahkan default value untuk last_contacted karena itu adalah properti tambahan
     return { ...response.data, last_contacted: null } as ClientData;
@@ -192,5 +204,78 @@ export const contactAdminService = {
     await makeApiCall(`/contact?id=${id}`, {
       method: 'DELETE',
     });
+  },
+
+  // Mengirim balasan pesan
+  sendReply: async (messageId: string, reply: string): Promise<ReplyResponse> => {
+    const response = await makeApiCall('/pesan', {
+      method: 'POST',
+      body: JSON.stringify({ messageId, reply }),
+    });
+    return response.data as ReplyResponse;
+  },
+
+  // Mengambil riwayat percakapan pesan kontak
+  getMessageThread: async (messageId: string): Promise<MessageThreadItem[]> => {
+    const supabase = createClient();
+    
+    // Ambil pesan asli
+    const { data: originalMessage, error: originalError } = await supabase
+      .from('contact_submissions')
+      .select('*')
+      .eq('id', messageId)
+      .single();
+    
+    if (originalError) {
+      console.error('Error fetching original message:', originalError);
+      throw new Error('Original message not found');
+    }
+    
+    // Ambil riwayat percakapan
+    const { data: threadMessages, error: threadError } = await supabase
+      .from('contact_message_threads')
+      .select('*')
+      .eq('contact_submission_id', messageId)
+      .order('created_at', { ascending: true });
+    
+    if (threadError) {
+      console.error('Error fetching message thread:', threadError);
+      throw new Error('Failed to fetch message thread');
+    }
+    
+    // Gabungkan pesan asli dengan riwayat percakapan
+    const fullThread: MessageThreadItem[] = [
+      {
+        id: originalMessage.id,
+        message: originalMessage.message,
+        sender_type: 'user',
+        created_at: originalMessage.created_at,
+        name: originalMessage.name,
+        email: originalMessage.email
+      },
+      ...(threadMessages || []).map((msg) => ({
+        id: msg.id,
+        message: msg.message,
+        sender_type: msg.sender_type,
+        created_at: msg.created_at
+      }))
+    ];
+    
+    return fullThread;
+  },
+
+  // Mengambil pesan untuk proyek tertentu
+  getProjectMessages: async (projectId: string) => {
+    const response = await makeApiCall(`/pesan/project/${projectId}`);
+    return response.data;
+  },
+
+  // Mengirim pesan untuk proyek tertentu
+  sendProjectMessage: async (projectId: string, message: string, senderId: string) => {
+    const response = await makeApiCall(`/pesan/project/${projectId}`, {
+      method: 'POST',
+      body: JSON.stringify({ message, senderId }),
+    });
+    return response.data;
   }
 };

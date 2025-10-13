@@ -282,15 +282,64 @@ export const communicationDashboardService = {
 
   // Mendapatkan percakapan proyek
   async getProjectConversations(userId: string): Promise<DashboardConversation[]> {
-    const projects = await projectDashboardService.getUserProjects(userId);
+    const supabase = createClient();
     
-    return projects.slice(0, 2).map((project, index) => ({
-      id: project.id,
-      project: project.name,
-      participants: 2,
-      lastMessage: `Pembaruan untuk proyek ${project.name} telah tersedia`,
-      lastActivity: `${index + 1} jam yang lalu`
-    }));
+    // Ambil proyek milik pengguna
+    const { data: projects, error: projectsError } = await supabase
+      .from('projects')
+      .select('id, title')
+      .eq('user_id', userId);
+
+    if (projectsError) {
+      console.error('Error fetching user projects:', projectsError);
+      throw new Error(projectsError.message);
+    }
+
+    // Ambil pesan terakhir untuk setiap proyek
+    const conversations = await Promise.all(
+      projects.map(async (project) => {
+        // Ambil pesan terakhir dari proyek ini
+        const { data: lastMessage, error: messageError } = await supabase
+          .from('chat_messages')
+          .select('message, created_at, sender_type')
+          .eq('project_id', project.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        let lastMessageText = 'Belum ada pesan';
+        let lastActivity = 'Baru saja';
+
+        if (!messageError && lastMessage) {
+          lastMessageText = lastMessage.message.length > 50 
+            ? lastMessage.message.substring(0, 50) + '...' 
+            : lastMessage.message;
+          
+          const timeDiff = Math.floor((Date.now() - new Date(lastMessage.created_at).getTime()) / 60000); // dalam menit
+          if (timeDiff < 1) {
+            lastActivity = 'Baru saja';
+          } else if (timeDiff < 60) {
+            lastActivity = `${timeDiff} menit yang lalu`;
+          } else if (timeDiff < 1440) {
+            const hours = Math.floor(timeDiff / 60);
+            lastActivity = `${hours} jam yang lalu`;
+          } else {
+            const days = Math.floor(timeDiff / 1440);
+            lastActivity = `${days} hari yang lalu`;
+          }
+        }
+
+        return {
+          id: project.id,
+          project: project.title,
+          participants: 2, // Misalnya: user dan admin
+          lastMessage: lastMessageText,
+          lastActivity: lastActivity
+        };
+      })
+    );
+
+    return conversations;
   }
 };
 
@@ -496,14 +545,14 @@ export const supportTicketDashboardService = {
     return data.map(ticket => ({
       id: parseInt(ticket.id) || 0,
       subject: ticket.subject || 'Tiket tanpa subjek',
-      status: ticket.status || 'terbuka',
-      priority: ticket.priority || 'normal',
+      status: ticket.status || 'open',
+      priority: ticket.priority || 'low',
       date: ticket.created_at || new Date().toISOString()
     }));
   },
 
   // Mengirim tiket dukungan baru
-  async createSupportTicket(userId: string, subject: string, message: string, priority: string) {
+  async createSupportTicket(userId: string, subject: string, description: string, priority: string) {
     const supabase = createClient();
 
     const { data, error } = await supabase
@@ -511,9 +560,9 @@ export const supportTicketDashboardService = {
       .insert([{
         user_id: userId,
         subject: subject,
-        message: message,
+        description: description,
         priority: priority,
-        status: 'terbuka'
+        status: 'open'
       }])
       .select()
       .single();
@@ -639,8 +688,8 @@ export const dashboardService = {
   },
 
   // Wrapper untuk create support ticket
-  async createSupportTicket(userId: string, subject: string, message: string, priority: string) {
-    return await supportTicketDashboardService.createSupportTicket(userId, subject, message, priority);
+  async createSupportTicket(userId: string, subject: string, description: string, priority: string) {
+    return await supportTicketDashboardService.createSupportTicket(userId, subject, description, priority);
   },
 
   // Wrapper untuk create project submission
@@ -652,5 +701,33 @@ export const dashboardService = {
       type, 
       requirements
     );
+  },
+
+  // Fungsi untuk mengambil pesan obrolan proyek
+  async getProjectChatMessages(projectId: string, userId: string, limit: number = 50, offset: number = 0) {
+    const supabase = createClient();
+
+    const { data, error } = await supabase
+      .from('chat_messages')
+      .select('id, project_id, sender_id, sender_type, message, created_at')
+      .eq('project_id', projectId)
+      .order('created_at', { ascending: true })
+      .range(offset, offset + limit - 1); // Gunakan range untuk pagination
+
+    if (error) {
+      console.error('Error fetching project chat messages:', error);
+      throw new Error(error.message);
+    }
+
+    // Tambahkan informasi apakah pesan berasal dari user atau admin
+    return data.map((message) => ({
+      id: message.id,
+      projectId: message.project_id,
+      senderId: message.sender_id,
+      senderType: message.sender_type as 'user' | 'admin',
+      message: message.message,
+      timestamp: message.created_at,
+      isOwnMessage: message.sender_id === userId
+    }));
   }
 };

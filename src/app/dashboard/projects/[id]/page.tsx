@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
+import ProjectConversationChat from "@/components/project-conversation-chat";
 
 export default function ProjectDetailPage() {
   const params = useParams();
@@ -312,6 +313,24 @@ export default function ProjectDetailPage() {
                     </Link>
                  </Button>
               </div>
+           </div>
+           
+           {/* Project Conversation Chat */}
+           <div className="border-t border-border pt-6">
+             <Card>
+               <CardHeader>
+                 <CardTitle className="flex items-center gap-2">
+                   <MessageSquare className="h-5 w-5" />
+                   <span>Chat Proyek</span>
+                 </CardTitle>
+                 <CardDescription>
+                   Konsultasikan detail proyek Anda langsung dengan admin
+                 </CardDescription>
+               </CardHeader>
+               <CardContent>
+                 <ProjectConversationChat projectId={project.id} />
+               </CardContent>
+             </Card>
            </div>
         </CardContent>
       </Card>

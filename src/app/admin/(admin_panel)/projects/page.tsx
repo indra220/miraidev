@@ -62,7 +62,8 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
-  XCircle
+  XCircle,
+  MessageSquare
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
@@ -181,8 +182,8 @@ export default function ProjectsPage() {
       
       const { data: allClients, error: allClientsError } = await supabase
         .from('clients')
-        .select('user_id, name')
-        .order('name', { ascending: true });
+        .select('user_id')
+        .order('user_id', { ascending: true });
 
       if (allClientsError && allClientsError.code !== 'PGRST116') throw allClientsError;
 
@@ -190,7 +191,7 @@ export default function ProjectsPage() {
       if (allClients) {
         allClients.forEach(client => {
           if (client.user_id) {
-            clientMap.set(client.user_id, client.name);
+            clientMap.set(client.user_id, client.user_id);
           }
         });
       }
@@ -653,6 +654,13 @@ export default function ProjectsPage() {
                               }}>
                                 <Eye className="h-4 w-4 mr-2" />
                                 Lihat Detail
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(`/admin/chat?projectId=${project.id}`);
+                              }}>
+                                <MessageSquare className="h-4 w-4 mr-2" />
+                                Chat Proyek
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem className="text-red-600 focus:bg-red-50 focus:text-red-700" onClick={() => handleDelete(project.id)}>

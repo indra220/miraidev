@@ -21,13 +21,15 @@ import {
   Phone,
   AlertCircle,
   ArrowLeft,
-  Edit3
+  Edit3,
+  MessageSquare
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useParams } from 'next/navigation';
 
 import ProjectUpdateForm from '@/components/ProjectUpdateForm';
 import ProjectUpdateList from '@/components/ProjectUpdateList';
+import ProjectConversationChat from '@/components/project-conversation-chat';
 
 // Interface disesuaikan dengan skema database yang ada
 interface Project {
@@ -293,6 +295,22 @@ export default function ProjectDetailPage() {
       <ProjectUpdateForm projectId={project.id} />
 
       <ProjectUpdateList projectId={project.id} />
+      
+      {/* Project Conversation Chat */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MessageSquare className="h-5 w-5" />
+            <span>Chat Proyek</span>
+          </CardTitle>
+          <CardDescription>
+            Konsultasikan detail proyek ini dengan klien
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ProjectConversationChat projectId={project.id} isAdmin={true} userId={project.user_id || undefined} />
+        </CardContent>
+      </Card>
     </div>
   );
 }

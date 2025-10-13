@@ -208,7 +208,7 @@ export default function AdminDashboard() {
       {/* Quick Actions */}
       <Card className="p-6 bg-white/5 backdrop-blur-sm border border-gray-700/50">
         <h2 className="text-lg font-bold text-white mb-4">Aksi Cepat</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <button className="flex flex-col items-center justify-center p-6 bg-gray-800/50 rounded-lg border border-gray-700/30 hover:bg-gray-800 transition-colors">
             <FolderOpen className="h-8 w-8 text-blue-400 mb-2" />
             <span className="font-medium text-white">Tambah Proyek</span>
@@ -220,6 +220,13 @@ export default function AdminDashboard() {
           <button className="flex flex-col items-center justify-center p-6 bg-gray-800/50 rounded-lg border border-gray-700/30 hover:bg-gray-800 transition-colors">
             <BarChart3 className="h-8 w-8 text-purple-400 mb-2" />
             <span className="font-medium text-white">Lihat Analitik</span>
+          </button>
+          <button 
+            onClick={() => window.location.href = "/admin/chat"}
+            className="flex flex-col items-center justify-center p-6 bg-gray-800/50 rounded-lg border border-gray-700/30 hover:bg-gray-800 transition-colors"
+          >
+            <MessageSquare className="h-8 w-8 text-yellow-400 mb-2" />
+            <span className="font-medium text-white">Chat Umum</span>
           </button>
         </div>
       </Card>

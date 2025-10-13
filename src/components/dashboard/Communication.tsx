@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
   UserIcon,
-  CalendarIcon 
+  CalendarIcon,
+  MessageSquare 
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -13,6 +14,7 @@ import {
   DashboardMessage, 
   DashboardConversation 
 } from "@/lib/dashboard-service";
+import { ProjectChat } from "./ProjectChat";
 
 export function Communication() {
   const [messages, setMessages] = useState<DashboardMessage[]>([]);
@@ -98,7 +100,10 @@ export function Communication() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Forum Diskusi Proyek</CardTitle>
+            <CardTitle className="flex items-center justify-between">
+              <span>Forum Diskusi Proyek</span>
+              <Button size="sm" variant="outline">Lihat Semua</Button>
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {conversations.length > 0 ? (
@@ -113,7 +118,10 @@ export function Communication() {
                   <p className="text-sm text-muted-foreground mt-2">{conversation.lastMessage}</p>
                   <div className="flex justify-between items-center mt-2">
                     <span className="text-xs text-muted-foreground">{conversation.lastActivity}</span>
-                    <Button size="sm">Gabung</Button>
+                    <Button size="sm" variant="outline">
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      Chat
+                    </Button>
                   </div>
                 </div>
               ))
@@ -125,6 +133,35 @@ export function Communication() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Bagian untuk obrolan proyek spesifik */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <MessageSquare className="h-5 w-5 mr-2" />
+            Obrolan Proyek
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Pilih proyek untuk memulai percakapan
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {conversations.length > 0 ? (
+              conversations.map((conversation) => (
+                <div key={`chat-${conversation.id}`} className="border rounded-lg p-4">
+                  <h3 className="font-medium mb-2">{conversation.project}</h3>
+                  <ProjectChat projectId={conversation.id} />
+                </div>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-8 text-muted-foreground">
+                Tidak ada proyek aktif untuk obrolan
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

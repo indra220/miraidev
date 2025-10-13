@@ -77,7 +77,7 @@ export default function AdminLayoutProvider({ children }: AdminLayoutProviderPro
           <p className="text-sm text-gray-400">Role: {userRole}</p>
         </div>
       </div>
-      <nav className="flex-grow">
+      <nav className="flex-grow overflow-y-auto max-h-[calc(100vh-160px)] hide-scrollbar">
         {menuItems.map((item) => {
           const ItemIcon = item.icon;
           return (
@@ -110,8 +110,8 @@ export default function AdminLayoutProvider({ children }: AdminLayoutProviderPro
   );
 
   return (
-    <div className="flex h-screen bg-gray-900 text-gray-200">
-      <aside className="hidden md:flex flex-col w-64 bg-gray-800 text-white p-4 border-r border-gray-700 fixed h-full">
+    <div className="flex h-screen bg-gray-900 text-gray-200 overflow-y-hidden">
+      <aside className="hidden md:flex flex-col w-64 bg-gray-800 text-white p-4 border-r border-gray-700 fixed h-full overflow-y-hidden">
         {sidebarContent}
       </aside>
 
@@ -125,7 +125,7 @@ export default function AdminLayoutProvider({ children }: AdminLayoutProviderPro
       </div>
       
       <aside 
-        className={`fixed top-0 left-0 h-full w-64 bg-gray-800 text-white z-50 transform transition-transform duration-300 ease-in-out p-4 border-r border-gray-700
+        className={`fixed top-0 left-0 h-full w-64 bg-gray-800 text-white z-50 transform transition-transform duration-300 ease-in-out p-4 border-r border-gray-700 overflow-y-hidden
           ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:hidden`}
       >
         {sidebarContent}

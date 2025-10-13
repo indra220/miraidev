@@ -79,8 +79,6 @@ export async function POST(request: NextRequest) {
       .from('clients')
       .insert([{
         ...body,
-        project_count: 0,
-        rating: 0,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       }])

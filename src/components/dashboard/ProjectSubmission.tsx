@@ -252,8 +252,6 @@ export function ProjectSubmission() {
       if (!clientData && clientError && clientError.code === 'PGRST116') {
           const { error: insertClientError } = await supabase.from('clients').insert({
               user_id: session.user.id,
-              email: session.user.email,
-              name: (session.user.user_metadata?.full_name as string) || (session.user.user_metadata?.name as string) || session.user.email,
               status: 'aktif',
               role: 'klien',
               join_date: new Date().toISOString()

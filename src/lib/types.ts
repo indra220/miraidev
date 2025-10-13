@@ -23,6 +23,11 @@ type PortfolioRow = Database['public']['Tables']['portfolio']['Row'];
 type ContactSubmissionRow = Database['public']['Tables']['contact_submissions']['Row'];
 type SupportTicketRow = Database['public']['Tables']['support_tickets']['Row'];
 type ProjectUpdateRow = Database['public']['Tables']['project_updates']['Row'];
+type ChatMessageRow = Database['public']['Tables']['chat_messages']['Row'];
+type ContactMessageThreadRow = Database['public']['Tables']['contact_message_threads']['Row'];
+type SupportTicketReplyRow = Database['public']['Tables']['support_ticket_replies']['Row'];
+type ConversationRow = Database['public']['Tables']['conversations']['Row'];
+type ConversationMessageRow = Database['public']['Tables']['conversation_messages']['Row'];
 
 // Sistem Harga Dinamis
 type ProjectTypeRow = Database['public']['Tables']['project_types']['Row'];
@@ -47,12 +52,15 @@ type UserSessionRow = Database['public']['Tables']['user_sessions']['Row'];
 export type AppRole = Database['public']['Enums']['app_role'];
 export type ClientRole = Database['public']['Enums']['client_role'];
 export type ClientStatus = Database['public']['Enums']['client_status'];
+export type ChatSenderType = Database['public']['Enums']['chat_sender_type'];
+export type MessageSenderType = Database['public']['Enums']['message_sender_type'];
 export type NotificationType = Database['public']['Enums']['notification_type'];
 export type ReportType = Database['public']['Enums']['report_type'];
 export type SubmissionPriority = Database['public']['Enums']['submission_priority'];
 export type SubmissionStatus = Database['public']['Enums']['submission_status'];
 export type TicketPriority = Database['public']['Enums']['ticket_priority'];
 export type TicketStatus = Database['public']['Enums']['ticket_status'];
+export type TicketSenderType = Database['public']['Enums']['ticket_sender_type'];
 
 // =================================================================
 // 2. TIPE YANG DIEKSPOR UNTUK DIGUNAKAN DI APLIKASI
@@ -91,9 +99,33 @@ export interface Project extends ProjectRow {
 
 // --- Laporan/Update Proyek ---
 /**
- * Tipe untuk laporan atau pembaruan proyek. Sepenuhnya sinkron dengan skema.
+ * Tipe untuk laporan atau pembaruan proyek.
  */
 export type ProjectUpdate = ProjectUpdateRow;
+
+// --- Pesan Chat Proyek ---
+/**
+ * Tipe untuk pesan dalam fitur chat proyek.
+ */
+export type ChatMessage = ChatMessageRow;
+
+// --- Thread Balasan Kontak ---
+/**
+ * Tipe untuk pesan dalam thread balasan dari formulir kontak.
+ */
+export type ContactMessageThread = ContactMessageThreadRow;
+
+// --- Percakapan Umum ---
+/**
+ * Tipe untuk sebuah thread percakapan umum.
+ */
+export type Conversation = ConversationRow;
+
+/**
+ * Tipe untuk sebuah pesan dalam percakapan umum.
+ */
+export type ConversationMessage = ConversationMessageRow;
+
 
 // --- Layanan ---
 /**
@@ -149,9 +181,11 @@ export type PricingLog = PricingLogRow;
 // --- Tipe Lainnya (Ekspor Langsung) ---
 
 /** Tipe untuk item dalam portofolio. */
-export type PortfolioItem = PortfolioRow;
+export type PortfolioItem = PortfolioRow; // <-- PERBAIKAN DI SINI
 
-/** Tipe untuk data dari formulir kontak. */
+/**
+ * Tipe untuk data dari formulir kontak.
+ */
 export type ContactSubmission = ContactSubmissionRow;
 
 /** Tipe untuk data analitik. */
@@ -172,5 +206,12 @@ export type UserSession = UserSessionRow;
 /** Tipe untuk laporan. */
 export type Report = ReportRow;
 
-/** Tipe untuk tiket dukungan. */
+/**
+ * Tipe untuk tiket dukungan.
+ */
 export type SupportTicket = SupportTicketRow;
+
+/**
+ * Tipe untuk balasan pada sebuah tiket dukungan.
+ */
+export type SupportTicketReply = SupportTicketReplyRow;

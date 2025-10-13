@@ -1,4 +1,4 @@
-import { Communication } from "@/components/dashboard/Communication";
+import ConversationChat from "@/components/conversation-chat";
 import type { Metadata } from "next";
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -12,11 +12,11 @@ export default function MessagesPage() {
       <div>
         <h1 className="text-3xl font-bold">Pesan & Komunikasi</h1>
         <p className="text-muted-foreground">
-          Lihat dan kelola komunikasi terkait proyek Anda
+          Lihat dan kelola komunikasi umum dengan admin
         </p>
       </div>
       
-      <Communication />
+      <ConversationChat />
     </div>
   );
 }

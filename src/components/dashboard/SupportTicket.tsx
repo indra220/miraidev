@@ -28,7 +28,7 @@ export function SupportTicket() {
   const [newTicket, setNewTicket] = useState({
     subject: "",
     message: "",
-    priority: "normal"
+    priority: "medium"
   });
 
   useEffect(() => {
@@ -67,7 +67,7 @@ export function SupportTicket() {
         const updatedData = await dashboardService.getDashboardData(session.user.id);
         setTickets(updatedData.supportTickets);
         
-        setNewTicket({ subject: "", message: "", priority: "normal" });
+        setNewTicket({ subject: "", message: "", priority: "medium" });
       } catch (error) {
         console.error("Error creating support ticket:", error);
       }
@@ -126,9 +126,10 @@ export function SupportTicket() {
                   onChange={(e) => setNewTicket({...newTicket, priority: e.target.value})}
                   className="border rounded px-2 py-1 text-sm"
                 >
-                  <option value="rendah">Rendah</option>
-                  <option value="normal">Normal</option>
-                  <option value="tinggi">Tinggi</option>
+                  <option value="low">Rendah</option>
+                  <option value="medium">Sedang</option>
+                  <option value="high">Tinggi</option>
+                  <option value="critical">Kritis</option>
                 </select>
               </div>
               <Button type="submit">
@@ -184,7 +185,15 @@ export function SupportTicket() {
                         </span>
                       </div>
                     </div>
-                    <Button size="sm" variant="outline">Lihat Detail</Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => {
+                        window.location.href = `/dashboard/support/${ticket.id}`;
+                      }}
+                    >
+                      Lihat Detail
+                    </Button>
                   </div>
                 </div>
               ))

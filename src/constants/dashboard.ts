@@ -30,7 +30,7 @@ export const dashboardNavItems: NavItem[] = [
     icon: MessageSquareIcon,
   },
   {
-    title: "Tanya Jawab",
+    title: "Dukungan & Bantuan",
     href: "/dashboard/support",
     icon: MessageSquareIcon,
   },
