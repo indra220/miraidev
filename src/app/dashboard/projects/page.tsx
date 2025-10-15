@@ -16,15 +16,15 @@ export default function ProjectsPage() {
 
   const [projects, setProjects] = useState<DashboardProject[]>([]);
   const [loading, setLoading] = useState(true);
-  const { session, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   
   useEffect(() => {
     if (authLoading) return; // Jika auth masih loading, jangan lanjutkan
     
     const fetchProjects = async () => {
-      if (session?.user) {
+      if (user) {
         try {
-          const userData = await dashboardService.getDashboardData(session.user.id);
+          const userData = await dashboardService.getDashboardData(user.id);
           setProjects(userData.projects);
         } catch (error) {
           console.error("Error fetching projects:", error);
@@ -37,7 +37,7 @@ export default function ProjectsPage() {
     };
     
     fetchProjects();
-  }, [session, authLoading]);
+  }, [user, authLoading]);
 
   if (loading || authLoading) {
     return (

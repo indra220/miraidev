@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Image from 'next/image';
 
 interface MetaTagPreviewProps {
   title: string;
@@ -65,9 +66,11 @@ export function OpenGraphPreview({ title, description, imageUrl, siteName }: Ope
         <div className="border border-gray-600 rounded-lg overflow-hidden">
           <div className="h-48 bg-gray-700 relative">
             {imageUrl ? (
-              <img 
+              <Image 
                 src={imageUrl} 
                 alt="Open Graph Preview" 
+                width={400}
+                height={200}
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -104,9 +107,11 @@ export function TwitterCardPreview({ title, description, imageUrl, username }: T
         <div className="border border-gray-600 rounded-lg overflow-hidden max-w-md">
           <div className="h-32 bg-gray-700 relative">
             {imageUrl ? (
-              <img 
+              <Image 
                 src={imageUrl} 
                 alt="Twitter Card Preview" 
+                width={400}
+                height={128}
                 className="w-full h-full object-cover"
               />
             ) : (

@@ -14,15 +14,15 @@ import { dashboardService, DashboardService } from "@/lib/dashboard-service";
 export function ServiceHistory() {
   const [services, setServices] = useState<DashboardService[]>([]);
   const [loading, setLoading] = useState(true);
-  const { session, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
     if (authLoading) return;
     
     const fetchServices = async () => {
-      if (session?.user) {
+      if (user) {
         try {
-          const userServices = await dashboardService.getDashboardData(session.user.id);
+          const userServices = await dashboardService.getDashboardData(user.id);
           setServices(userServices.services);
         } catch (error) {
           console.error("Error fetching services:", error);
@@ -35,7 +35,7 @@ export function ServiceHistory() {
     };
 
     fetchServices();
-  }, [session, authLoading]);
+  }, [user, authLoading]);
 
   if (loading || authLoading) {
     return (

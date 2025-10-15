@@ -23,7 +23,7 @@ import {
 export function SupportTicket() {
   const [tickets, setTickets] = useState<DashboardSupportTicket[]>([]);
   const [loading, setLoading] = useState(true);
-  const { session, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   const [newTicket, setNewTicket] = useState({
     subject: "",
@@ -35,9 +35,9 @@ export function SupportTicket() {
     if (authLoading) return;
     
     const fetchTickets = async () => {
-      if (session?.user) {
+      if (user) {
         try {
-          const ticketsData = await dashboardService.getDashboardData(session.user.id);
+          const ticketsData = await dashboardService.getDashboardData(user.id);
           setTickets(ticketsData.supportTickets);
         } catch (error) {
           console.error("Error fetching support tickets:", error);
@@ -50,21 +50,21 @@ export function SupportTicket() {
     };
 
     fetchTickets();
-  }, [session, authLoading]);
+  }, [user, authLoading]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (session?.user) {
+    if (user) {
       try {
         await dashboardService.createSupportTicket(
-          session.user.id, 
+          user.id, 
           newTicket.subject, 
           newTicket.message, 
           newTicket.priority
         );
         
-        const updatedData = await dashboardService.getDashboardData(session.user.id);
+        const updatedData = await dashboardService.getDashboardData(user.id);
         setTickets(updatedData.supportTickets);
         
         setNewTicket({ subject: "", message: "", priority: "medium" });

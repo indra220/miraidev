@@ -79,3 +79,28 @@ export async function logout() {
   roleCache.role = null;
   roleCache.timestamp = 0;
 }
+
+// Fungsi untuk memeriksa role pengguna saat ini
+export async function getUserRole(): Promise<string | null> {
+  const supabase = createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+
+  // Jika tidak ada sesi, return null
+  if (!session) {
+    return null;
+  }
+
+  // Periksa cache terlebih dahulu
+  if (roleCache.role !== null && Date.now() - roleCache.timestamp < CACHE_DURATION) {
+    return roleCache.role;
+  }
+
+  // Jika cache kosong atau sudah kedaluwarsa, panggil API
+  const role = await getRoleFromServer();
+  
+  // Simpan hasil ke cache
+  roleCache.role = role;
+  roleCache.timestamp = Date.now();
+  
+  return role;
+}

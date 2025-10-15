@@ -291,7 +291,7 @@ export function Navbar() {
                           {currentUser?.email || "Nama Pengguna"}
                         </p>
                         <p className="text-xs leading-none text-gray-400">
-                          Klien
+                          {isAdminUser ? "Admin" : "Klien"}
                         </p>
                       </div>
                     </div>
@@ -519,7 +519,7 @@ export function Navbar() {
                                 {currentUser?.email || "Nama Pengguna"}
                               </p>
                               <p className="text-xs leading-none text-gray-400">
-                                Klien
+                                {isAdminUser ? "Admin" : "Klien"}
                               </p>
                             </div>
                           </div>

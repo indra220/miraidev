@@ -22,15 +22,15 @@ export function Reports() {
   const [reports, setReports] = useState<DashboardReport[]>([]);
   const [analytics, setAnalytics] = useState<DashboardAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
-  const { session, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
     if (authLoading) return;
     
     const fetchReports = async () => {
-      if (session?.user) {
+      if (user) {
         try {
-          const reportsData = await dashboardService.getDashboardData(session.user.id);
+          const reportsData = await dashboardService.getDashboardData(user.id);
           setReports(reportsData.reports);
           setAnalytics(reportsData.analytics);
         } catch (error) {
@@ -44,7 +44,7 @@ export function Reports() {
     };
 
     fetchReports();
-  }, [session, authLoading]);
+  }, [user, authLoading]);
 
   if (loading || authLoading) {
     return (

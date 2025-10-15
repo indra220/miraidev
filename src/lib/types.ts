@@ -1,8 +1,9 @@
 // src/lib/types.ts
 //
 // File ini berfungsi sebagai pusat definisi tipe TypeScript untuk seluruh aplikasi.
-// Tipe-tipe ini diimpor dari skema database yang dihasilkan secara otomatis oleh Supabase (`supabase.ts`)
+// Tipe-tipe ini diimpor dari skema database yang dihasilkan secara otomatis oleh Supabase (`supabase-types/supabase.ts`)
 // dan diperkaya dengan tipe kustom atau properti tambahan untuk kebutuhan sisi klien (UI/UX).
+// CATATAN: Perubahan pada skema DB memerlukan regenerasi tipe Supabase, yang akan otomatis memperbarui tipe 'Row' di bawah ini.
 
 import type { Database } from './supabase-types/supabase';
 
@@ -46,7 +47,7 @@ type NotificationRow = Database['public']['Tables']['notifications']['Row'];
 type ReportRow = Database['public']['Tables']['reports']['Row'];
 type AnalyticsDataRow = Database['public']['Tables']['analytics_data']['Row'];
 type NewsletterSubscriptionRow = Database['public']['Tables']['newsletter_subscriptions']['Row'];
-type UserSessionRow = Database['public']['Tables']['user_sessions']['Row'];
+type UserSessionRow = Database['public']['Tables']['user_sessions']['Row']; // Tipe ini akan otomatis diperbarui setelah regenerasi
 
 // --- Alias untuk Tipe Enum ---
 export type AppRole = Database['public']['Enums']['app_role'];
@@ -181,7 +182,7 @@ export type PricingLog = PricingLogRow;
 // --- Tipe Lainnya (Ekspor Langsung) ---
 
 /** Tipe untuk item dalam portofolio. */
-export type PortfolioItem = PortfolioRow; // <-- PERBAIKAN DI SINI
+export type PortfolioItem = PortfolioRow;
 
 /**
  * Tipe untuk data dari formulir kontak.
@@ -200,7 +201,9 @@ export type SeoSetting = SeoSettingRow;
 /** Tipe untuk pelanggan buletin. */
 export type NewsletterSubscription = NewsletterSubscriptionRow;
 
-/** Tipe untuk sesi pengguna yang aktif. */
+/** * Tipe untuk sesi pengguna yang aktif.
+ * Tipe ini secara otomatis mencerminkan skema tabel 'user_sessions'.
+ */
 export type UserSession = UserSessionRow;
 
 /** Tipe untuk laporan. */

@@ -4,15 +4,15 @@ import { useAuth } from "@/hooks/useAuth";
 import SessionTimeoutHandler from "@/components/SessionTimeoutHandler";
 
 export default function SessionProvider() {
-  const { session, loading } = useAuth();
+  const { user, loading } = useAuth();
 
   // Jangan tampilkan apa pun saat status otentikasi sedang diperiksa
   if (loading) {
     return null;
   }
 
-  // Hanya jalankan SessionTimeoutHandler jika ada sesi (pengguna sudah login)
-  if (session) {
+  // Hanya jalankan SessionTimeoutHandler jika ada user (pengguna sudah login)
+  if (user) {
     return <SessionTimeoutHandler />;
   }
 

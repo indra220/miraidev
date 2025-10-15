@@ -20,7 +20,7 @@ import {
   Mail
 } from "lucide-react";
 import { AdminMenuItem, getUserMenu } from '@/constants/admin-menu';
-import { useSidebar } from '@/contexts/sidebar-context';
+import { useSidebar } from '@/contexts/useSidebar';
 
 interface AdminSidebarProps {
   userRole: string;

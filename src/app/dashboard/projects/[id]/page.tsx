@@ -18,7 +18,7 @@ import ProjectConversationChat from "@/components/project-conversation-chat";
 export default function ProjectDetailPage() {
   const params = useParams();
   const projectId = params.id as string;
-  const { session, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   
   const [project, setProject] = useState<DashboardProject | null>(null);
   const [loading, setLoading] = useState(true);
@@ -30,10 +30,10 @@ export default function ProjectDetailPage() {
   }, [project]);
 
   const fetchProjectDetails = useCallback(async () => {
-    if (session?.user && projectId && !hasFetched.current) {
+    if (user && projectId && !hasFetched.current) {
       try {
         setLoading(true);
-        const projectData = await dashboardService.getUserProjectById(session.user.id, projectId);
+        const projectData = await dashboardService.getUserProjectById(user.id, projectId);
         if (projectData) {
           setProject(projectData);
           hasFetched.current = true; // Tandai bahwa data sudah diambil
@@ -45,11 +45,11 @@ export default function ProjectDetailPage() {
       } finally {
         setLoading(false);
       }
-    } else if (!authLoading && !session?.user) {
+    } else if (!authLoading && !user) {
       setError("Sesi tidak ditemukan. Silakan login kembali.");
       setLoading(false);
     }
-  }, [session, authLoading, projectId]);
+  }, [user, authLoading, projectId]);
 
   useEffect(() => {
     if (!authLoading && !hasFetched.current) {
@@ -61,7 +61,7 @@ export default function ProjectDetailPage() {
   useEffect(() => {
     const handleVisibilityChange = () => {
       // Jika halaman tidak tersembunyi dan data belum pernah diambil, ambil data
-      if (!document.hidden && !hasFetched.current && !authLoading && session?.user) {
+      if (!document.hidden && !hasFetched.current && !authLoading && user) {
         fetchProjectDetails();
       }
     };
@@ -71,11 +71,11 @@ export default function ProjectDetailPage() {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [fetchProjectDetails, authLoading, session]);
+  }, [fetchProjectDetails, authLoading, user]);
 
   // Fungsi untuk membatalkan proyek
   const cancelProject = async () => {
-    if (!session?.user || !project) {
+    if (!user || !project) {
       toast.error("Anda harus login untuk membatalkan proyek");
       return;
     }
@@ -90,7 +90,7 @@ export default function ProjectDetailPage() {
         .from('projects')
         .update({ status: 'dibatalkan', progress: 0 })
         .eq('id', project.id)
-        .eq('user_id', session.user.id);
+        .eq('user_id', user.id);
 
       if (error) {
         console.error('Error cancelling project:', error);
@@ -98,7 +98,7 @@ export default function ProjectDetailPage() {
       }
 
       // Perbarui data proyek setelah pembatalan
-      const projectData = await dashboardService.getUserProjectById(session.user.id, project.id);
+      const projectData = await dashboardService.getUserProjectById(user.id, project.id);
       if (projectData) {
         setProject(projectData);
       }

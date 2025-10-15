@@ -16,6 +16,7 @@ import {
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { dashboardService, DashboardProfile } from "@/lib/dashboard-service";
+import Image from "next/image";
 
 export function UserProfile() {
   const [profile, setProfile] = useState<DashboardProfile>({
@@ -28,15 +29,15 @@ export function UserProfile() {
   });
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
-  const { session, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
     if (authLoading) return;
     
     const fetchProfile = async () => {
-      if (session?.user) {
+      if (user) {
         try {
-          const userProfile = await dashboardService.getDashboardData(session.user.id);
+          const userProfile = await dashboardService.getDashboardData(user.id);
           setProfile(userProfile.profile);
         } catch (error) {
           console.error("Error fetching profile:", error);
@@ -49,11 +50,11 @@ export function UserProfile() {
     };
 
     fetchProfile();
-  }, [session, authLoading]);
+  }, [user, authLoading]);
 
   const handleSave = async () => {
     setIsEditing(false);
-    if (session?.user) {
+    if (user) {
       try {
         // Logika untuk menyimpan ke database di sini
       } catch (error) {
@@ -89,9 +90,11 @@ export function UserProfile() {
         <CardHeader className="flex items-center justify-center pb-2">
           <div className="relative">
             <div className="w-24 h-24 rounded-full bg-gray-200 border-4 border-white dark:border-gray-800 flex items-center justify-center overflow-hidden">
-              <img 
+              <Image 
                 src={profile.avatar} 
                 alt="Avatar" 
+                width={96}
+                height={96}
                 className="w-full h-full object-cover rounded-full"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;

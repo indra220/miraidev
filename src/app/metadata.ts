@@ -16,6 +16,9 @@ export const metadata: Metadata = {
     telephone: false,
   },
   metadataBase: new URL("https://www.mirai.dev"),
+  icons: {
+    icon: '/codeguide-logo.png', // Gunakan logo yang sudah ada di public
+  },
   openGraph: {
     type: "website",
     title: "MiraiDev - Solusi Pengembangan Website Modern",

@@ -30,27 +30,27 @@ export function ProjectChat({ projectId }: ProjectChatProps) {
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
-  const { session } = useAuth();
+  const { user } = useAuth();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   // Ambil pesan dari database
   const fetchMessages = useCallback(async () => {
-    if (!session?.user) return;
+    if (!user) return;
 
     try {
       // Ambil pesan terbaru terlebih dahulu (batasi jumlahnya untuk performa)
-      const messagesData = await dashboardService.getProjectChatMessages(projectId, session.user.id, 50);
+      const messagesData = await dashboardService.getProjectChatMessages(projectId, user.id, 50);
       setMessages(messagesData);
     } catch (error) {
       console.error("Error fetching messages:", error);
     } finally {
       setLoading(false);
     }
-  }, [projectId, session]);
+  }, [projectId, user]);
 
   // Kirim pesan baru
   const sendMessage = async () => {
-    if (!newMessage.trim() || !session?.user || sending) return;
+    if (!newMessage.trim() || !user || sending) return;
 
     setSending(true);
 
@@ -61,7 +61,7 @@ export function ProjectChat({ projectId }: ProjectChatProps) {
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")
         .select("role")
-        .eq("id", session.user.id)
+        .eq("id", user.id)
         .single();
 
       if (profileError) {
@@ -78,7 +78,7 @@ export function ProjectChat({ projectId }: ProjectChatProps) {
         .insert([
           {
             project_id: projectId,
-            sender_id: session.user.id,
+            sender_id: user.id,
             sender_type: senderType,
             message: newMessage.trim(),
           },
@@ -93,7 +93,7 @@ export function ProjectChat({ projectId }: ProjectChatProps) {
       const newMessageData: ChatMessage = {
         id: Date.now().toString(), // ID sementara, akan diganti saat diterima dari realtime
         projectId: projectId,
-        senderId: session.user.id,
+        senderId: user.id,
         senderType: "user", // Karena ini dari user
         message: newMessage.trim(),
         timestamp: new Date().toISOString(),
@@ -138,7 +138,7 @@ export function ProjectChat({ projectId }: ProjectChatProps) {
               senderType: payload.new.sender_type,
               message: payload.new.message,
               timestamp: payload.new.created_at,
-              isOwnMessage: session?.user?.id ? payload.new.sender_id === session.user.id : false
+              isOwnMessage: user?.id ? payload.new.sender_id === user.id : false
             };
             setMessages((prev) => [...prev, newMessageData]);
           }
@@ -149,7 +149,7 @@ export function ProjectChat({ projectId }: ProjectChatProps) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [projectId, session, fetchMessages, messages]);
+  }, [projectId, user, fetchMessages, messages]);
 
   // Scroll ke bawah saat pesan baru masuk
   useEffect(() => {

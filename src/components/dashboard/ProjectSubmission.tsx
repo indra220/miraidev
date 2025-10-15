@@ -43,7 +43,7 @@ export function ProjectSubmission() {
   const [projectTypes, setProjectTypes] = useState<ProjectType[]>([]);
   const [loadingPackages, setLoadingPackages] = useState(true);
   const [loading, setLoading] = useState(true);
-  const { session, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   const [newProject, setNewProject] = useState({
     name: "",
@@ -74,9 +74,9 @@ export function ProjectSubmission() {
     if (authLoading) return;
     
     const fetchProjects = async () => {
-      if (session?.user) {
+      if (user) {
         try {
-          const projectsData = await dashboardService.getDashboardData(session.user.id);
+          const projectsData = await dashboardService.getDashboardData(user.id);
           setProjects(projectsData.projectSubmissions);
         } catch (error) {
           console.error("Error fetching project submissions:", error);
@@ -212,7 +212,7 @@ export function ProjectSubmission() {
 
     fetchProjects();
     fetchPricingData();
-  }, [session, authLoading]);
+  }, [user, authLoading]);
 
 
 
@@ -235,7 +235,7 @@ export function ProjectSubmission() {
   }, [timelinePrices]);
 
   const ensureClientRecordExists = async () => {
-      if (!session?.user?.id || !session.user.email) {
+      if (!user?.id || !user.email) {
           throw new Error('Informasi pengguna tidak lengkap. Silakan login kembali.');
       }
 
@@ -245,13 +245,13 @@ export function ProjectSubmission() {
       const { data: clientData, error: clientError } = await supabase
           .from('clients')
           .select('user_id')
-          .eq('user_id', session.user.id)
+          .eq('user_id', user.id)
           .single();
 
       // 2. Jika tidak ada (error "PGRST116: No rows found"), buat record baru
       if (!clientData && clientError && clientError.code === 'PGRST116') {
           const { error: insertClientError } = await supabase.from('clients').insert({
-              user_id: session.user.id,
+              user_id: user.id,
               status: 'aktif',
               role: 'klien',
               join_date: new Date().toISOString()
@@ -296,7 +296,7 @@ export function ProjectSubmission() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (session?.user) {
+    if (user) {
       try {
         await ensureClientRecordExists();
         
@@ -312,7 +312,7 @@ export function ProjectSubmission() {
         }
         
         const projectData = {
-          user_id: session.user.id,
+          user_id: user.id,
           title: newProject.name.trim() || 'Proyek Baru',
           description: newProject.description,
           category: categoryName,
@@ -348,7 +348,7 @@ export function ProjectSubmission() {
           const { data: updatedProjects, error: fetchError } = await supabase
             .from('projects')
             .select('*')
-            .eq('user_id', session.user.id)
+            .eq('user_id', user.id)
             .order('created_at', { ascending: false });
 
           if (fetchError) {
@@ -397,7 +397,7 @@ export function ProjectSubmission() {
   const handleCustomSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (session?.user) {
+    if (user) {
       try {
         await ensureClientRecordExists();
         
@@ -415,7 +415,7 @@ export function ProjectSubmission() {
         
         // --- PERBAIKAN: Menambahkan complexity dan features ---
         const projectData = {
-          user_id: session.user.id,
+          user_id: user.id,
           title: newProject.name.trim() || 'Proyek Baru',
           description: newProject.description,
           category: categoryName,
@@ -454,7 +454,7 @@ export function ProjectSubmission() {
           const { data: updatedProjects, error: fetchError } = await supabase
             .from('projects')
             .select('*')
-            .eq('user_id', session.user.id)
+            .eq('user_id', user.id)
             .order('created_at', { ascending: false });
 
           if (fetchError) {
@@ -494,7 +494,7 @@ export function ProjectSubmission() {
   };
 
   const cancelProject = async (projectId: string) => {
-    if (!session?.user) {
+    if (!user) {
       toast.error("Anda harus login untuk membatalkan proyek");
       return;
     }
@@ -509,7 +509,7 @@ export function ProjectSubmission() {
         .from('projects')
         .update({ status: 'dibatalkan', progress: 0 })
         .eq('id', projectId)
-        .eq('user_id', session.user.id);
+        .eq('user_id', user.id);
 
       if (error) {
         console.error('Error cancelling project:', {
@@ -525,7 +525,7 @@ export function ProjectSubmission() {
       const { data: updatedProjects, error: fetchError } = await supabase
         .from('projects')
         .select('*')
-        .eq('user_id', session.user.id)
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (fetchError) {

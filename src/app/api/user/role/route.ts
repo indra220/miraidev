@@ -13,18 +13,7 @@ export async function GET() {
       );
     }
     
-    // Cek role dari metadata user terlebih dahulu
-    const metadataRole = session.user.user_metadata?.role as 'klien' | 'pegawai' | 'admin' | undefined;
-    
-    // Jika sudah ada role di metadata, kembalikan itu
-    if (metadataRole) {
-      return new Response(
-        JSON.stringify({ role: metadataRole }),
-        { status: 200, headers: { "Content-Type": "application/json" } }
-      );
-    }
-    
-    // Jika tidak ada role di metadata, coba dapatkan dari tabel profiles
+    // Hanya ambil role dari tabel profiles, bukan dari metadata user
     const { data, error } = await supabase
       .from('profiles')
       .select('role')
@@ -32,9 +21,11 @@ export async function GET() {
       .single();
     
     if (error) {
+      console.error('Error fetching role from profiles:', error);
+      // Jika gagal mengambil dari profiles, kembalikan role default 'user'
       return new Response(
-        JSON.stringify({ error: "Gagal mengambil informasi role" }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
+        JSON.stringify({ role: 'user' }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
       );
     }
     

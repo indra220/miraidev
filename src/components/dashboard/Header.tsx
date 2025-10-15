@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { MenuIcon } from "lucide-react";
 import { Session } from "@/types/dashboard";
+import Link from "next/link";
 
 interface HeaderProps {
   session: Session | null;
@@ -21,34 +22,34 @@ export function Header({ session }: HeaderProps) {
             </SheetTrigger>
             <SheetContent side="left" className="pr-0">
               <nav className="grid gap-6 text-lg font-medium">
-                <a href="/dashboard" className="flex items-center gap-2 text-lg font-semibold">
+                <Link href="/dashboard" className="flex items-center gap-2 text-lg font-semibold">
                   <span className="sr-only">MiraiDev</span>
                   MiraiDev
-                </a>
-                <a href="/dashboard" className="text-muted-foreground transition-colors hover:text-foreground">
+                </Link>
+                <Link href="/dashboard" className="text-muted-foreground transition-colors hover:text-foreground">
                   Ringkasan
-                </a>
-                <a href="/dashboard/projects" className="text-muted-foreground transition-colors hover:text-foreground">
+                </Link>
+                <Link href="/dashboard/projects" className="text-muted-foreground transition-colors hover:text-foreground">
                   Proyek
-                </a>
-                <a href="/dashboard/services" className="text-muted-foreground transition-colors hover:text-foreground">
+                </Link>
+                <Link href="/dashboard/services" className="text-muted-foreground transition-colors hover:text-foreground">
                   Layanan
-                </a>
-                <a href="/dashboard/messages" className="text-muted-foreground transition-colors hover:text-foreground">
+                </Link>
+                <Link href="/dashboard/messages" className="text-muted-foreground transition-colors hover:text-foreground">
                   Pesan
-                </a>
-                <a href="/dashboard/reports" className="text-muted-foreground transition-colors hover:text-foreground">
+                </Link>
+                <Link href="/dashboard/reports" className="text-muted-foreground transition-colors hover:text-foreground">
                   Laporan
-                </a>
-                <a href="/dashboard/support" className="text-muted-foreground transition-colors hover:text-foreground">
+                </Link>
+                <Link href="/dashboard/support" className="text-muted-foreground transition-colors hover:text-foreground">
                   Dukungan
-                </a>
+                </Link>
               </nav>
             </SheetContent>
           </Sheet>
-          <a href="/dashboard" className="flex items-center gap-2">
+          <Link href="/dashboard" className="flex items-center gap-2">
             <span className="text-xl font-bold">MiraiDev</span>
-          </a>
+          </Link>
         </div>
 
         <div className="flex items-center gap-4">

@@ -65,7 +65,7 @@ export default function SupportDetailPage({ params }: { params: Promise<{ id: st
     closeAlertResult
   } = useDialog();
   
-  const { session } = useAuth();
+  const { user } = useAuth();
   
   const [ticket, setTicket] = useState<SupportTicket | null>(null);
   const [replies, setReplies] = useState<SupportReply[]>([]);
@@ -279,7 +279,7 @@ export default function SupportDetailPage({ params }: { params: Promise<{ id: st
       return;
     }
 
-    if (!ticket || !session || !session.user) {
+    if (!ticket || !user) {
       showAlertResult("Gagal", "Tidak dapat mengirim balasan. Silakan coba lagi.");
       return;
     }
@@ -294,7 +294,7 @@ export default function SupportDetailPage({ params }: { params: Promise<{ id: st
         .from('support_ticket_replies')
         .insert([{
           ticket_id: ticket.id,
-          sender_id: session.user?.id || '',
+          sender_id: user?.id || '',
           sender_type: 'admin',
           message: replyMessage,
         }]);

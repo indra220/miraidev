@@ -59,7 +59,7 @@ export default function UserSupportDetailPage({ params }: { params: Promise<{ id
     closeAlertResult
   } = useDialog();
   
-  const { session } = useAuth();
+  const { user } = useAuth();
   const [ticket, setTicket] = useState<SupportTicket | null>(null);
   const [replies, setReplies] = useState<SupportReply[]>([]);
   const [loading, setLoading] = useState(true);
@@ -87,7 +87,7 @@ export default function UserSupportDetailPage({ params }: { params: Promise<{ id
             projects (title)
           `)
           .eq('id', resolvedParams.id)
-          .eq('user_id', session?.user?.id || '')
+          .eq('user_id', user?.id || '')
           .single();
 
         if (ticketError) {
@@ -125,11 +125,11 @@ export default function UserSupportDetailPage({ params }: { params: Promise<{ id
         }
 
         // Ambil informasi profil pengguna
-        if (session?.user?.id) {
+        if (user?.id) {
           const { data: profileData, error: profileError } = await supabase
             .from('profiles')
             .select('full_name, email')
-            .eq('id', session.user.id || '')
+            .eq('id', user.id || '')
             .single();
             
           if (!profileError) {
@@ -145,10 +145,10 @@ export default function UserSupportDetailPage({ params }: { params: Promise<{ id
       }
     };
 
-    if (session) {
+    if (user) {
       fetchTicketAndReplies();
     }
-  }, [params, session]);
+  }, [params, user]);
 
   // Subscription realtime untuk balasan tiket dukungan
   useEffect(() => {
@@ -198,7 +198,7 @@ export default function UserSupportDetailPage({ params }: { params: Promise<{ id
       return;
     }
 
-    if (!ticket || !session) {
+    if (!ticket || !user) {
       showAlertResult("Gagal", "Tidak dapat mengirim balasan. Silakan coba lagi.");
       return;
     }
@@ -213,7 +213,7 @@ export default function UserSupportDetailPage({ params }: { params: Promise<{ id
         .from('support_ticket_replies')
         .insert([{
           ticket_id: ticket.id,
-          sender_id: session?.user?.id || '',
+          sender_id: user?.id || '',
           sender_type: 'user',
           message: replyMessage,
         }]);

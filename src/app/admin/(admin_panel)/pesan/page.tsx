@@ -98,7 +98,7 @@ export default function MessageManagement() {
     } finally {
       setLoading(false);
     }
-  }, [user?.id, isAdmin]); // Tambahkan dependensi yang diperlukan
+  }, [user, isAdmin]); // Tambahkan dependensi yang diperlukan
 
   // useEffect untuk memperbarui data saat komponen menerima fokus kembali
   useEffect(() => {

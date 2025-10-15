@@ -1,13 +1,30 @@
 import js from '@eslint/js'
-import globals from 'globals'
+import nextPlugin from '@next/eslint-plugin-next'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
+import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
-export default tseslint.config(
+export default [
   { ignores: ['dist', 'src/lib/supabase-types/supabase.ts'] },
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
   {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    files: ['**/*.{js,ts,tsx}'],
+    plugins: {
+      '@next/next': nextPlugin,
+    },
+    rules: {
+      ...nextPlugin.configs.recommended.rules,
+      ...nextPlugin.configs['core-web-vitals'].rules,
+    },
+    settings: {
+      next: {
+        rootDir: './',
+      },
+    },
+  },
+  {
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2020,
@@ -28,4 +45,4 @@ export default tseslint.config(
       'no-console': ['warn', { allow: ['warn', 'error'] }], // Batasi penggunaan console.log
     },
   }
-)
+]

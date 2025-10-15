@@ -24,6 +24,7 @@ import { PortfolioItem } from "@/lib/types";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { AlertDialog, AlertDialogResult } from "@/components/AlertDialog";
 import { useDialog } from "@/hooks/useDialog";
+import Image from "next/image";
 
 export default function PortfolioManagement() {
   useEffect(() => {
@@ -175,7 +176,7 @@ export default function PortfolioManagement() {
             <Card key={item.id} className="overflow-hidden bg-white/5 backdrop-blur-sm border border-gray-700/50 hover:bg-white/10 transition-all duration-200">
               <div className="h-48 bg-gray-800 relative flex items-center justify-center">
                  {item.image_urls && item.image_urls.length > 0 ? (
-                    <img src={item.image_urls[0]} alt={item.title} className="w-full h-full object-cover" />
+                    <Image src={item.image_urls[0]} alt={item.title} width={400} height={300} className="w-full h-full object-cover" />
                  ) : (
                     <FolderOpen className="h-16 w-16 text-gray-600" />
                  )}

@@ -14,7 +14,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const { session, loading } = useAuth();
+  const { user, loading } = useAuth();
 
   if (loading) {
     return (
@@ -24,7 +24,7 @@ export default function DashboardLayout({
     );
   }
 
-  if (!session) {
+  if (!user) {
     return redirect("/auth/login");
   }
 
@@ -34,7 +34,7 @@ export default function DashboardLayout({
       <SessionTimeoutHandler /> {/* <-- Tambahkan handler di sini */}
       <Sidebar pathname={pathname} />
       <div className="flex flex-col flex-1 min-h-screen overflow-y-auto">
-        <Header session={session} />
+        <Header session={{ user }} />
         <main className="flex-1 p-6 mt-16 overflow-y-auto">{children}</main>
       </div>
     </div>

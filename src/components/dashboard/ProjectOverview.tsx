@@ -22,14 +22,14 @@ import { toast } from "sonner";
 export function ProjectOverview() {
   const [projects, setProjects] = useState<DashboardProject[]>([]);
   const [loading, setLoading] = useState(true);
-  const { session, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   // --- PERUBAHAN DIMULAI DI SINI ---
-  // Ambil nama pengguna dari data sesi
+  // Ambil nama pengguna dari data user
   const userName =
-    (session?.user?.user_metadata?.full_name as string) ||
-    (session?.user?.user_metadata?.name as string) ||
-    session?.user?.email ||
+    (user?.user_metadata?.full_name as string) ||
+    (user?.user_metadata?.name as string) ||
+    user?.email ||
     "Klien";
   // --- AKHIR PERUBAHAN ---
 
@@ -37,9 +37,9 @@ export function ProjectOverview() {
     if (authLoading) return;
     
     const fetchProjects = async () => {
-      if (session?.user) {
+      if (user) {
         try {
-          const userProjects = await dashboardService.getDashboardData(session.user.id);
+          const userProjects = await dashboardService.getDashboardData(user.id);
           setProjects(userProjects.projects);
         } catch (error) {
           console.error("Error fetching projects:", error);
@@ -52,11 +52,11 @@ export function ProjectOverview() {
     };
 
     fetchProjects();
-  }, [session, authLoading]);
+  }, [user, authLoading]);
 
   // Fungsi untuk membatalkan proyek
   const cancelProject = async (projectId: string) => {
-    if (!session?.user) {
+    if (!user) {
       toast.error("Anda harus login untuk membatalkan proyek");
       return;
     }
@@ -71,7 +71,7 @@ export function ProjectOverview() {
         .from('projects')
         .update({ status: 'cancelled' })
         .eq('id', projectId)
-        .eq('user_id', session.user.id);
+        .eq('user_id', user.id);
 
       if (error) {
         console.error('Error cancelling project:', error);
@@ -79,7 +79,7 @@ export function ProjectOverview() {
       }
 
       // Perbarui daftar proyek setelah pembatalan
-      const userProjects = await dashboardService.getDashboardData(session.user.id);
+      const userProjects = await dashboardService.getDashboardData(user.id);
       setProjects(userProjects.projects);
 
       toast.success("Proyek Berhasil Dibatalkan", {

@@ -13,7 +13,7 @@ interface AdminLayoutProviderProps {
 
 export default function AdminLayoutProvider({ children }: AdminLayoutProviderProps) {
   const router = useRouter();
-  const [userRole, setUserRole] = useState<string>('admin'); // Default role
+  const [userRole, setUserRole] = useState<string>('user'); // Default role
   const [loading, setLoading] = useState(true);
 
   // Ambil informasi user dan role
@@ -24,9 +24,20 @@ export default function AdminLayoutProvider({ children }: AdminLayoutProviderPro
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {
-          // Ambil role dari user_metadata atau gunakan default
-          const role = user.user_metadata?.role || 'admin';
-          setUserRole(role);
+          // Ambil role dari tabel profiles, bukan dari user_metadata
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+          
+          if (error) {
+            console.error('Error fetching profile:', error);
+            // Jika gagal mengambil dari profiles, default ke user biasa
+            setUserRole('user');
+          } else {
+            setUserRole(data?.role || 'user');
+          }
         } else {
           // Jika tidak ada user, redirect ke login
           router.push('/admin/login');

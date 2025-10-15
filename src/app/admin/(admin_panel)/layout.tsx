@@ -42,7 +42,18 @@ export default async function AdminPanelLayout({
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user || user.user_metadata?.role !== 'admin') {
+  // Cek role dari tabel profiles, bukan dari user_metadata
+  if (!user) {
+    redirect('/admin/login');
+  }
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (error || data?.role !== 'admin') {
     redirect('/admin/login');
   }
 

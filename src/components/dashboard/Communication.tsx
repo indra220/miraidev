@@ -20,15 +20,15 @@ export function Communication() {
   const [messages, setMessages] = useState<DashboardMessage[]>([]);
   const [conversations, setConversations] = useState<DashboardConversation[]>([]);
   const [loading, setLoading] = useState(true);
-  const { session, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
     if (authLoading) return;
     
     const fetchCommunication = async () => {
-      if (session?.user) {
+      if (user) {
         try {
-          const commData = await dashboardService.getDashboardData(session.user.id);
+          const commData = await dashboardService.getDashboardData(user.id);
           setMessages(commData.messages);
           setConversations(commData.conversations);
         } catch (error) {
@@ -42,7 +42,7 @@ export function Communication() {
     };
 
     fetchCommunication();
-  }, [session, authLoading]);
+  }, [user, authLoading]);
 
   if (loading || authLoading) {
     return (

@@ -24,7 +24,7 @@ export const useChatAuth = () => {
         if (currentUser) {
           setUser(currentUser);
           
-          // Periksa apakah pengguna adalah admin
+          // Periksa apakah pengguna adalah admin - hanya dari tabel profiles
           const { data: profileData, error } = await supabase
             .from('profiles')
             .select('role')
@@ -33,9 +33,8 @@ export const useChatAuth = () => {
           
           if (error) {
             console.error('Error fetching profile:', error);
-            // Coba periksa dari user metadata sebagai fallback
-            const isAdminFromMetadata = currentUser.user_metadata?.role === 'admin';
-            setIsAdmin(isAdminFromMetadata);
+            // Jika tidak bisa mengambil dari profiles, default ke bukan admin
+            setIsAdmin(false);
           } else {
             const isAdminFromProfile = profileData?.role === 'admin';
             setIsAdmin(isAdminFromProfile);
@@ -56,7 +55,7 @@ export const useChatAuth = () => {
         if (session?.user) {
           setUser(session.user);
           
-          // Periksa apakah pengguna adalah admin
+          // Periksa apakah pengguna adalah admin - hanya dari tabel profiles
           const { data: profileData, error } = await supabase
             .from('profiles')
             .select('role')
@@ -65,9 +64,8 @@ export const useChatAuth = () => {
           
           if (error) {
             console.error('Error fetching profile:', error);
-            // Coba periksa dari user metadata sebagai fallback
-            const isAdminFromMetadata = session.user.user_metadata?.role === 'admin';
-            setIsAdmin(isAdminFromMetadata);
+            // Jika tidak bisa mengambil dari profiles, default ke bukan admin
+            setIsAdmin(false);
           } else {
             const isAdminFromProfile = profileData?.role === 'admin';
             setIsAdmin(isAdminFromProfile);
