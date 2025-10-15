@@ -91,18 +91,20 @@ interface Project {
 // Interface untuk data klien
 interface Client {
   id: string;
-  name: string;
-  email: string;
+  user_id: string | null;
   phone: string | null;
   company: string | null;
   join_date: string | null;
   project_count: number | null;
   rating: number | null;
-  role: 'super_admin' | 'admin' | 'klien' | null;
   status: 'aktif' | 'tidak_aktif' | null;
   created_at: string;
   updated_at: string;
-  user_id: string | null;
+  name: string; // Ditambahkan untuk menampung nama dari profiles
+  profiles?: {
+    full_name: string | null;
+    email: string | null;
+  } | null;
 }
 
 export default function ProjectsPage() {
@@ -172,7 +174,10 @@ export default function ProjectsPage() {
         .select(`*`)
         .order('created_at', { ascending: false });
 
-      if (projectsError) throw projectsError;
+      if (projectsError) {
+        console.error('Error fetching projects:', projectsError?.message || projectsError);
+        throw projectsError;
+      }
       if (!projectsData) {
         setProjects([]);
         setFilteredProjects([]);
@@ -185,7 +190,10 @@ export default function ProjectsPage() {
         .select('user_id')
         .order('user_id', { ascending: true });
 
-      if (allClientsError && allClientsError.code !== 'PGRST116') throw allClientsError;
+      if (allClientsError && allClientsError.code !== 'PGRST116') {
+        console.error('Error fetching client IDs:', allClientsError?.message || allClientsError);
+        throw allClientsError;
+      }
 
       const clientMap = new Map<string, string>();
       if (allClients) {
@@ -206,16 +214,29 @@ export default function ProjectsPage() {
 
       const { data: clientsData, error: clientsError } = await supabase
         .from('clients')
-        .select('*')
-        .order('name', { ascending: true });
+        .select(`
+          *,
+          profiles (full_name, email)
+        `)
+        .order('created_at', { ascending: true });
 
-      if (clientsError && clientsError.code !== 'PGRST116') throw clientsError;
+      if (clientsError && clientsError.code !== 'PGRST116') {
+        console.error('Error fetching clients:', clientsError?.message || clientsError);
+        throw clientsError;
+      }
       
-      setClients(clientsData || []);
+      // Konversi data agar sesuai dengan interface Client
+      const formattedClients = clientsData?.map(client => ({
+        ...client,
+        name: client.profiles?.full_name || 'Nama Tidak Tersedia' // Gunakan nama dari profiles
+      })) || [];
+      
+      setClients(formattedClients);
 
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      toast.error('Gagal memuat data proyek dan klien');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('Error fetching data:', errorMessage);
+      toast.error(`Gagal memuat data proyek dan klien: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -328,7 +349,10 @@ export default function ProjectsPage() {
 
       if (isEditing && editingId) {
         const { error } = await supabase.from('projects').update(projectPayload).eq('id', editingId);
-        if (error) throw error;
+        if (error) {
+          console.error('Error updating project:', error);
+          throw error;
+        }
         toast.success('Proyek berhasil diperbarui');
       } else {
         // Jika ini proyek baru dengan status 'planning', atur progress ke 0
@@ -336,16 +360,20 @@ export default function ProjectsPage() {
           projectPayload.progress = 0;
         }
         const { error } = await supabase.from('projects').insert([projectPayload]);
-        if (error) throw error;
+        if (error) {
+          console.error('Error inserting project:', error);
+          throw error;
+        }
         toast.success('Proyek berhasil ditambahkan');
       }
 
       await fetchData();
       setIsDialogOpen(false);
       resetForm();
-    } catch (error) {
-      console.error('Error submitting project:', error);
-      toast.error(isEditing ? 'Gagal memperbarui proyek' : 'Gagal menambahkan proyek');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('Error submitting project:', errorMessage);
+      toast.error(`${isEditing ? 'Gagal memperbarui proyek' : 'Gagal menambahkan proyek'}: ${errorMessage}`);
     }
   };
 
@@ -541,7 +569,7 @@ export default function ProjectsPage() {
                     <SelectContent>
                       {clients.map(client => (
                         <SelectItem key={client.id} value={client.user_id || ''}>
-                          {client.name} ({client.email})
+                          {client.name} ({client.profiles?.email || 'Email tidak tersedia'})
                         </SelectItem>
                       ))}
                     </SelectContent>

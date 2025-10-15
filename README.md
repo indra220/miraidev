@@ -2,7 +2,26 @@
 
 # MiraiDev Website
 
+Versi: 0.5.26
+
 Sebuah aplikasi web modern untuk agensi pengembangan website MiraiDev, dibangun dengan Next.js 15, menggunakan Supabase untuk database, dan mendukung mode gelap.
+
+## Riwayat Versi
+
+### Versi 0.5.26 (15 Oktober 2025)
+- Penambahan aturan pengelolaan CHANGELOG.md
+- Pembaruan dokumentasi dan panduan pengembangan
+- Perbaikan minor pada struktur proyek
+
+### Versi 0.5.25 (14 Oktober 2025)
+- Peningkatan signifikan pada admin panel
+- Perbaikan berbagai error build dan type
+- Optimasi performa dan UX
+- Penambahan fitur-fitur baru sesuai dengan roadmap pengembangan
+
+### Versi 0.5.24 (10 Oktober 2025)
+- Rilis awal admin panel
+- Implementasi dasar dashboard, manajemen pengguna, proyek, chat, SEO, harga, dan dukungan
 
 ## Teknologi yang Digunakan
 

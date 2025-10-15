@@ -95,13 +95,8 @@ export default function ProjectDetailPage() {
         setClient(clientData);
       }
     } catch (error: unknown) {
-        console.error('Error fetching data:', error);
-        let errorMessage = "Terjadi kesalahan yang tidak diketahui.";
-        if (error instanceof Error) {
-            errorMessage = error.message;
-        } else if (typeof error === 'object' && error !== null && 'message' in error) {
-            errorMessage = String((error as { message: string }).message);
-        }
+        const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan yang tidak diketahui.';
+        console.error('Error fetching data:', errorMessage);
         toast.error('Gagal memuat data proyek', {
             description: errorMessage
         });
