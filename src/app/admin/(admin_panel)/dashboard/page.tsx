@@ -39,6 +39,13 @@ export default function AdminDashboard() {
       color: "bg-blue-600"
     },
     {
+      title: "Total Portofolio",
+      value: realtimeStats.totalPortfolios.toString(),
+      icon: FolderOpen,
+      change: "+3.1% dari bulan lalu",
+      color: "bg-indigo-600"
+    },
+    {
       title: "Klien Aktif",
       value: realtimeStats.activeClients.toString(),
       icon: Users,
@@ -51,13 +58,6 @@ export default function AdminDashboard() {
       icon: Eye,
       change: "+12.3% dari bulan lalu",
       color: "bg-purple-600"
-    },
-    {
-      title: "Pesan Baru",
-      value: realtimeStats.unreadMessages.toString(),
-      icon: MessageSquare,
-      change: `${realtimeStats.unreadMessages} belum dibaca`,
-      color: "bg-yellow-600"
     }
   ];
 
@@ -97,8 +97,8 @@ export default function AdminDashboard() {
           <h1 className="text-3xl font-bold text-white">Dashboard Admin</h1>
           <p className="text-slate-300 mt-2">Memuat data dashboard real-time...</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[1, 2, 3, 4].map((i) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+          {[1, 2, 3, 4, 5].map((i) => (
             <Card key={i} className="p-6 bg-slate-800 border border-slate-700 shadow-md">
               <div className="animate-pulse">
                 <div className="h-4 bg-slate-700 rounded w-3/4 mb-4"></div>
@@ -147,7 +147,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
@@ -168,8 +168,11 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <AnimatedCard className="p-6 bg-slate-800 border border-slate-700 shadow-md" delay={0.2}>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold text-white">Proyek Terbaru</h2>
-            <button className="text-sm text-slate-400 hover:text-slate-300 hover:underline">
+            <h2 className="text-lg font-bold text-white">Portofolio</h2>
+            <button 
+              onClick={() => window.location.href = "/admin/portfolio"} 
+              className="text-sm text-slate-400 hover:text-slate-300 hover:underline"
+            >
               Lihat Semua
             </button>
           </div>
@@ -243,6 +246,7 @@ export default function AdminDashboard() {
           <motion.button 
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.98 }}
+            onClick={() => window.location.href = "/admin/projects"}
             className="flex flex-col items-center justify-center p-6 bg-slate-750 rounded-lg border border-slate-700 hover:bg-slate-700 transition-colors shadow-sm"
           >
             <FolderOpen className="h-8 w-8 text-blue-400 mb-2" />
@@ -251,6 +255,7 @@ export default function AdminDashboard() {
           <motion.button 
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.98 }}
+            onClick={() => window.location.href = "/admin/clients"}
             className="flex flex-col items-center justify-center p-6 bg-slate-750 rounded-lg border border-slate-700 hover:bg-slate-700 transition-colors shadow-sm"
           >
             <Users className="h-8 w-8 text-green-400 mb-2" />
@@ -259,6 +264,7 @@ export default function AdminDashboard() {
           <motion.button 
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.98 }}
+            onClick={() => window.location.href = "/admin/analytics"}
             className="flex flex-col items-center justify-center p-6 bg-slate-750 rounded-lg border border-slate-700 hover:bg-slate-700 transition-colors shadow-sm"
           >
             <BarChart3 className="h-8 w-8 text-purple-400 mb-2" />
@@ -267,11 +273,11 @@ export default function AdminDashboard() {
           <motion.button 
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => window.location.href = "/admin/chat"}
+            onClick={() => window.location.href = "/admin/pesan"}
             className="flex flex-col items-center justify-center p-6 bg-slate-750 rounded-lg border border-slate-700 hover:bg-slate-700 transition-colors shadow-sm"
           >
             <MessageSquare className="h-8 w-8 text-yellow-400 mb-2" />
-            <span className="font-medium text-white">Chat Umum</span>
+            <span className="font-medium text-white">Pesan</span>
           </motion.button>
         </div>
       </AnimatedCard>

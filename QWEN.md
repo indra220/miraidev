@@ -186,3 +186,10 @@ Sebelum memulai proses coding, harap menerapkan dan mematuhi aturan pengembangan
 ### 8. Kepatuhan terhadap Aturan
 - Semua instruksi di atas bersifat permanen dan wajib dipatuhi selama proses pengembangan berlangsung.
 - Jika ada kondisi yang membuat aturan ini sulit diterapkan, berikan penjelasan terlebih dahulu sebelum melakukan tindakan.
+
+### 9. Aturan Update Versi dan CHANGELOG.md
+- Jika pengguna memberikan perintah "update versi", maka file `CHANGELOG.md` dan versi dalam `package.json` wajib diperbarui.
+- Format versi mengikuti sistem versioning semantik (vX.Y.Z) sesuai aturan nomor 1.
+- Entri baru di `CHANGELOG.md` harus mengikuti format standar sesuai aturan nomor 7.
+- Nomor versi di `package.json` harus dinaikkan sesuai dengan perubahan yang telah dilakukan.
+- Perubahan versi hanya dilakukan ketika secara eksplisit diminta dengan perintah "update versi".

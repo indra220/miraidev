@@ -2,6 +2,13 @@
 
 All notable changes to the MiraiDev Admin Panel will be documented in this file.
 
+## [0.5.30] - 2025-10-15
+
+### Added
+- Menambahkan statistik Total Portofolio di dashboard admin
+- Memperbarui perhitungan Total Proyek untuk mengambil dari tabel projects bukan portfolio
+- Menyesuaikan tampilan dashboard admin untuk menampilkan 5 card statistik
+
 ## [0.5.29] - 2025-10-15
 
 ### Changed
@@ -112,7 +119,7 @@ All notable changes to the MiraiDev Admin Panel will be documented in this file.
 - Resolved build errors related to type mismatches
 - Fixed unused variable warnings
 - Addressed React Hook dependency warnings
-- Corrected component import/export issues
+- Corrected component import-export issues
 - Resolved virtual scrolling implementation problems
 
 ### Removed
@@ -131,5 +138,8 @@ All notable changes to the MiraiDev Admin Panel will be documented in this file.
 - Pricing management system
 - Support ticket system
 
+[0.5.30]: https://github.com/mirai-dev/mirai-dev-website/compare/v0.5.29...v0.5.30
+[0.5.29]: https://github.com/mirai-dev/mirai-dev-website/compare/v0.5.28...v0.5.29
+[0.5.28]: https://github.com/mirai-dev/mirai-dev-website/compare/v0.5.26...v0.5.28
 [0.5.26]: https://github.com/mirai-dev/mirai-dev-website/compare/v0.5.24...v0.5.26
 [0.5.24]: https://github.com/mirai-dev/mirai-dev-website/compare/v0.5.0...v0.5.24

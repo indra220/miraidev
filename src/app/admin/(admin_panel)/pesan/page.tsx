@@ -1,13 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import ConversationChat from "@/components/conversation-chat";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, MessageCircle, User, X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Users, MessageCircle, User, MoreVertical } from "lucide-react";
 import { useChatAuth } from "@/hooks/use-chat-auth";
 import { createClient } from "@/lib/supabase/client";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Conversation {
   id: string;
@@ -26,7 +33,87 @@ export default function MessageManagement() {
   const [isClient, setIsClient] = useState(false);
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [userList, setUserList] = useState<Conversation[]>([]);
+  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
+
+  // Fungsi untuk memperbarui data percakapan
+  const refreshData = useCallback(async () => {
+    if (!user || !isAdmin) return; // hanya refresh jika user adalah admin
+    
+    setLoading(true);
+    
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('conversations')
+        .select(`
+          id,
+          user_id,
+          created_at,
+          updated_at,
+          profiles (full_name, email)
+        `)
+        .order('updated_at', { ascending: false });
+
+      if (error) throw error;
+      
+      setUserList(data as Conversation[]);
+      
+      // Ambil jumlah pesan unread untuk setiap pengguna
+      const newUnreadCounts: Record<string, number> = {};
+      const supabaseClient = createClient();
+      
+      for (const conv of data) {
+        try {
+          const { count, error, status } = await supabaseClient
+            .from('conversation_messages')
+            .select('*', { count: 'exact', head: true })
+            .eq('conversation_id', conv.id)
+            .eq('read_status', false)
+            .neq('sender_id', user?.id); // Hanya pesan dari pengguna, bukan dari admin
+
+          if (error) {
+            // Jika error kosong, tampilkan informasi tambahan
+            if (!error) {
+              console.warn(`Received undefined/null error for user ${conv.user_id}, status: ${status}, count: ${count}`);
+              newUnreadCounts[conv.user_id] = 0;
+            } else {
+              // Dalam kasus ini, mungkin tidak adanya pesan unread adalah kondisi normal
+              // Kita hanya perlu mengatur jumlah unread ke 0 tanpa mencatat error
+              newUnreadCounts[conv.user_id] = 0;
+            }
+          } else {
+            newUnreadCounts[conv.user_id] = count || 0;
+          }
+        } catch (err) {
+          const errorMessage = err instanceof Error ? err.message : String(err);
+          console.error(`Exception fetching unread count for user ${conv.user_id}:`, errorMessage);
+          newUnreadCounts[conv.user_id] = 0;
+        }
+      }
+      
+      setUnreadCounts(newUnreadCounts);
+    } catch (error) {
+      console.error("Error refreshing user list:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [user?.id, isAdmin]); // Tambahkan dependensi yang diperlukan
+
+  // useEffect untuk memperbarui data saat komponen menerima fokus kembali
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        refreshData();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [refreshData]);
 
   useEffect(() => {
     document.title = "Manajemen Pesan | MiraiDev";
@@ -51,14 +138,54 @@ export default function MessageManagement() {
         
         setUserList(data as Conversation[]);
         setLoading(false);
+        
+        // Ambil jumlah pesan unread untuk setiap pengguna
+        fetchUnreadCounts(data as Conversation[]);
       } catch (error) {
         console.error("Error fetching user list:", error);
         setLoading(false);
       }
     };
     
+    // Ambil jumlah pesan unread untuk setiap pengguna
+    const fetchUnreadCounts = async (conversations: Conversation[]) => {
+      const newUnreadCounts: Record<string, number> = {};
+      const supabaseClient = createClient();
+      
+      for (const conv of conversations) {
+        try {
+          const { count, error, status } = await supabaseClient
+            .from('conversation_messages')
+            .select('*', { count: 'exact', head: true })
+            .eq('conversation_id', conv.id)
+            .eq('read_status', false)
+            .neq('sender_id', user?.id); // Hanya pesan dari pengguna, bukan dari admin
+
+          if (error) {
+            // Jika error kosong, tampilkan informasi tambahan
+            if (!error) {
+              console.warn(`Received undefined/null error for user ${conv.user_id}, status: ${status}, count: ${count}`);
+              newUnreadCounts[conv.user_id] = 0;
+            } else {
+              // Dalam kasus ini, mungkin tidak adanya pesan unread adalah kondisi normal
+              // Kita hanya perlu mengatur jumlah unread ke 0 tanpa mencatat error
+              newUnreadCounts[conv.user_id] = 0;
+            }
+          } else {
+            newUnreadCounts[conv.user_id] = count || 0;
+          }
+        } catch (err) {
+          const errorMessage = err instanceof Error ? err.message : String(err);
+          console.error(`Exception fetching unread count for user ${conv.user_id}:`, errorMessage);
+          newUnreadCounts[conv.user_id] = 0;
+        }
+      }
+      
+      setUnreadCounts(newUnreadCounts);
+    };
+    
     fetchUsers();
-  }, []);
+  }, [user?.id, selectedUser, refreshData]); // Tambahkan refreshData sebagai dependensi agar data di-refresh saat pengguna dipilih
 
   // Jika tidak login atau bukan admin, arahkan ke halaman utama
   useEffect(() => {
@@ -128,6 +255,13 @@ export default function MessageManagement() {
       // Perbarui daftar pengguna
       setUserList(prev => prev.filter(conv => conv.user_id !== userId));
       
+      // Juga hapus jumlah pesan unread untuk pengguna ini
+      setUnreadCounts(prev => {
+        const newUnreadCounts = { ...prev };
+        delete newUnreadCounts[userId];
+        return newUnreadCounts;
+      });
+      
       // Jika pengguna yang dihapus adalah pengguna yang sedang dipilih, hapus pilihan
       if (selectedUser === userId) {
         setSelectedUser(null);
@@ -140,22 +274,21 @@ export default function MessageManagement() {
     }
   };
 
+  // Fungsi untuk memperbarui jumlah pesan unread ketika percakapan dibuka
+  const updateUnreadCount = (userId: string) => {
+    setUnreadCounts(prev => {
+      const newUnreadCounts = { ...prev };
+      newUnreadCounts[userId] = 0; // Setel jumlah unread menjadi 0 ketika membuka percakapan
+      return newUnreadCounts;
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-white">Manajemen Pesan</h1>
-            <p className="text-gray-300 mt-2">Kelola percakapan dengan pengguna</p>
-          </div>
-          <Button 
-            variant="outline" 
-            onClick={() => window.location.href = "/admin/chat"}
-            className="border-blue-500 text-blue-400 hover:bg-blue-500/10 flex items-center"
-          >
-            <MessageCircle className="h-4 w-4 mr-2" />
-            Chat Umum
-          </Button>
+        <div>
+          <h1 className="text-3xl font-bold text-white">Manajemen Pesan</h1>
+          <p className="text-gray-300 mt-2">Kelola percakapan dengan pengguna</p>
         </div>
       </div>
 
@@ -189,42 +322,68 @@ export default function MessageManagement() {
                     ) : userList.length === 0 ? (
                       <p className="text-gray-500 text-sm">Belum ada pengguna yang memiliki percakapan</p>
                     ) : (
-                      userList.map((conv) => (
-                        <div 
-                          key={conv.user_id}
-                          className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                            selectedUser === conv.user_id 
-                              ? "bg-blue-100 border border-blue-300" 
-                              : "hover:bg-gray-100 dark:hover:bg-gray-800"
-                          }`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div 
-                              className="flex-1"
-                              onClick={() => setSelectedUser(conv.user_id)}
-                            >
-                              <div className="flex items-center gap-2">
-                                <User className="w-4 h-4 text-gray-500" />
-                                <div>
-                                  <p className="font-medium text-sm">{conv.profiles?.full_name || 'Pengguna Tak Dikenal'}</p>
-                                  <p className="text-xs text-gray-500 truncate">{conv.profiles?.email || 'Email tidak tersedia'}</p>
+                      userList.map((conv) => {
+                        const unreadCount = unreadCounts[conv.user_id] || 0;
+                        const displayCount = unreadCount > 99 ? '+99' : unreadCount > 0 ? unreadCount.toString() : '';
+                        
+                        return (
+                          <div 
+                            key={conv.user_id}
+                            className={`p-3 rounded-lg cursor-pointer transition-colors group relative ${
+                              selectedUser === conv.user_id 
+                                ? "bg-blue-100 border border-blue-300" 
+                                : "hover:bg-gray-100 dark:hover:bg-gray-800"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div 
+                                className="flex-1 min-w-0"
+                                onClick={() => {
+                                  setSelectedUser(conv.user_id);
+                                  updateUnreadCount(conv.user_id);
+                                }}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <User className="w-4 h-4 text-gray-500" />
+                                  <div className="min-w-0 flex-1">
+                                    <div className="flex items-center gap-2">
+                                      <p className="font-medium text-sm truncate">{conv.profiles?.full_name || 'Pengguna Tak Dikenal'}</p>
+                                      {displayCount && (
+                                        <Badge variant="destructive" className="h-5 w-5 p-0 rounded-full flex items-center justify-center text-xs">
+                                          {unreadCount > 99 ? '+99' : unreadCount}
+                                        </Badge>
+                                      )}
+                                    </div>
+                                    <p className="text-xs text-gray-500 truncate">{conv.profiles?.email || 'Email tidak tersedia'}</p>
+                                  </div>
                                 </div>
                               </div>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm"
+                                    className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  >
+                                    <MoreVertical className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                  <DropdownMenuItem 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteUser(conv.user_id);
+                                    }}
+                                    className="text-red-600"
+                                  >
+                                    Hapus Percakapan
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteUser(conv.user_id);
-                              }}
-                              className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
                           </div>
-                        </div>
-                      ))
+                        );
+                      })
                     )}
                   </div>
                 </CardContent>

@@ -4,6 +4,7 @@ import { PortfolioItem } from '@/lib/types';
 
 interface DashboardStats {
   totalProjects: number;
+  totalPortfolios: number;
   activeClients: number;
   totalViews: number;
   unreadMessages: number;
@@ -41,6 +42,7 @@ interface ContactSubmission {
 export const useRealtimeDashboard = () => {
   const [stats, setStats] = useState<DashboardStats>({
     totalProjects: 0,
+    totalPortfolios: 0,
     activeClients: 0,
     totalViews: 0,
     unreadMessages: 0
@@ -57,7 +59,7 @@ export const useRealtimeDashboard = () => {
       try {
         setLoading(true);
         
-        const [portfolioData, clientsData, contactData] = await Promise.all([
+        const [portfolioData, projectsData, clientsData, contactData] = await Promise.all([
           supabase.from('portfolio').select(`
             id,
             title,
@@ -72,21 +74,25 @@ export const useRealtimeDashboard = () => {
             price,
             use_url
           `).order('created_at', { ascending: false }),
+          supabase.from('projects').select('*', { count: 'exact' }),
           supabase.from('clients').select('*'),
           supabase.from('contact_submissions').select('*').order('created_at', { ascending: false })
         ]);
 
         if (portfolioData.error) throw portfolioData.error;
+        if (projectsData.error) throw projectsData.error;
         if (clientsData.error) throw clientsData.error;
         if (contactData.error) throw contactData.error;
 
-        const totalProjects = portfolioData.data.length;
+        const totalPortfolios = portfolioData.data.length;
+        const totalProjects = projectsData.count || 0;
         const activeClients = clientsData.data.filter((client: Client) => client.status === 'aktif').length;
         const totalViews = portfolioData.data.reduce((sum: number, project: { views?: number | null }) => sum + (project.views || 0), 0);
         const unreadMessages = contactData.data.filter((message: ContactSubmission) => message.status !== 'diarsipkan').length;
 
         setStats({
           totalProjects,
+          totalPortfolios,
           activeClients,
           totalViews,
           unreadMessages
@@ -104,7 +110,8 @@ export const useRealtimeDashboard = () => {
 
     const updateStats = async () => {
       try {
-        const [totalProjects, activeClients, totalViews, unreadMessages] = await Promise.all([
+        const [totalProjects, totalPortfolios, activeClients, totalViews, unreadMessages] = await Promise.all([
+          supabase.from('projects').select('*', { count: 'exact' }).then(res => res.count || 0),
           supabase.from('portfolio').select('*', { count: 'exact' }).then(res => res.count || 0),
           supabase.from('clients').select('*', { count: 'exact' }).eq('status', 'aktif').then(res => res.count || 0),
           supabase.from('portfolio').select('views').then(res => {
@@ -118,6 +125,7 @@ export const useRealtimeDashboard = () => {
 
         setStats({
           totalProjects,
+          totalPortfolios,
           activeClients,
           totalViews,
           unreadMessages
@@ -138,6 +146,13 @@ export const useRealtimeDashboard = () => {
       })
       .subscribe();
 
+    const projectsChannel = supabase
+      .channel('projects-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, () => {
+        updateStats();
+      })
+      .subscribe();
+
     const clientsChannel = supabase
       .channel('clients-changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'clients' }, () => {
@@ -154,6 +169,7 @@ export const useRealtimeDashboard = () => {
 
     return () => {
       supabase.removeChannel(portfolioChannel);
+      supabase.removeChannel(projectsChannel);
       supabase.removeChannel(clientsChannel);
       supabase.removeChannel(contactChannel);
     };
