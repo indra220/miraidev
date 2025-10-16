@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { clearAuthInfoFromStorage } from '@/utils/auth-utils';
 
 const IDLE_TIMEOUT = 15 * 60 * 1000; // 15 menit
 const WARNING_TIME = 1 * 60 * 1000; // 1 menit sebelum timeout
@@ -14,6 +15,7 @@ export const useSessionTimeout = () => {
   const handleLogout = useCallback(async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
+    clearAuthInfoFromStorage(); // Bersihkan sessionStorage saat logout
     window.location.href = '/auth/login?timeout=true';
   }, []);
 

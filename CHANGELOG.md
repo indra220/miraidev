@@ -2,6 +2,22 @@
 
 All notable changes to the MiraiDev Admin Panel will be documented in this file.
 
+## [0.5.31] - 2025-10-16
+
+### Added
+- Menambahkan estimasi waktu pengerjaan proyek dari kolom timeline_estimate ke halaman update proyek admin
+- Menambahkan deskripsi estimasi waktu pengerjaan proyek dengan ikon jam di halaman update proyek admin
+
+### Changed
+- Mengubah tombol "Edit" menjadi "Update" di halaman manajemen proyek admin dan mengarahkannya ke halaman update proyek
+- Mengubah struktur tampilan informasi klien di halaman detail proyek admin untuk menangani kasus di mana tidak ada klien terkait dengan proyek
+- Memperbaiki query untuk mengambil data proyek dan klien secara terpisah karena tidak adanya relasi yang terdefinisi antara tabel projects dan clients
+
+### Removed
+- Menghapus komponen ProjectConversationChat dari halaman detail proyek admin
+- Menghapus komponen ProjectConversationChat dari halaman update proyek admin
+- Menghapus tombol "Chat Proyek" dari dropdown menu di halaman manajemen proyek admin
+
 ## [0.5.30] - 2025-10-15
 
 ### Added
@@ -138,6 +154,7 @@ All notable changes to the MiraiDev Admin Panel will be documented in this file.
 - Pricing management system
 - Support ticket system
 
+[0.5.31]: https://github.com/mirai-dev/mirai-dev-website/compare/v0.5.30...v0.5.31
 [0.5.30]: https://github.com/mirai-dev/mirai-dev-website/compare/v0.5.29...v0.5.30
 [0.5.29]: https://github.com/mirai-dev/mirai-dev-website/compare/v0.5.28...v0.5.29
 [0.5.28]: https://github.com/mirai-dev/mirai-dev-website/compare/v0.5.26...v0.5.28

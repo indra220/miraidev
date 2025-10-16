@@ -62,8 +62,7 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
-  XCircle,
-  MessageSquare
+  XCircle
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
@@ -86,6 +85,11 @@ interface Project {
   created_at: string | null;
   updated_at: string | null;
   client_name?: string; // Properti opsional dari relasi dengan tabel clients
+  clients?: {
+    profiles?: {
+      full_name: string | null;
+    } | null;
+  } | null;
 }
 
 // Interface untuk data klien
@@ -171,7 +175,7 @@ export default function ProjectsPage() {
       const supabase = createClient();
       const { data: projectsData, error: projectsError } = await supabase
         .from('projects')
-        .select(`*`)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (projectsError) {
@@ -184,46 +188,39 @@ export default function ProjectsPage() {
         setClients([]);
         return;
       }
-      
-      const { data: allClients, error: allClientsError } = await supabase
-        .from('clients')
-        .select('user_id')
-        .order('user_id', { ascending: true });
 
-      if (allClientsError && allClientsError.code !== 'PGRST116') {
-        console.error('Error fetching client IDs:', allClientsError?.message || allClientsError);
-        throw allClientsError;
+      // Ambil semua data klien dengan informasi profil
+      const { data: clientsData, error: clientsError } = await supabase
+        .from('clients')
+        .select(`
+          *,
+          profiles (
+            full_name
+          )
+        `);
+
+      if (clientsError && clientsError.code !== 'PGRST116') {
+        console.error('Error fetching clients:', clientsError?.message || clientsError);
+        throw clientsError;
       }
 
+      // Buat map dari user_id ke nama klien
       const clientMap = new Map<string, string>();
-      if (allClients) {
-        allClients.forEach(client => {
-          if (client.user_id) {
-            clientMap.set(client.user_id, client.user_id);
+      if (clientsData) {
+        clientsData.forEach(client => {
+          if (client.user_id && client.profiles?.full_name) {
+            clientMap.set(client.user_id, client.profiles.full_name);
           }
         });
       }
 
       const projectWithClients: Project[] = projectsData.map(project => ({
         ...project,
-        client_name: (project.user_id && clientMap.get(project.user_id)) || 'Klien Tidak Ditemukan'
+        client_name: project.user_id ? clientMap.get(project.user_id) || 'Nama Tidak Ditemukan' : 'Proyek Tanpa Klien'
       }));
 
       setProjects(projectWithClients);
       setFilteredProjects(projectWithClients);
-
-      const { data: clientsData, error: clientsError } = await supabase
-        .from('clients')
-        .select(`
-          *,
-          profiles (full_name, email)
-        `)
-        .order('created_at', { ascending: true });
-
-      if (clientsError && clientsError.code !== 'PGRST116') {
-        console.error('Error fetching clients:', clientsError?.message || clientsError);
-        throw clientsError;
-      }
       
       // Konversi data agar sesuai dengan interface Client
       const formattedClients = clientsData?.map(client => ({
@@ -377,25 +374,7 @@ export default function ProjectsPage() {
     }
   };
 
-  const handleEdit = (project: Project) => {
-    setFormData({
-      title: project.title,
-      description: project.description || '',
-      status: project.status || 'aktif',
-      start_date: project.start_date || new Date().toISOString().split('T')[0],
-      end_date: project.end_date || new Date().toISOString().split('T')[0],
-      price: project.price || 0,
-      user_id: project.user_id || '',
-      category: project.category || '',
-      complexity: project.complexity || '',
-      features: project.features || [],
-      additional_requirements: project.additional_requirements || '',
-      progress: project.progress || 0
-    });
-    setIsEditing(true);
-    setEditingId(project.id);
-    setIsDialogOpen(true);
-  };
+
 
   const handleDelete = (id: string) => {
     setProjectToDelete(id);
@@ -672,9 +651,12 @@ export default function ProjectsPage() {
                             <DropdownMenuContent align="end">
                               <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem onClick={() => handleEdit(project)}>
+                              <DropdownMenuItem onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(`/admin/projects/${project.id}/update`);
+                              }}>
                                 <Edit className="h-4 w-4 mr-2" />
-                                Edit
+                                Update
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={(e) => {
                                 e.stopPropagation();
@@ -683,14 +665,7 @@ export default function ProjectsPage() {
                                 <Eye className="h-4 w-4 mr-2" />
                                 Lihat Detail
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={(e) => {
-                                e.stopPropagation();
-                                router.push(`/admin/chat?projectId=${project.id}`);
-                              }}>
-                                <MessageSquare className="h-4 w-4 mr-2" />
-                                Chat Proyek
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
+
                               <DropdownMenuItem className="text-red-600 focus:bg-red-50 focus:text-red-700" onClick={() => handleDelete(project.id)}>
                                 <Trash className="h-4 w-4 mr-2" />
                                 Hapus

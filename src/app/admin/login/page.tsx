@@ -11,6 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { createClient } from "@/lib/supabase/client";
 import { Eye, EyeOff, Lock, ArrowLeft } from "lucide-react";
+import { setAuthInfoToStorage } from "@/utils/auth-utils";
 
 export default function AdminLoginPage() {
   useEffect(() => {
@@ -29,7 +30,7 @@ export default function AdminLoginPage() {
     setError(null);
 
     const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -38,6 +39,11 @@ export default function AdminLoginPage() {
       setError("Email atau kata sandi yang Anda masukkan salah.");
       setIsLoading(false);
       return;
+    }
+
+    // Simpan role ke sessionStorage setelah login berhasil
+    if (data.user) {
+      setAuthInfoToStorage('admin', data.user.id);
     }
 
     router.push('/admin/dashboard');

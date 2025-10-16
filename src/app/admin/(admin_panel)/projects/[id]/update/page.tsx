@@ -40,6 +40,7 @@ interface Project {
   progress: number | null;
   created_at: string;
   updated_at: string;
+  timeline_estimate: string | null; // Menambahkan kolom timeline_estimate
 }
 
 interface Client {
@@ -291,6 +292,13 @@ export default function UpdateProjectPage() {
                       <div className="flex items-center mt-1">
                         <CreditCard className="h-4 w-4 mr-2 text-muted-foreground" />
                         <span>Rp {(formData.price || 0).toLocaleString('id-ID')}</span>
+                      </div>
+                    </div>
+                    <div>
+                      <Label>Estimasi Waktu Pengerjaan</Label>
+                      <div className="flex items-center mt-1">
+                        <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
+                        <span>{project.timeline_estimate || 'Tidak ada estimasi waktu'}</span>
                       </div>
                     </div>
                   </CardContent>

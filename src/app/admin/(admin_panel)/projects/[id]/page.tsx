@@ -21,15 +21,14 @@ import {
   Phone,
   AlertCircle,
   ArrowLeft,
-  Edit3,
-  MessageSquare
+  Edit3
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useParams } from 'next/navigation';
 
 import ProjectUpdateForm from '@/components/ProjectUpdateForm';
 import ProjectUpdateList from '@/components/ProjectUpdateList';
-import ProjectConversationChat from '@/components/project-conversation-chat';
+
 
 // Interface disesuaikan dengan skema database yang ada
 interface Project {
@@ -47,12 +46,16 @@ interface Project {
 }
 
 interface Client {
-  id: number;
+  id: number | string; // Bisa number atau string tergantung sumber data
   name: string;
   email: string;
   phone: string | null;
   company: string | null;
   user_id: string | null;
+  profiles?: {
+    full_name: string | null;
+    email: string | null;
+  } | null;
 }
 
 export default function ProjectDetailPage() {
@@ -72,6 +75,7 @@ export default function ProjectDetailPage() {
       setLoading(true);
       const supabase = createClient();
       
+      // Ambil data proyek terlebih dahulu
       const { data: projectData, error: projectError } = await supabase
         .from('projects')
         .select('*')
@@ -83,16 +87,35 @@ export default function ProjectDetailPage() {
 
       setProject(projectData);
 
+      // Jika proyek memiliki user_id, ambil informasi klien
       if (projectData.user_id) {
         const { data: clientData, error: clientError } = await supabase
           .from('clients')
-          .select('*')
+          .select(`
+            *,
+            profiles (
+              full_name,
+              email
+            )
+          `)
           .eq('user_id', projectData.user_id)
           .single();
 
-        if (clientError && clientError.code !== 'PGRST116') throw clientError;
-
-        setClient(clientData);
+        if (clientError && clientError.code !== 'PGRST116') {
+          console.error('Error fetching client:', clientError);
+        } else if (clientData) {
+          // Format data klien sesuai interface Client
+          const formattedClient: Client = {
+            id: 0, // Dummy value karena id diubah dari number ke string
+            name: clientData.profiles?.full_name || 'Nama Tidak Ditemukan',
+            email: clientData.profiles?.email || 'Email Tidak Ditemukan',
+            phone: clientData.phone || null,
+            company: clientData.company || null,
+            user_id: clientData.user_id || null
+          };
+          
+          setClient(formattedClient);
+        }
       }
     } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan yang tidak diketahui.';
@@ -291,21 +314,7 @@ export default function ProjectDetailPage() {
 
       <ProjectUpdateList projectId={project.id} />
       
-      {/* Project Conversation Chat */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageSquare className="h-5 w-5" />
-            <span>Chat Proyek</span>
-          </CardTitle>
-          <CardDescription>
-            Konsultasikan detail proyek ini dengan klien
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ProjectConversationChat projectId={project.id} isAdmin={true} userId={project.user_id || undefined} />
-        </CardContent>
-      </Card>
+
     </div>
   );
 }

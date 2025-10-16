@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import AdminSidebar from '@/components/admin-sidebar';
 import AdminHeader from '@/components/admin-header';
 import { SidebarProvider } from '@/contexts/sidebar-provider';
+import { getAuthInfoFromStorage } from '@/utils/auth-utils';
 
 interface AdminLayoutProviderProps {
   children: React.ReactNode;
@@ -20,11 +21,27 @@ export default function AdminLayoutProvider({ children }: AdminLayoutProviderPro
   useEffect(() => {
     const fetchUserRole = async () => {
       try {
+        // Cek apakah role sudah tersimpan di sessionStorage
+        const { role: storedRole } = getAuthInfoFromStorage();
+        if (storedRole) {
+          setUserRole(storedRole);
+          setLoading(false);
+          return;
+        }
+        
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {
-          // Ambil role dari tabel profiles, bukan dari user_metadata
+          // Ambil role dari user_metadata terlebih dahulu (lebih cepat)
+          const userRoleFromMetadata = user.user_metadata?.role as string;
+          if (userRoleFromMetadata === 'admin') {
+            setUserRole('admin');
+            setLoading(false);
+            return;
+          }
+          
+          // Jika role di user_metadata bukan admin, ambil dari tabel profiles
           const { data, error } = await supabase
             .from('profiles')
             .select('role')

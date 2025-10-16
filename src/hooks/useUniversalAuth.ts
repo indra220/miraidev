@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
+import { setAuthInfoToStorage, getAuthInfoFromStorage, clearAuthInfoFromStorage } from "@/utils/auth-utils";
 
 interface UniversalAuthState {
   user: User | null;
@@ -34,28 +35,44 @@ export const useUniversalAuth = (): UniversalAuthState => {
         if (session?.user) {
           setUser(session.user);
           
-          // Ambil role dari tabel profiles, bukan dari user_metadata
-          const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', session.user.id)
-            .single();
+          // Cek apakah role sudah tersimpan di sessionStorage
+          const { role: storedRole } = getAuthInfoFromStorage();
+          if (storedRole) {
+            setRole(storedRole);
+            setIsAdmin(storedRole === 'admin');
+            setIsLoading(false);
+            return;
+          }
           
-          if (profileError) {
-            console.error('Error fetching profile:', profileError);
-            // Jika gagal mengambil dari profiles, coba dari user_metadata sebagai fallback
-            const fallbackRole = session.user.user_metadata?.role as string;
-            setRole(fallbackRole || 'user');
-            setIsAdmin(fallbackRole === 'admin');
-          } else {
-            const userRole = profileData?.role || 'user';
-            setRole(userRole);
-            setIsAdmin(userRole === 'admin');
+          // Ambil role dari user_metadata terlebih dahulu (lebih cepat)
+          const userRole = session.user.user_metadata?.role as string || 'user';
+          setRole(userRole);
+          setIsAdmin(userRole === 'admin');
+          
+          // Simpan role ke sessionStorage
+          setAuthInfoToStorage(userRole, session.user.id);
+          
+          // Jika role di user_metadata tidak valid atau kosong, ambil dari tabel profiles
+          if (!userRole || userRole === 'user') {
+            const { data: profileData, error: profileError } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', session.user.id)
+              .single();
+            
+            if (!profileError && profileData?.role) {
+              const profileRole = profileData.role;
+              setRole(profileRole);
+              setIsAdmin(profileRole === 'admin');
+              // Perbarui role di sessionStorage
+              setAuthInfoToStorage(profileRole, session.user.id);
+            }
           }
         } else {
           setUser(null);
           setRole(null);
           setIsAdmin(false);
+          clearAuthInfoFromStorage(); // Bersihkan sessionStorage saat logout
         }
       } catch (err) {
         console.error('Error during auth check:', err);
@@ -76,28 +93,44 @@ export const useUniversalAuth = (): UniversalAuthState => {
         if (session?.user) {
           setUser(session.user);
           
-          // Ambil role dari tabel profiles
-          const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', session.user.id)
-            .single();
+          // Cek apakah role sudah tersimpan di sessionStorage
+          const { role: storedRole } = getAuthInfoFromStorage();
+          if (storedRole) {
+            setRole(storedRole);
+            setIsAdmin(storedRole === 'admin');
+            setIsLoading(false);
+            return;
+          }
           
-          if (profileError) {
-            console.error('Error fetching profile:', profileError);
-            // Jika gagal mengambil dari profiles, coba dari user_metadata sebagai fallback
-            const fallbackRole = session.user.user_metadata?.role as string;
-            setRole(fallbackRole || 'user');
-            setIsAdmin(fallbackRole === 'admin');
-          } else {
-            const userRole = profileData?.role || 'user';
-            setRole(userRole);
-            setIsAdmin(userRole === 'admin');
+          // Ambil role dari user_metadata terlebih dahulu (lebih cepat)
+          const userRole = session.user.user_metadata?.role as string || 'user';
+          setRole(userRole);
+          setIsAdmin(userRole === 'admin');
+          
+          // Simpan role ke sessionStorage
+          setAuthInfoToStorage(userRole, session.user.id);
+          
+          // Jika role di user_metadata tidak valid atau kosong, ambil dari tabel profiles
+          if (!userRole || userRole === 'user') {
+            const { data: profileData, error: profileError } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', session.user.id)
+              .single();
+            
+            if (!profileError && profileData?.role) {
+              const profileRole = profileData.role;
+              setRole(profileRole);
+              setIsAdmin(profileRole === 'admin');
+              // Perbarui role di sessionStorage
+              setAuthInfoToStorage(profileRole, session.user.id);
+            }
           }
         } else {
           setUser(null);
           setRole(null);
           setIsAdmin(false);
+          clearAuthInfoFromStorage(); // Bersihkan sessionStorage saat logout
         }
         setIsLoading(false);
       }

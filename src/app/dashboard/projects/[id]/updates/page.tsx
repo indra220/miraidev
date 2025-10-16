@@ -13,7 +13,6 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { ProjectUpdate } from '@/lib/types';
-import { ProjectChat } from '@/components/dashboard/ProjectChat';
 
 export default function ProjectUpdatesPage() {
   const { id } = useParams<{ id: string }>();
@@ -138,10 +137,7 @@ export default function ProjectUpdatesPage() {
           ))}
         </div>
       )}
-      {/* Chat Section */}
-      <div className="mt-8">
-        <ProjectChat projectId={id} />
-      </div>
+
     </div>
   );
 }
