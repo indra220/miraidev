@@ -14,9 +14,8 @@ import { Eye, EyeOff, Lock, ArrowLeft } from "lucide-react";
 
 export default function AdminLoginPage() {
   useEffect(() => {
-    document.title = "Admin Login | MiraiDev";
+    document.title = "Admin Login";
   }, []);
-
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -46,16 +45,18 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="w-full max-w-md">
-       <div className="text-center mb-8">
-        <div className="mx-auto w-16 h-16 rounded-full bg-blue-600/20 flex items-center justify-center mb-4">
-          <div className="w-10 h-10 rounded-full bg-blue-600/30 flex items-center justify-center">
-            <Lock className="w-6 h-6 text-blue-400" />
+    <>
+
+      <div className="w-full max-w-md">
+         <div className="text-center mb-8">
+          <div className="mx-auto w-16 h-16 rounded-full bg-blue-600/20 flex items-center justify-center mb-4">
+            <div className="w-10 h-10 rounded-full bg-blue-600/30 flex items-center justify-center">
+              <Lock className="w-6 h-6 text-blue-400" />
+            </div>
           </div>
+          <h1 className="text-3xl font-bold text-white">Admin Portal</h1>
+          <p className="text-gray-400 mt-2">Masuk untuk mengelola situs</p>
         </div>
-        <h1 className="text-3xl font-bold text-white">Admin Portal</h1>
-        <p className="text-gray-400 mt-2">Masuk untuk mengelola situs</p>
-      </div>
 
       <Card className="bg-white/10 backdrop-blur-md border border-gray-700 shadow-xl rounded-xl overflow-hidden">
         <CardContent className="p-6">
@@ -98,5 +99,6 @@ export default function AdminLoginPage() {
         </Button>
       </div>
     </div>
-  );
+  </>
+);
 }

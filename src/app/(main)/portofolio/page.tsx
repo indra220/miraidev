@@ -38,7 +38,7 @@ const formatPrice = (price: number | null | undefined): string => {
   
 export default function PortofolioPage() {
   useEffect(() => {
-    document.title = "Templates | MiraiDev";
+    document.title = "Portofolio | MiraiDev";
   }, []);
 
   const [activeFilter, setActiveFilter] = useState("all");
@@ -125,6 +125,7 @@ export default function PortofolioPage() {
 
   return (
     <div>
+
       <div className="relative overflow-hidden pt-16">
         <div className="container mx-auto px-4 py-24 sm:py-32 relative">
           <div className="max-w-4xl mx-auto text-center">

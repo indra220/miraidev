@@ -57,6 +57,10 @@ interface SupportReply {
 }
 
 export default function SupportDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  useEffect(() => {
+    document.title = "Detail Tiket Dukungan";
+  }, []);
+
   const { 
     alertDialogState, 
     closeAlertDialog,
@@ -75,10 +79,6 @@ export default function SupportDetailPage({ params }: { params: Promise<{ id: st
   const [editData, setEditData] = useState<Partial<SupportTicket> | null>(null);
   const [replyMessage, setReplyMessage] = useState("");
   const [replyLoading, setReplyLoading] = useState(false);
-
-  useEffect(() => {
-    document.title = "Detail Tiket Dukungan | MiraiDev";
-  }, []);
 
   useEffect(() => {
     const fetchTicketAndReplies = async () => {
@@ -383,19 +383,21 @@ export default function SupportDetailPage({ params }: { params: Promise<{ id: st
   };
 
   return (
-    <div className="space-y-6">
-      <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-white">Detail Tiket Dukungan</h1>
-            <p className="text-gray-300 mt-2">ID: {ticket.id}</p>
-          </div>
-          <Button 
-            className="mt-4 sm:mt-0 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white" 
-            onClick={handleEditToggle}
-          >
-            {isEditing ? (
-              <>
+    <>
+
+      <div className="space-y-6">
+        <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-white">Detail Tiket Dukungan</h1>
+              <p className="text-gray-300 mt-2">ID: {ticket.id}</p>
+            </div>
+            <Button 
+              className="mt-4 sm:mt-0 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white" 
+              onClick={handleEditToggle}
+            >
+              {isEditing ? (
+                <>
                 <Save className="mr-2 h-4 w-4" />
                 Simpan
               </>
@@ -716,5 +718,6 @@ export default function SupportDetailPage({ params }: { params: Promise<{ id: st
         onClose={closeAlertResult}
       />
     </div>
-  );
+  </>
+);
 }

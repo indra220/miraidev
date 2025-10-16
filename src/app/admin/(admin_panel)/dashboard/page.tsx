@@ -1,8 +1,6 @@
 "use client";
 
-"use client";
-
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { 
   FolderOpen, 
@@ -21,9 +19,8 @@ import { motion } from 'framer-motion';
 
 export default function AdminDashboard() {
   useEffect(() => {
-    document.title = "Dashboard Admin | MiraiDev";
+    document.title = "Dashboard Admin";
   }, []);
-
   const { stats: realtimeStats, recentProjects, loading, error } = useRealtimeDashboard();
   
   // State untuk filter waktu
@@ -124,27 +121,29 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="space-y-6 dashboard-content">
-      <div className="bg-gradient-to-r from-slate-800 to-slate-700 p-6 rounded-xl flex justify-between items-center shadow-lg border border-slate-600">
-        <div>
-          <h1 className="text-3xl font-bold text-white">Dashboard Admin</h1>
-          <p className="text-slate-300 mt-2">Selamat datang di panel admin MiraiDev (Real-time)</p>
+    <div>
+
+      <div className="space-y-6 dashboard-content">
+        <div className="bg-gradient-to-r from-slate-800 to-slate-700 p-6 rounded-xl flex justify-between items-center shadow-lg border border-slate-600">
+          <div>
+            <h1 className="text-3xl font-bold text-white">Dashboard Admin</h1>
+            <p className="text-slate-300 mt-2">Selamat datang di panel admin MiraiDev (Real-time)</p>
+          </div>
+          <div>
+            <ExportDashboardData 
+              data={formattedRecentProjects} 
+              fileName="dashboard-proyek-terbaru" 
+              title="Laporan Proyek Terbaru" 
+              description="Daftar proyek terbaru dari dashboard admin" 
+              columns={[
+                { key: 'title', header: 'Judul Proyek' },
+                { key: 'status', header: 'Status' },
+                { key: 'date', header: 'Tanggal' },
+                { key: 'views', header: 'Dilihat' }
+              ]} 
+            />
+          </div>
         </div>
-        <div>
-          <ExportDashboardData 
-            data={formattedRecentProjects} 
-            fileName="dashboard-proyek-terbaru" 
-            title="Laporan Proyek Terbaru" 
-            description="Daftar proyek terbaru dari dashboard admin" 
-            columns={[
-              { key: 'title', header: 'Judul Proyek' },
-              { key: 'status', header: 'Status' },
-              { key: 'date', header: 'Tanggal' },
-              { key: 'views', header: 'Dilihat' }
-            ]} 
-          />
-        </div>
-      </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
@@ -282,5 +281,6 @@ export default function AdminDashboard() {
         </div>
       </AnimatedCard>
     </div>
-  );
+  </div>
+);
 }

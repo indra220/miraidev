@@ -25,9 +25,8 @@ import { useDialog } from "@/hooks/useDialog";
 
 export default function ContactManagement() {
   useEffect(() => {
-    document.title = "Manajemen Pesan Kontak | MiraiDev";
+    document.title = "Manajemen Pesan Kontak";
   }, []);
-
   const { 
     alertDialogState, 
     showAlertDialog, 
@@ -157,11 +156,13 @@ export default function ContactManagement() {
   });
 
   return (
-    <div className="space-y-6">
-      <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
-        <h1 className="text-3xl font-bold text-white">Manajemen Pesan Kontak</h1>
-        <p className="text-gray-300 mt-2">Kelola pesan dari formulir kontak website</p>
-      </div>
+    <div>
+
+      <div className="space-y-6">
+        <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
+          <h1 className="text-3xl font-bold text-white">Manajemen Pesan Kontak</h1>
+          <p className="text-gray-300 mt-2">Kelola pesan dari formulir kontak website</p>
+        </div>
 
       {/* Filters and Search */}
       <Card className="p-4 bg-white/5 backdrop-blur-sm border border-gray-700/50">
@@ -344,5 +345,6 @@ export default function ContactManagement() {
         onClose={closeAlertResult}
       />
     </div>
-  );
+  </div>
+);
 }

@@ -35,6 +35,9 @@ export default function KontakPage() {
 
   useEffect(() => {
     document.title = "Kontak | MiraiDev";
+  }, []);
+
+  useEffect(() => {
     setIsClient(true);
     if (typeof window !== 'undefined') {
       setSearchParams(new URLSearchParams(window.location.search));

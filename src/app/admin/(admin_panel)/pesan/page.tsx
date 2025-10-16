@@ -28,6 +28,10 @@ interface Conversation {
 }
 
 export default function MessageManagement() {
+  useEffect(() => {
+    document.title = "Manajemen Pesan";
+  }, []);
+
   const router = useRouter();
   const { user, isLoading, isAdmin } = useChatAuth();
   const [isClient, setIsClient] = useState(false);
@@ -116,7 +120,6 @@ export default function MessageManagement() {
   }, [refreshData]);
 
   useEffect(() => {
-    document.title = "Manajemen Pesan | MiraiDev";
     setIsClient(true);
     
     // Ambil daftar pengguna yang memiliki percakapan
@@ -284,13 +287,15 @@ export default function MessageManagement() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
-        <div>
-          <h1 className="text-3xl font-bold text-white">Manajemen Pesan</h1>
-          <p className="text-gray-300 mt-2">Kelola percakapan dengan pengguna</p>
+    <>
+
+      <div className="space-y-6">
+        <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
+          <div>
+            <h1 className="text-3xl font-bold text-white">Manajemen Pesan</h1>
+            <p className="text-gray-300 mt-2">Kelola percakapan dengan pengguna</p>
+          </div>
         </div>
-      </div>
 
       <Card>
         <CardHeader>
@@ -408,5 +413,6 @@ export default function MessageManagement() {
         </CardContent>
       </Card>
     </div>
-  );
+  </>
+);
 }

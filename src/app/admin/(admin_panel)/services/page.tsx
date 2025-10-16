@@ -28,9 +28,8 @@ import { useDialog } from "@/hooks/useDialog";
 
 export default function ServicesManagement() {
   useEffect(() => {
-    document.title = "Manajemen Layanan | MiraiDev";
+    document.title = "Manajemen Layanan";
   }, []);
-
   const { 
     alertDialogState, 
     showAlertDialog, 
@@ -183,20 +182,22 @@ export default function ServicesManagement() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
-        <div>
-          <h1 className="text-3xl font-bold text-white">Manajemen Layanan</h1>
-          <p className="text-gray-300 mt-2">Kelola layanan yang ditawarkan oleh MiraiDev</p>
+    <>
+
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
+          <div>
+            <h1 className="text-3xl font-bold text-white">Manajemen Layanan</h1>
+            <p className="text-gray-300 mt-2">Kelola layanan yang ditawarkan oleh MiraiDev</p>
+          </div>
+          <Button 
+            className="mt-4 sm:mt-0 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-5 px-6" 
+            onClick={handleAddNew}
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Tambah Layanan
+          </Button>
         </div>
-        <Button 
-          className="mt-4 sm:mt-0 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-5 px-6" 
-          onClick={handleAddNew}
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Tambah Layanan
-        </Button>
-      </div>
 
       {/* Search Bar */}
       <Card className="p-4 bg-white/5 backdrop-blur-sm border border-gray-700/50">
@@ -291,7 +292,8 @@ export default function ServicesManagement() {
         onClose={closeAlertResult}
       />
     </div>
-  );
+  </>
+);
 }
 
 interface ServiceModalProps {

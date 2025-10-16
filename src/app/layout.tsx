@@ -5,6 +5,9 @@ import ScrollToTop from "@/components/ScrollToTop";
 import RegisterSW from "@/components/RegisterSW";
 import SessionProvider from "@/components/SessionProvider";
 
+// eslint-disable-next-line react-refresh/only-export-components
+export { metadata } from "./metadata";
+
 export default function RootLayout({
   children,
 }: Readonly<{

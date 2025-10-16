@@ -53,6 +53,7 @@ export default function TentangPage() {
 
   return (
     <div>
+
       {/* Hero Section */}
       <div className="relative overflow-hidden pt-16">
         <div className="container mx-auto px-4 py-24 sm:py-32 relative">

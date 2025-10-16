@@ -21,6 +21,10 @@ interface Conversation {
 }
 
 export default function GeneralConversationPage() {
+  useEffect(() => {
+    document.title = "Percakapan Umum";
+  }, []);
+
   const router = useRouter();
   const { user, isLoading, isAdmin } = useChatAuth();
   const [isClient, setIsClient] = useState(false);
@@ -29,7 +33,6 @@ export default function GeneralConversationPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    document.title = "Percakapan Umum | MiraiDev";
     setIsClient(true);
     
     // Ambil daftar pengguna yang memiliki percakapan
@@ -76,23 +79,25 @@ export default function GeneralConversationPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-white">Percakapan Umum</h1>
-            <p className="text-gray-300 mt-2">Kelola percakapan dengan pengguna</p>
+    <>
+
+      <div className="space-y-6">
+        <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-white">Percakapan Umum</h1>
+              <p className="text-gray-300 mt-2">Kelola percakapan dengan pengguna</p>
+            </div>
+            <Button 
+              variant="outline" 
+              onClick={() => router.back()}
+              className="border-gray-600 text-gray-300 hover:bg-gray-700/50 flex items-center"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Kembali
+            </Button>
           </div>
-          <Button 
-            variant="outline" 
-            onClick={() => router.back()}
-            className="border-gray-600 text-gray-300 hover:bg-gray-700/50 flex items-center"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Kembali
-          </Button>
         </div>
-      </div>
 
       <Card>
         <CardHeader>
@@ -167,5 +172,6 @@ export default function GeneralConversationPage() {
         </CardContent>
       </Card>
     </div>
-  );
+  </>
+);
 }

@@ -48,10 +48,6 @@ interface BrowserData {
 }
 
 export default function AnalyticsDashboard() {
-  useEffect(() => {
-    document.title = "Analitik Website | MiraiDev";
-  }, []);
-
   const [timeRange, setTimeRange] = useState<string>("7d");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -72,6 +68,10 @@ export default function AnalyticsDashboard() {
   const [browsers, setBrowsers] = useState<BrowserData[]>([]);
 
   // Fetch real analytics data
+  useEffect(() => {
+    document.title = "Analitik Website";
+  }, []);
+
   useEffect(() => {
     const fetchAnalyticsData = async () => {
       try {
@@ -196,27 +196,29 @@ export default function AnalyticsDashboard() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-white">Analitik Website</h1>
-            <p className="text-gray-300 mt-2">Statistik pengunjung dan kinerja website</p>
-          </div>
-          <div className="mt-4 md:mt-0">
-            <select
-              value={timeRange}
-              onChange={(e) => setTimeRange(e.target.value)}
-              className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-500 rounded-md px-3 py-2"
-            >
-              <option value="7d">7 Hari Terakhir</option>
-              <option value="30d">30 Hari Terakhir</option>
-              <option value="90d">90 Hari Terakhir</option>
-              <option value="1y">1 Tahun Terakhir</option>
-            </select>
+    <div>
+
+      <div className="space-y-6">
+        <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-white">Analitik Website</h1>
+              <p className="text-gray-300 mt-2">Statistik pengunjung dan kinerja website</p>
+            </div>
+            <div className="mt-4 md:mt-0">
+              <select
+                value={timeRange}
+                onChange={(e) => setTimeRange(e.target.value)}
+                className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-500 rounded-md px-3 py-2"
+              >
+                <option value="7d">7 Hari Terakhir</option>
+                <option value="30d">30 Hari Terakhir</option>
+                <option value="90d">90 Hari Terakhir</option>
+                <option value="1y">1 Tahun Terakhir</option>
+              </select>
+            </div>
           </div>
         </div>
-      </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -451,5 +453,6 @@ export default function AnalyticsDashboard() {
         </Card>
       </div>
     </div>
-  );
+  </div>
+);
 }

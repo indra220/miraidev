@@ -28,9 +28,8 @@ import Image from "next/image";
 
 export default function PortfolioManagement() {
   useEffect(() => {
-    document.title = "Manajemen Template | MiraiDev";
+    document.title = "Manajemen Template";
   }, []);
-
   const { 
     alertDialogState, 
     showAlertDialog, 
@@ -132,20 +131,22 @@ export default function PortfolioManagement() {
   );
   
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
-        <div>
-          <h1 className="text-3xl font-bold text-white">Manajemen Template</h1>
-          <p className="text-gray-300 mt-2">Kelola template yang ditampilkan di situs Anda</p>
+    <>
+
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
+          <div>
+            <h1 className="text-3xl font-bold text-white">Manajemen Template</h1>
+            <p className="text-gray-300 mt-2">Kelola template yang ditampilkan di situs Anda</p>
+          </div>
+          <Button 
+            className="mt-4 sm:mt-0 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-5 px-6" 
+            onClick={handleAddNew}
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Tambah Template
+          </Button>
         </div>
-        <Button 
-          className="mt-4 sm:mt-0 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-5 px-6" 
-          onClick={handleAddNew}
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Tambah Template
-        </Button>
-      </div>
 
       <Card className="p-4 bg-white/5 backdrop-blur-sm border border-gray-700/50">
         <div className="relative">
@@ -243,7 +244,8 @@ export default function PortfolioManagement() {
         onClose={closeAlertResult}
       />
     </div>
-  );
+  </>
+);
 }
 
 interface PortfolioModalProps {

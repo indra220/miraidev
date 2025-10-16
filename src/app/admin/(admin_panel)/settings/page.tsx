@@ -10,9 +10,8 @@ import { useState } from "react";
 
 export default function SettingsPage() {
   useEffect(() => {
-    document.title = "Pengaturan | MiraiDev";
+    document.title = "Pengaturan";
   }, []);
-
   const [settings, setSettings] = useState({
     siteName: "MiraiDev",
     siteDescription: "Solusi pengembangan website modern untuk UMKM dan profesional lokal",
@@ -48,11 +47,13 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
-        <h1 className="text-3xl font-bold text-white">Pengaturan</h1>
-        <p className="text-gray-300 mt-2">Kelola pengaturan situs web Anda</p>
-      </div>
+    <>
+
+      <div className="space-y-6">
+        <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
+          <h1 className="text-3xl font-bold text-white">Pengaturan</h1>
+          <p className="text-gray-300 mt-2">Kelola pengaturan situs web Anda</p>
+        </div>
 
       <Card className="p-6 bg-white/5 backdrop-blur-sm border border-gray-700/50">
         <div className="space-y-6">
@@ -178,5 +179,6 @@ export default function SettingsPage() {
         </div>
       </Card>
     </div>
-  );
+  </>
+);
 }

@@ -43,7 +43,7 @@ interface FormSeoSettings {
 
 export default function SeoManagement() {
   useEffect(() => {
-    document.title = "Manajemen SEO | MiraiDev";
+    document.title = "Manajemen SEO";
   }, []);
 
   const { 
@@ -152,11 +152,13 @@ export default function SeoManagement() {
   );
 
   return (
-    <div className="space-y-6">
-      <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
-        <h1 className="text-3xl font-bold text-white">Manajemen SEO</h1>
-        <p className="text-gray-300 mt-2">Atur meta tags dan optimasi SEO untuk halaman website</p>
-      </div>
+    <>
+
+      <div className="space-y-6">
+        <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
+          <h1 className="text-3xl font-bold text-white">Manajemen SEO</h1>
+          <p className="text-gray-300 mt-2">Atur meta tags dan optimasi SEO untuk halaman website</p>
+        </div>
 
       {!isEditing ? (
         <>
@@ -497,5 +499,6 @@ export default function SeoManagement() {
         onClose={closeAlertResult}
       />
     </div>
-  );
+  </>
+);
 }

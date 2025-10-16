@@ -1,7 +1,7 @@
 // src/app/auth/login/page.tsx
 "use client";
 
-import { useActionState, useState } from 'react';
+import { useActionState, useState, useEffect } from 'react';
 import { useFormStatus } from 'react-dom';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,10 @@ function SubmitButton() {
 }
 
 export default function LoginPage() {
+  useEffect(() => {
+    document.title = "Login | MiraiDev";
+  }, []);
+
   const [state, formAction] = useActionState(loginClient, initialState);
   const [showPassword, setShowPassword] = useState(false);
 

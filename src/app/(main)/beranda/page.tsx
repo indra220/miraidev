@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react"; // DIUBAH: Menambahkan useState
 import { HeroSection } from "./components/hero-section";
 import { ClientTrustSection } from "./components/client-trust";
 import { ServicesOverview } from "./components/services-overview";
@@ -5,14 +8,8 @@ import { FeaturedPortfolio } from "./components/featured-portfolio";
 import { WhyChooseUsSection } from "./components/why-choose-us";
 import { Testimonials } from "./components/testimonials";
 import { FinalCtaSection } from "./components/final-cta";
-import type { Metadata } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { PortfolioItem, ServiceItem, ContactSubmission } from "@/lib/types";
-
-// eslint-disable-next-line react-refresh/only-export-components
-export const metadata: Metadata = {
-  title: "Beranda",
-};
 
 // Fungsi untuk mengambil data portfolio dari API
 async function getPortfolioData(): Promise<PortfolioItem[]> {
@@ -100,35 +97,55 @@ async function getTestimonialsData(): Promise<ContactSubmission[]> {
   }
 }
 
-export default async function HomePage() {
-  // Ambil data real dari database
-  const portfolio = await getPortfolioData();
-  const services = await getServicesData();
-  const contactSubmissions = await getTestimonialsData();
-  
-  // Konversi contact submissions ke format testimonial
-  const testimonials = contactSubmissions.map(submission => ({
-    name: submission.name,
-    role: submission.name, // Gunakan nama sebagai role jika tidak tersedia
-    content: submission.message,
-    avatar: undefined // Avatar tidak tersedia di contact submission
-  }));
+export default function HomePage() {
+  // Mengatur judul halaman secara dinamis di sisi klien
+  useEffect(() => {
+    // Baris di bawah ini dihapus untuk menggunakan judul default dari metadata
+    // document.title = "Beranda | MiraiDev";
+
+    // Fetch data inside useEffect for client component
+    async function fetchData() {
+        const portfolioData = await getPortfolioData();
+        const servicesData = await getServicesData();
+        const testimonialsData = await getTestimonialsData();
+        
+        // Update state dengan data yang diambil
+        setPortfolio(portfolioData);
+        setServices(servicesData);
+        setTestimonials(testimonialsData.map(submission => ({
+            name: submission.name,
+            role: submission.name, // Use name as role if not available
+            content: submission.message,
+            avatar: undefined // Avatar is not available in contact submission
+        })));
+    }
+
+    fetchData();
+  }, []);
+
+  // State untuk menyimpan data
+  const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
+  const [services, setServices] = useState<ServiceItem[]>([]);
+  const [testimonials, setTestimonials] = useState<{name: string, role: string, content: string, avatar?: string}[]>([]);
 
   return (
-    <div>
-      <HeroSection />
-      
-      <ClientTrustSection />
-      
-      <ServicesOverview services={services} />
-      
-      <FeaturedPortfolio portfolio={portfolio} />
-      
-      <WhyChooseUsSection />
-      
-      <Testimonials testimonials={testimonials} />
-      
-      <FinalCtaSection />
-    </div>
+    <>
+
+      <div>
+        <HeroSection />
+        
+        <ClientTrustSection />
+        
+        <ServicesOverview services={services} />
+        
+        <FeaturedPortfolio portfolio={portfolio} />
+        
+        <WhyChooseUsSection />
+        
+        <Testimonials testimonials={testimonials} />
+        
+        <FinalCtaSection />
+      </div>
+    </>
   );
 }

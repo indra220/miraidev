@@ -28,9 +28,8 @@ import { useDialog } from "@/hooks/useDialog";
 
 export default function ClientManagement() {
   useEffect(() => {
-    document.title = "Manajemen Klien | MiraiDev";
+    document.title = "Manajemen Klien";
   }, []);
-
   const { 
     alertDialogState, 
     showAlertDialog, 
@@ -305,20 +304,22 @@ export default function ClientManagement() {
   });
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
-        <div>
-          <h1 className="text-3xl font-bold text-white">Manajemen Klien</h1>
-          <p className="text-gray-300 mt-2">Kelola akun klien dan pengguna sistem</p>
+    <div>
+
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
+          <div>
+            <h1 className="text-3xl font-bold text-white">Manajemen Klien</h1>
+            <p className="text-gray-300 mt-2">Kelola akun klien dan pengguna sistem</p>
+          </div>
+          <Button 
+            className="mt-4 sm:mt-0 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-5 px-6" 
+            onClick={handleAddNew}
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Tambah Klien
+          </Button>
         </div>
-        <Button 
-          className="mt-4 sm:mt-0 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-5 px-6" 
-          onClick={handleAddNew}
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Tambah Klien
-        </Button>
-      </div>
 
       {/* Filters and Search */}
       <Card className="p-4 bg-white/5 backdrop-blur-sm border border-gray-700/50">
@@ -473,7 +474,8 @@ export default function ClientManagement() {
         onClose={closeAlertResult}
       />
     </div>
-  );
+  </div>
+);
 }
 
 interface ClientModalProps {

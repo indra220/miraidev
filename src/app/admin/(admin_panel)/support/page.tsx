@@ -39,7 +39,7 @@ interface SupportTicket {
 
 export default function SupportManagement() {
   useEffect(() => {
-    document.title = "Manajemen Dukungan & Bantuan | MiraiDev";
+    document.title = "Manajemen Dukungan & Bantuan";
   }, []);
 
   const { 
@@ -241,11 +241,13 @@ export default function SupportManagement() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
-        <h1 className="text-3xl font-bold text-white">Manajemen Dukungan & Bantuan</h1>
-        <p className="text-gray-300 mt-2">Kelola tiket dukungan dari pengguna</p>
-      </div>
+    <>
+
+      <div className="space-y-6">
+        <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 rounded-xl">
+          <h1 className="text-3xl font-bold text-white">Manajemen Dukungan & Bantuan</h1>
+          <p className="text-gray-300 mt-2">Kelola tiket dukungan dari pengguna</p>
+        </div>
 
       {/* Filters and Search */}
       <Card className="p-4 bg-white/5 backdrop-blur-sm border border-gray-700/50">
@@ -428,5 +430,6 @@ export default function SupportManagement() {
         onClose={closeAlertResult}
       />
     </div>
-  );
+  </>
+);
 }
