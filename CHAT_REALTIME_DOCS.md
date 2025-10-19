@@ -85,3 +85,12 @@ Lihat file `TESTING.md` untuk panduan pengujian manual fitur ini.
 - Jika pesan tidak muncul secara real-time, periksa koneksi internet dan status layanan Supabase
 - Jika otentikasi gagal, pastikan konfigurasi Supabase Auth benar
 - Untuk masalah RLS, pastikan kebijakan di database sudah diterapkan dengan benar
+- Jika admin ditampilkan sebagai pengguna biasa, pastikan kolom `role` di tabel `profiles` sudah diatur dengan benar sebagai 'admin'
+
+## Catatan Penting
+- Identitas pengirim pesan (admin atau user) ditentukan berdasarkan kolom `role` di tabel `profiles`, bukan hanya dari `sender_id`
+- Pastikan peran pengguna di tabel `profiles` sudah diatur dengan benar agar sistem dapat menampilkan identitas pengirim secara akurat
+- Untuk pengguna admin, pastikan nilai `role` di tabel `profiles` diatur sebagai 'admin'
+- Tabel `chat_messages` (untuk chat proyek) memiliki kolom `sender_type` yang menyimpan tipe pengirim secara eksplisit
+- Tabel `conversation_messages` (untuk chat umum) tidak memiliki kolom `sender_type`, sehingga tipe pengirim ditentukan berdasarkan peran pengguna di tabel `profiles` saat pesan ditampilkan
+- Untuk konsistensi jangka panjang, disarankan untuk menambahkan kolom `sender_type` ke tabel `conversation_messages` agar konsisten dengan `chat_messages`

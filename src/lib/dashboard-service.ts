@@ -50,6 +50,24 @@ export interface DashboardConversation {
   lastActivity: string;
 }
 
+// Interface untuk profil pengguna
+interface Profile {
+  full_name: string | null;
+}
+
+// Interface untuk pesan chat proyek
+export interface ProjectChatMessage {
+  id: string;
+  projectId: string;
+  senderId: string;
+  senderType: 'user' | 'admin';
+  senderName?: string;
+  message: string;
+  timestamp: string;
+  isOwnMessage: boolean;
+  profiles?: Profile | null;
+}
+
 // Interface untuk data profil pengguna
 export interface DashboardProfile {
   name: string;
@@ -704,12 +722,22 @@ export const dashboardService = {
   },
 
   // Fungsi untuk mengambil pesan obrolan proyek
-  async getProjectChatMessages(projectId: string, userId: string, limit: number = 50, offset: number = 0) {
+  async getProjectChatMessages(projectId: string, userId: string, limit: number = 50, offset: number = 0): Promise<ProjectChatMessage[]> {
     const supabase = createClient();
 
     const { data, error } = await supabase
       .from('chat_messages')
-      .select('id, project_id, sender_id, sender_type, message, created_at')
+      .select(`
+        id, 
+        project_id, 
+        sender_id, 
+        sender_type, 
+        message, 
+        created_at, 
+        profiles (
+          full_name
+        )
+      `)
       .eq('project_id', projectId)
       .order('created_at', { ascending: true })
       .range(offset, offset + limit - 1); // Gunakan range untuk pagination
@@ -720,14 +748,20 @@ export const dashboardService = {
     }
 
     // Tambahkan informasi apakah pesan berasal dari user atau admin
-    return data.map((message) => ({
-      id: message.id,
-      projectId: message.project_id,
-      senderId: message.sender_id,
-      senderType: message.sender_type as 'user' | 'admin',
-      message: message.message,
-      timestamp: message.created_at,
-      isOwnMessage: message.sender_id === userId
-    }));
+    return data.map((message) => {
+      // Jika profiles adalah array (kemungkinan besar), ambil elemen pertama
+      const profile = Array.isArray(message.profiles) ? message.profiles[0] : message.profiles;
+      
+      return {
+        id: message.id.toString(), // Konversi ID ke string agar sesuai dengan tipe di ProjectChat.tsx
+        projectId: message.project_id,
+        senderId: message.sender_id,
+        senderType: message.sender_type as 'user' | 'admin',
+        senderName: profile?.full_name || 'Pengguna',
+        message: message.message,
+        timestamp: message.created_at,
+        isOwnMessage: message.sender_id === userId
+      };
+    });
   }
 };

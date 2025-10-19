@@ -13,10 +13,10 @@ export default function SocialProof() {
   ];
 
   return (
-    <div className="py-12 bg-gray-800/30">
+    <div className="py-12 bg-slate-800/30">
       <div className="container mx-auto px-4">
         <motion.h2 
-          className="text-center text-gray-400 mb-12"
+          className="text-center text-slate-400 mb-12"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -29,7 +29,7 @@ export default function SocialProof() {
           {clients.map((client, index) => (
             <motion.div
               key={client.id}
-              className="h-12 w-32 bg-gray-700 rounded flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity duration-300"
+              className="h-12 w-32 bg-slate-700 rounded flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity duration-300"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 0.7, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -40,7 +40,7 @@ export default function SocialProof() {
                 y: -5
               }}
             >
-              <span className="text-gray-400 font-medium text-sm">
+              <span className="text-slate-400 font-medium text-sm">
                 {client.name}
               </span>
             </motion.div>

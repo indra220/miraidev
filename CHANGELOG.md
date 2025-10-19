@@ -2,6 +2,67 @@
 
 All notable changes to the MiraiDev Admin Panel will be documented in this file.
 
+## [0.5.44] - 2025-10-19
+
+### Added
+- Menambahkan halaman profile pengguna di dashboard dengan tampilan detail informasi lengkap
+- Membuat halaman edit profile terpisah untuk mengedit informasi pengguna
+- Menambahkan navigasi ke halaman profile di sidebar dashboard
+
+### Changed
+- Memperbarui tampilan halaman profile agar konsisten dengan gaya dashboard lainnya
+- Mengganti input fields dengan label dan teks biasa di halaman profile utama karena fungsi edit sudah tersedia di halaman terpisah
+- Menyederhanakan struktur tampilan halaman profile dan edit agar lebih bersih dan informatif
+- Memperbarui tata letak avatar, nama, dan email di halaman profile (avatar di tengah, nama di bawah avatar, email di bawah nama)
+- Menyesuaikan warna form dan button di halaman profile dan edit agar konsisten dengan halaman lain
+
+### Fixed
+- Memperbaiki masalah sidebar ganda dengan menghapus layout profile yang tidak diperlukan
+- Menghapus duplikasi elemen dan memperbaiki tata letak informasi pengguna di halaman profile
+- Memperbaiki pengambilan data profil pengguna sesuai dengan skema database yang benar
+
+## [0.5.43] - 2025-10-17
+
+### Fixed
+- Memperbaiki ketidaksesuaian antara penghitungan pesan unread di manajemen pesan admin dan dashboard
+- Memperbaiki logika penghitungan pesan baru di dashboard untuk konsistensi dengan manajemen pesan admin
+- Memperbaiki error handling pada fungsi useRealtimeDashboard untuk sepenuhnya mencegah error kosong muncul di console
+- Mengganti pendekatan error handling untuk tidak mencatat error kosong sama sekali
+- Memperbaiki pendekatan pengecekan error untuk menghindari error ESLint
+- Memperbaiki struktur data yang dikembalikan oleh Supabase untuk menghindari type error
+- Memperbaiki error pada fungsi useRealtimeDashboard terkait dengan pengambilan data admin
+- Memperbaiki logika penghitungan pesan unread di card 'Pesan Baru' agar hanya menghitung pesan dari pengguna ke admin
+- Menyempurnakan akurasi jumlah pesan baru di dashboard admin
+
+### Added
+- Menambahkan card 'Pesan Baru' di dashboard admin untuk menampilkan jumlah total pesan yang belum dibaca
+- Menambahkan fungsi untuk menandai pesan sebagai sudah dibaca ketika admin membuka chat pengguna
+- Angka unread pada daftar pengguna di panel admin sekarang akan langsung hilang ketika admin mengklik bubble chat pengguna
+
+### Changed
+- Memperbarui dokumentasi sistem chat untuk mencakup catatan penting tentang verifikasi peran pengguna
+
+## [0.5.33] - 2025-10-17
+
+### Fixed
+- Memperbaiki masalah di mana admin ditampilkan sebagai pengguna biasa dalam sistem pesan
+- Memastikan identitas pengirim pesan (admin atau user) ditentukan berdasarkan peran di tabel profiles
+- Memperbarui logika verifikasi peran pengirim pesan di komponen realtime-chat.tsx
+- Memperbaiki asumsi awal dalam WebSocket subscription untuk chat umum agar tidak menganggap pesan dari non-user sebagai dari admin
+
+### Changed
+- Memperbarui dokumentasi sistem chat untuk mencakup catatan penting tentang verifikasi peran pengguna
+
+## [0.5.32] - 2025-10-17
+
+### Fixed
+- Memperbaiki masalah di mana admin ditampilkan sebagai pengguna biasa dalam sistem pesan
+- Memastikan identitas pengirim pesan (admin atau user) ditentukan berdasarkan peran di tabel profiles
+- Memperbarui logika verifikasi peran pengirim pesan di komponen realtime-chat.tsx
+
+### Changed
+- Memperbarui dokumentasi sistem chat untuk mencakup catatan penting tentang verifikasi peran pengguna
+
 ## [0.5.31] - 2025-10-16
 
 ### Added

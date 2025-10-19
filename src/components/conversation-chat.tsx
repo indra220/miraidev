@@ -1,3 +1,4 @@
+// src/components/conversation-chat.tsx
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -6,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Bot, Send, User, FolderOpen, X, MoreVertical } from "lucide-react";
+import { Bot, Send, User as UserIcon, FolderOpen, X, MoreVertical } from "lucide-react";
 import { useChatAuth } from "@/hooks/use-chat-auth";
 import { createBrowserClient } from "@supabase/ssr";
 import {
@@ -42,11 +43,6 @@ interface Conversation {
   updated_at: string;
 }
 
-interface User {
-  id: string;
-  name: string;
-}
-
 interface ConversationChatProps {
   isAdmin?: boolean; // Whether this is being rendered in admin panel
   userId?: string;   // For admin to specify which user's conversation to view
@@ -60,7 +56,6 @@ export default function ConversationChat({ isAdmin = false, userId }: Conversati
   const [stagedProjectId, setStagedProjectId] = useState<string | null>(null);
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [userList, setUserList] = useState<User[]>([]);
   const [contextMenu, setContextMenu] = useState<{ visible: boolean; message: Message | null; x: number; y: number }>({
     visible: false,
     message: null,
@@ -86,32 +81,20 @@ export default function ConversationChat({ isAdmin = false, userId }: Conversati
   
   // Determine if current user is the sender of a message
   const isMessageSender = (messageSenderId: string) => {
-    console.warn('isMessageSender check:', { 
-      messageSenderId, 
-      isAdmin, 
-      userId, 
-      currentUserId: user?.id,
-      result: isAdmin && userId ? messageSenderId !== userId : messageSenderId === user?.id
-    });
-    
     if (isAdmin && userId) {
       // In admin view, current user is admin, so any message not from target user is from admin
       // messageSenderId !== userId means it's from admin (current user)
       // messageSenderId === userId means it's from the target user
       const result = messageSenderId !== userId;
-      console.warn('Admin view result:', { result, messageSenderId, userId });
       return result;
     }
     // In user view, current user is the logged-in user
     const result = messageSenderId === user?.id;
-    console.warn('User view result:', { result, messageSenderId, currentUserId: user?.id });
     return result;
   };
 
   // Fetch conversation and messages
   useEffect(() => {
-    console.warn('ConversationChat useEffect triggered', { actualUserId, isAdmin });
-    
     if (!actualUserId) return;
 
     const fetchConversation = async () => {
@@ -126,7 +109,6 @@ export default function ConversationChat({ isAdmin = false, userId }: Conversati
         .single();
 
       if (error) {
-        console.error('Error fetching conversation:', error);
         // Create new conversation if it doesn't exist
         if (error.code === 'PGRST116') { // Record not found
           const { data: newConv, error: createError } = await supabase
@@ -156,7 +138,6 @@ export default function ConversationChat({ isAdmin = false, userId }: Conversati
         conversationCache.current[conv.id] = conv;
         setConversation(conv);
         
-        // Cek apakah pesan sudah di-cache
         // Fetch messages for this conversation (batasi jumlah pesan untuk performa)
         const { data: messagesData, error: messagesError } = await supabase
           .from('conversation_messages')
@@ -203,65 +184,16 @@ export default function ConversationChat({ isAdmin = false, userId }: Conversati
             }
           }
           
-          // Buat daftar pengguna dengan nama dari cache
-          const userNames = uniqueSenderIds.map(id => ({
-            id,
-            name: userCache.current[id] || 'Pengguna'
-          }));
-          
-          setUserList(userNames);
-          
           // Jika ini adalah admin yang membuka percakapan, tandai pesan sebagai telah dibaca
           if (isAdmin && actualUserId && messagesData.length > 0) {
-            console.warn('Admin opening conversation, checking for unread messages...', { 
-              isAdmin, 
-              actualUserId, 
-              totalMessages: messagesData.length,
-              // Tampilkan detail pesan untuk debugging
-              messages: messagesData.map(m => ({
-                id: m.id,
-                sender_id: m.sender_id,
-                read_status: m.read_status,
-                created_at: m.created_at
-              }))
-            });
-            
             // Temukan pesan-pesan yang belum dibaca dari user (bukan dari admin)
             const unreadMessages = messagesData.filter(
-              msg => {
-                // Log detail setiap pesan untuk debugging
-                // Ketika admin membuka chat pengguna:
-                // - actualUserId adalah ID pengguna yang sedang dilihat chat-nya
-                // - Pesan dari pengguna tersebut (sender_id === actualUserId) adalah pesan dari user
-                // - Pesan dari admin (sender_id !== actualUserId) adalah pesan dari admin
-                const isFromUser = msg.sender_id === actualUserId;
-                const isUnread = !msg.read_status;
-                console.warn('Checking message:', { 
-                  id: msg.id, 
-                  sender_id: msg.sender_id, 
-                  actualUserId, 
-                  isFromUser, 
-                  read_status: msg.read_status, 
-                  isUnread,
-                  // Tambahkan informasi tambahan untuk debugging
-                  senderMatchesUser: msg.sender_id === actualUserId,
-                  senderNotMatchesUser: msg.sender_id !== actualUserId
-                });
-                return isFromUser && isUnread;
-              }
+              msg => msg.sender_id === actualUserId && !msg.read_status
             );
             
-            console.warn('Unread messages found:', unreadMessages.length);
             if (unreadMessages.length > 0) {
-              console.warn('Unread messages details:', unreadMessages.map(m => ({
-                id: m.id,
-                sender_id: m.sender_id,
-                read_status: m.read_status
-              })));
-              
               // Update status read untuk semua pesan yang belum dibaca
               const messageIds = unreadMessages.map(msg => msg.id);
-              console.warn('Updating read status for message IDs:', messageIds);
               
               const { error: updateError } = await supabase
                 .from('conversation_messages')
@@ -271,8 +203,6 @@ export default function ConversationChat({ isAdmin = false, userId }: Conversati
               if (updateError) {
                 console.error('Error updating read status:', updateError);
               } else {
-                console.warn('Successfully updated read status for messages:', messageIds);
-                
                 // Update status di state lokal juga
                 setMessages(prev => 
                   prev.map(msg => 
@@ -282,15 +212,6 @@ export default function ConversationChat({ isAdmin = false, userId }: Conversati
                   )
                 );
               }
-            } else {
-              console.warn('No unread messages to update');
-              // Log semua pesan untuk melihat status mereka
-              console.warn('All messages status:', messagesData.map(m => ({
-                id: m.id,
-                sender_id: m.sender_id,
-                read_status: m.read_status,
-                senderMatchesUser: m.sender_id === actualUserId
-              })));
             }
           }
         }
@@ -482,17 +403,11 @@ export default function ConversationChat({ isAdmin = false, userId }: Conversati
   // Set up realtime listener for conversation messages
   useEffect(() => {
     if (!conversation) {
-      console.warn('Skipping conversation chat listener setup - no conversation');
       return;
     }
 
-    let isSubscribed = true;
-    const channelName = `conversation-${conversation.id}`;
-    console.warn('Setting up conversation chat listener', { channelName, conversationId: conversation.id });
-
-    // Subscribe to changes in conversation_messages table
     const channel = supabase
-      .channel(channelName)
+      .channel(`conversation-${conversation.id}`)
       .on(
         "postgres_changes",
         {
@@ -502,89 +417,42 @@ export default function ConversationChat({ isAdmin = false, userId }: Conversati
           filter: `conversation_id=eq.${conversation.id}`,
         },
         async (payload) => {
-          if (!isSubscribed) {
-            console.warn('Ignoring message event, component unsubscribed', { eventType: payload.eventType });
-            return;
-          }
-          
-          console.warn('Received conversation message event', { 
-            eventType: payload.eventType, 
-            channelId: channelName,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            payloadId: (payload.new as any)?.id || (payload.old as any)?.id
-          });
-          
           if (payload.eventType === "INSERT") {
-            // Add the new message to the list
-            const newMessage = {
-              id: payload.new.id,
-              conversation_id: payload.new.conversation_id,
-              sender_id: payload.new.sender_id,
-              message: payload.new.message,
-              linked_project_id: payload.new.linked_project_id,
-              read_status: payload.new.read_status,
-              created_at: payload.new.created_at
-            };
-            
-            setMessages((prev) => [...prev, newMessage]);
-            
-            // Check if sender is already in user list
-            const senderExists = userList.some(u => u.id === payload.new.sender_id);
-            if (!senderExists) {
-              // Fetch the user's name and add to user list
-              const { data, error } = await supabase
-                .from('profiles')
-                .select('full_name')
-                .eq('id', payload.new.sender_id)
-                .single();
-              
-              if (!isSubscribed) return;
-              
+            const newMessage = payload.new as Message;
+            if (!userCache.current[newMessage.sender_id]) {
+              const { data, error } = await supabase.from('profiles').select('full_name').eq('id', newMessage.sender_id).single();
               if (!error && data) {
-                // Simpan ke cache juga
-                userCache.current[payload.new.sender_id] = data.full_name || 'Pengguna';
-                
-                setUserList(prev => [
-                  ...prev,
-                  { id: payload.new.sender_id, name: data.full_name || 'Pengguna' }
-                ]);
-              } else {
-                setUserList(prev => [
-                  ...prev,
-                  { id: payload.new.sender_id, name: 'Pengguna' }
-                ]);
+                userCache.current[newMessage.sender_id] = data.full_name || 'Pengguna';
               }
             }
+            setMessages((prev) => [...prev, newMessage]);
           } else if (payload.eventType === "UPDATE") {
-            setMessages((prev) =>
-              prev.map((msg) => (msg.id === payload.new.id ? payload.new as Message : msg))
-            );
+            setMessages((prev) => prev.map((msg) => (msg.id === payload.new.id ? (payload.new as Message) : msg)));
           } else if (payload.eventType === "DELETE") {
-            setMessages((prev) => prev.filter(msg => msg.id !== payload.old.id));
+            setMessages((prev) => prev.filter((msg) => msg.id !== (payload.old as { id: string }).id));
           }
         }
       )
       .subscribe();
 
-    // Update connection status
     setIsConnected(true);
 
-    // Cleanup function
     return () => {
-      console.warn('Cleaning up conversation chat listener', { conversationId: conversation?.id });
-      isSubscribed = false;
       supabase.removeChannel(channel);
       setIsConnected(false);
-      console.warn('Finished cleaning up conversation chat listener');
     };
-  }, [conversation, supabase, userList]);
+  }, [conversation, supabase]);
 
-  // Scroll to bottom when new messages arrive
+  // Scroll to bottom when new messages arrive or loading finishes
   useEffect(() => {
     if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+        setTimeout(() => {
+            if (scrollAreaRef.current) {
+                scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+            }
+        }, 100);
     }
-  }, [messages]);
+  }, [messages, isLoading]);
 
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !conversation || !user) return;
@@ -651,7 +519,7 @@ export default function ConversationChat({ isAdmin = false, userId }: Conversati
   }
 
   return (
-    <div className="flex h-full w-full max-w-6xl mx-auto">
+    <div className="flex flex-col lg:flex-row h-full w-full max-w-5xl mx-auto gap-4">
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col border rounded-lg overflow-hidden">
         <Card className="flex-1 flex flex-col">
@@ -671,7 +539,7 @@ export default function ConversationChat({ isAdmin = false, userId }: Conversati
                 <p>Belum ada pesan. Kirim pesan pertama Anda!</p>
               </div>
             ) : (
-              <ScrollArea ref={scrollAreaRef} className="h-[500px] w-full p-4">
+              <ScrollArea viewportRef={scrollAreaRef} className="h-[350px] w-full p-4">
                 <div className="space-y-4">
                   {messages.map((message) => (
                     <div
@@ -696,7 +564,7 @@ export default function ConversationChat({ isAdmin = false, userId }: Conversati
                           <Avatar className="w-6 h-6">
                             <AvatarFallback className="text-xs">
                               {isMessageSender(message.sender_id) ? (
-                                <User className="w-3 h-3" />
+                                <UserIcon className="w-3 h-3" />
                               ) : (
                                 <Bot className="w-3 h-3" />
                               )}
@@ -705,17 +573,15 @@ export default function ConversationChat({ isAdmin = false, userId }: Conversati
                           <span className="text-xs font-medium">
                             {(() => {
                               const isSender = isMessageSender(message.sender_id);
-                              const displayName = isSender ? 
-                                (isAdmin ? "Admin" : "Anda") : 
-                                (userList.find(u => u.id === message.sender_id)?.name || "Pengguna");
-                              console.warn('Display name calculation:', { 
-                                messageId: message.id,
-                                senderId: message.sender_id,
-                                isSender,
-                                isAdmin,
-                                displayName
-                              });
-                              return displayName;
+                              if (isSender) {
+                                return isAdmin ? "Admin" : "Anda";
+                              } else {
+                                if (isAdmin) {
+                                  return userCache.current[message.sender_id] || "Pengguna";
+                                } else {
+                                  return "Admin";
+                                }
+                              }
                             })()}
                           </span>
                           {isMessageSender(message.sender_id) && (
@@ -857,7 +723,7 @@ export default function ConversationChat({ isAdmin = false, userId }: Conversati
 
       {/* Projects Sidebar (for user) */}
       {!isAdmin && projects.length > 0 && (
-        <div className="w-64 ml-4 flex flex-col border rounded-lg overflow-hidden">
+        <div className="w-full lg:w-56 lg:flex-shrink-0 flex flex-col border rounded-lg overflow-hidden">
           <Card className="flex-1 flex flex-col">
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2">
@@ -887,7 +753,7 @@ export default function ConversationChat({ isAdmin = false, userId }: Conversati
 
       {/* Projects Sidebar (for admin) */}
       {isAdmin && projects.length > 0 && (
-        <div className="w-64 ml-4 flex flex-col border rounded-lg overflow-hidden">
+        <div className="w-full lg:w-56 lg:flex-shrink-0 flex flex-col border rounded-lg overflow-hidden">
           <Card className="flex-1 flex flex-col">
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2">

@@ -1,3 +1,4 @@
+// src/components/project-conversation-chat.tsx
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -251,12 +252,16 @@ export default function ProjectConversationChat({ projectId, isAdmin = false, us
     };
   }, [conversation, supabase, projectId, userList]);
 
-  // Scroll to bottom when new messages arrive
+  // Scroll to bottom when new messages arrive or loading finishes
   useEffect(() => {
     if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+        setTimeout(() => {
+            if (scrollAreaRef.current) {
+                scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+            }
+        }, 100);
     }
-  }, [messages]);
+  }, [messages, isLoading]);
 
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !conversation || !user) return;
@@ -336,7 +341,7 @@ export default function ProjectConversationChat({ projectId, isAdmin = false, us
             <p>Belum ada pesan untuk proyek ini. Kirim pesan pertama Anda!</p>
           </div>
         ) : (
-          <ScrollArea ref={scrollAreaRef} className="h-[300px] w-full p-4">
+          <ScrollArea viewportRef={scrollAreaRef} className="h-[300px] w-full p-4">
             <div className="space-y-4">
               {messages.map((message) => (
                 <div

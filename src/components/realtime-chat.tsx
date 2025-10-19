@@ -58,7 +58,7 @@ export default function RealtimeChat({ projectId }: RealtimeChatProps) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [stagedProjectId, setStagedProjectId] = useState<string | null>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const { user } = useChatAuth();
+  const { user, isAdmin } = useChatAuth();
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -83,7 +83,7 @@ export default function RealtimeChat({ projectId }: RealtimeChatProps) {
             message,
             created_at,
             read_status,
-            profiles!sender_id (full_name)
+            profiles!sender_id (full_name, role)
           `)
           .eq("project_id", projectId)
           .order("created_at", { ascending: true })
@@ -106,7 +106,7 @@ export default function RealtimeChat({ projectId }: RealtimeChatProps) {
               linked_project_id,
               created_at,
               read_status,
-              profiles!sender_id (full_name)
+              profiles!sender_id (full_name, role)
             `)
             .eq("conversation_id", convData.id)
             .order("created_at", { ascending: true })
@@ -123,10 +123,22 @@ export default function RealtimeChat({ projectId }: RealtimeChatProps) {
           // Transform data to include sender_name and normalize structure
           const messagesWithNames = data.map((msg) => {
             const profile = Array.isArray(msg.profiles) ? msg.profiles[0] : msg.profiles;
+            
+            // Determine sender_type based on available fields and user role
+            let determinedSenderType: "user" | "admin";
+            
+            if ('sender_type' in msg) {
+              // For project-specific chat, use sender_type from database
+              determinedSenderType = msg.sender_type;
+            } else {
+              // For general conversation, determine based on user's role in profiles table
+              determinedSenderType = profile?.role === 'admin' ? 'admin' : 'user';
+            }
+            
             return {
               id: msg.id,
               sender_id: msg.sender_id,
-              sender_type: (msg.sender_id === user.id ? "user" : "admin") as "user" | "admin", // Simplified for general chat
+              sender_type: determinedSenderType,
               message: msg.message,
               linked_project_id: 'linked_project_id' in msg ? msg.linked_project_id : undefined,
               created_at: msg.created_at,
@@ -198,11 +210,11 @@ export default function RealtimeChat({ projectId }: RealtimeChatProps) {
               
               setMessages((prev) => [...prev, messageWithSenderName]);
               
-              // Fetch sender name separately to avoid blocking the UI
-              // We'll update the message with the correct name after fetching
+              // Fetch sender name and role separately to avoid blocking the UI
+              // We'll update the message with the correct name and type after fetching
               supabase
                 .from('profiles')
-                .select('full_name')
+                .select('full_name, role')
                 .eq('id', payload.new.sender_id)
                 .single()
                 .then(({ data, error }) => {
@@ -210,24 +222,76 @@ export default function RealtimeChat({ projectId }: RealtimeChatProps) {
                     setMessages(prev => 
                       prev.map(msg => 
                         msg.id === payload.new.id 
-                          ? { ...msg, sender_name: data.full_name || 'Pengguna' } 
+                          ? { 
+                              ...msg, 
+                              sender_type: data.role === 'admin' ? 'admin' : 'user',
+                              sender_name: data.full_name || 'Pengguna' 
+                            } 
                           : msg
                       )
                     );
                   } else {
-                    // If we can't get the name, update with default
-                    setMessages(prev => 
-                      prev.map(msg => 
-                        msg.id === payload.new.id 
-                          ? { ...msg, sender_name: 'Pengguna' } 
-                          : msg
-                      )
-                    );
+                    // If we can't get the profile with full details, fetch the role separately to determine sender_type
+                    supabase
+                      .from('profiles')
+                      .select('role')
+                      .eq('id', payload.new.sender_id)
+                      .single()
+                      .then(({ data: roleData, error: roleError }) => {
+                        if (!roleError && roleData) {
+                          // Update the message with correct sender_type based on role
+                          setMessages(prev => 
+                            prev.map(msg => 
+                              msg.id === payload.new.id 
+                                ? { 
+                                    ...msg, 
+                                    sender_type: roleData.role === 'admin' ? 'admin' : 'user',
+                                    sender_name: 'Pengguna' 
+                                  } 
+                                : msg
+                            )
+                          );
+                        } else {
+                          // If we still can't determine the role, keep the original sender_type from payload
+                          setMessages(prev => 
+                            prev.map(msg => 
+                              msg.id === payload.new.id 
+                                ? { ...msg, sender_name: 'Pengguna' } 
+                                : msg
+                            )
+                          );
+                        }
+                      });
                   }
                 });
             } else if (payload.eventType === "UPDATE") {
+              // For updates, we also need to verify the sender's role if needed
+              const updatedMessage = payload.new as Message;
+              
+              // Check if we need to fetch the sender's role (for cases where sender_type might be incorrect)
+              if (!('sender_type' in updatedMessage) || updatedMessage.sender_type === 'admin' && updatedMessage.sender_id !== user?.id) {
+                // Fetch the sender's role to confirm if it's actually an admin
+                supabase
+                  .from('profiles')
+                  .select('role')
+                  .eq('id', updatedMessage.sender_id)
+                  .single()
+                  .then(({ data, error }) => {
+                    if (!error && data) {
+                      // Update the message with correct sender_type
+                      setMessages(prev => 
+                        prev.map(msg => 
+                          msg.id === updatedMessage.id 
+                            ? { ...msg, sender_type: data.role === 'admin' ? 'admin' : 'user' } 
+                            : msg
+                        )
+                      );
+                    }
+                  });
+              }
+              
               setMessages((prev) =>
-                prev.map((msg) => (msg.id === payload.new.id ? payload.new as Message : msg))
+                prev.map((msg) => (msg.id === updatedMessage.id ? updatedMessage : msg))
               );
             } else if (payload.eventType === "DELETE") {
               setMessages((prev) => prev.filter(msg => msg.id !== payload.old.id));
@@ -262,11 +326,13 @@ export default function RealtimeChat({ projectId }: RealtimeChatProps) {
                 },
                 (payload) => {
                   if (payload.eventType === "INSERT") {
-                    // For new messages, we'll add them with a temporary sender name
+                    // For new messages, we'll add them with a temporary sender name and type
+                    // The actual role will be fetched separately if needed
                     const messageWithSenderName: Message = {
                       id: payload.new.id,
                       sender_id: payload.new.sender_id,
-                      sender_type: (payload.new.sender_id === user.id ? "user" : "admin") as "user" | "admin", // Simplified for general chat
+                      // Initially set sender_type based on sender_id, will update after role fetch
+                      sender_type: payload.new.sender_id === user.id ? "user" : "user", // Default to "user" temporarily until we fetch the actual role
                       message: payload.new.message,
                       linked_project_id: payload.new.linked_project_id,
                       created_at: payload.new.created_at,
@@ -276,35 +342,92 @@ export default function RealtimeChat({ projectId }: RealtimeChatProps) {
                     
                     setMessages((prev) => [...prev, messageWithSenderName]);
                     
-                    // Fetch sender name separately to avoid blocking the UI
+                    // Fetch sender's role and name separately to avoid blocking the UI
                     supabase
                       .from('profiles')
-                      .select('full_name')
+                      .select('full_name, role')
                       .eq('id', payload.new.sender_id)
                       .single()
                       .then(({ data, error }) => {
                         if (!error && data) {
+                          // Update the message with correct sender_type and name
                           setMessages(prev => 
                             prev.map(msg => 
                               msg.id === payload.new.id 
-                                ? { ...msg, sender_name: data.full_name || 'Pengguna' } 
+                                ? { 
+                                    ...msg, 
+                                    sender_type: data.role === 'admin' ? 'admin' : 'user',
+                                    sender_name: data.full_name || 'Pengguna' 
+                                  } 
                                 : msg
                             )
                           );
                         } else {
-                          // If we can't get the name, update with default
-                          setMessages(prev => 
-                            prev.map(msg => 
-                              msg.id === payload.new.id 
-                                ? { ...msg, sender_name: 'Pengguna' } 
-                                : msg
-                            )
-                          );
+                          // If we can't get the profile, fetch the role separately to determine sender_type
+                          supabase
+                            .from('profiles')
+                            .select('role')
+                            .eq('id', payload.new.sender_id)
+                            .single()
+                            .then(({ data: roleData, error: roleError }) => {
+                              if (!roleError && roleData) {
+                                // Update the message with correct sender_type based on role
+                                setMessages(prev => 
+                                  prev.map(msg => 
+                                    msg.id === payload.new.id 
+                                      ? { 
+                                          ...msg, 
+                                          sender_type: roleData.role === 'admin' ? 'admin' : 'user',
+                                          sender_name: payload.new.sender_id === user.id ? 'Anda' : 'Pengguna' 
+                                        } 
+                                      : msg
+                                  )
+                                );
+                              } else {
+                                // If we still can't determine the role, default to user
+                                setMessages(prev => 
+                                  prev.map(msg => 
+                                    msg.id === payload.new.id 
+                                      ? { 
+                                          ...msg, 
+                                          sender_type: payload.new.sender_id === user.id ? 'user' : 'user',
+                                          sender_name: payload.new.sender_id === user.id ? 'Anda' : 'Pengguna' 
+                                        } 
+                                      : msg
+                                  )
+                                );
+                              }
+                            });
                         }
                       });
                   } else if (payload.eventType === "UPDATE") {
+                    // For updates, we also need to verify the sender's role if it's not already known
+                    const updatedMessage = payload.new as Message;
+                    
+                    // Check if we need to fetch the sender's role (for cases where sender_type might be incorrect)
+                    if (!('sender_type' in updatedMessage) || updatedMessage.sender_type === 'admin' && updatedMessage.sender_id !== user?.id) {
+                      // Fetch the sender's role to confirm if it's actually an admin
+                      supabase
+                        .from('profiles')
+                        .select('role')
+                        .eq('id', updatedMessage.sender_id)
+                        .single()
+                        .then(({ data, error }) => {
+                          if (!error && data) {
+                            // Update the message with correct sender_type
+                            setMessages(prev => 
+                              prev.map(msg => 
+                                msg.id === updatedMessage.id 
+                                  ? { ...msg, sender_type: data.role === 'admin' ? 'admin' : 'user' } 
+                                  : msg
+                              )
+                            );
+                          }
+                        });
+                    }
+                    
                     setMessages((prev) =>
-                      prev.map((msg) => (msg.id === payload.new.id ? payload.new as Message : msg))
+                      prev.map((msg) => (msg.id === updatedMessage.id ? updatedMessage : msg))
                     );
                   } else if (payload.eventType === "DELETE") {
                     setMessages((prev) => prev.filter(msg => msg.id !== payload.old.id));
@@ -345,7 +468,7 @@ export default function RealtimeChat({ projectId }: RealtimeChatProps) {
       const messageData = {
         project_id: projectId,
         sender_id: user.id,
-        sender_type: "user" as const,
+        sender_type: isAdmin ? "admin" as const : "user" as const, // Tipe pengirim berdasarkan peran pengguna
         message: newMessage.trim(),
         read_status: false,
       };
@@ -384,6 +507,7 @@ export default function RealtimeChat({ projectId }: RealtimeChatProps) {
       const messageData = {
         conversation_id: convData.id,
         sender_id: user.id,
+        sender_type: isAdmin ? "admin" as const : "user" as const, // Tipe pengirim berdasarkan peran pengguna
         message: newMessage.trim(),
         linked_project_id: stagedProjectId || null,
         read_status: false,
@@ -405,7 +529,7 @@ export default function RealtimeChat({ projectId }: RealtimeChatProps) {
       const normalizedMessage: Message = {
         id: data.id,
         sender_id: data.sender_id,
-        sender_type: "user",
+        sender_type: data.sender_type, // Gunakan tipe pengirim dari data asli
         message: data.message,
         linked_project_id: data.linked_project_id,
         created_at: data.created_at,
@@ -458,7 +582,7 @@ export default function RealtimeChat({ projectId }: RealtimeChatProps) {
               message,
               created_at,
               read_status,
-              profiles!sender_id (full_name)
+              profiles!sender_id (full_name, role)
             `)
             .eq('id', messageId)
             .single();
@@ -476,7 +600,7 @@ export default function RealtimeChat({ projectId }: RealtimeChatProps) {
               linked_project_id,
               created_at,
               read_status,
-              profiles!sender_id (full_name)
+              profiles!sender_id (full_name, role)
             `)
             .eq('id', messageId)
             .single();
@@ -490,11 +614,13 @@ export default function RealtimeChat({ projectId }: RealtimeChatProps) {
           let messageWithSenderName;
           
           if (projectId) {
-            // For project-specific chat
+            // For project-specific chat - type assertion for project messages
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const projectMessage = restoredMessage as any;
             messageWithSenderName = {
               id: restoredMessage.id,
               sender_id: restoredMessage.sender_id,
-              sender_type: (restoredMessage.sender_id === user.id ? "user" : "admin") as "user" | "admin",
+              sender_type: projectMessage.sender_type, // Safe to assume sender_type exists for project messages
               message: restoredMessage.message,
               created_at: restoredMessage.created_at,
               read_status: restoredMessage.read_status,
@@ -502,13 +628,17 @@ export default function RealtimeChat({ projectId }: RealtimeChatProps) {
             };
           } else {
             // For general conversation
+            // Determine sender_type based on user's role in profiles table
+            const senderType: "user" | "admin" = profile?.role === 'admin' ? 'admin' : 'user';
+            
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const conversationMessage = restoredMessage as any;
             messageWithSenderName = {
               id: restoredMessage.id,
               sender_id: restoredMessage.sender_id,
-              sender_type: (restoredMessage.sender_id === user.id ? "user" : "admin") as "user" | "admin",
+              sender_type: senderType,
               message: restoredMessage.message,
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              linked_project_id: (restoredMessage as any).linked_project_id,
+              linked_project_id: conversationMessage.linked_project_id,
               created_at: restoredMessage.created_at,
               read_status: restoredMessage.read_status,
               sender_name: profile?.full_name || 'Pengguna'

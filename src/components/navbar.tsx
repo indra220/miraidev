@@ -15,10 +15,10 @@ import dynamic from "next/dynamic";
 import { createClient } from "@/lib/supabase/client";
 import { isAdmin, getCurrentUser } from "@/lib/auth-service";
 import { Session } from "@/types/dashboard";
-import Image from "next/image"; // Import Image component
+import Image from "next/image";
 
 const GlobalSearch = dynamic(() => import("@/components/GlobalSearch"), {
-  loading: () => <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">...</div>,
+  loading: () => <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center">...</div>,
   ssr: false
 });
 
@@ -165,7 +165,7 @@ export function Navbar() {
                 height={64}
                 priority
               />
-              <span className="text-xl font-bold">MiraiDev</span>
+              <span className="text-xl font-bold text-white">MiraiDev</span>
             </div>
           </Link>
         </div>
@@ -174,7 +174,7 @@ export function Navbar() {
           <button
             ref={openMenuButtonRef}
             type="button"
-            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             onClick={() => setMobileMenuOpen(true)}
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-menu"
@@ -244,7 +244,7 @@ export function Navbar() {
           {isAdminPage ? (
             <button
               onClick={handleLogout}
-              className="border border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-sm font-semibold flex items-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+              className="border border-slate-600 text-white hover:bg-slate-800 py-2 px-4 rounded-md text-sm font-semibold flex items-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900"
             >
               <LogOut className="mr-2 h-4 w-4" />
               Keluar
@@ -252,7 +252,7 @@ export function Navbar() {
           ) : (
             isAuthenticated === null ? (
               <div className="flex items-center gap-x-4">
-                <Button variant="outline" className="border border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-sm font-semibold" disabled>
+                <Button variant="outline" className="border border-slate-600 text-white hover:bg-slate-800 py-2 px-4 rounded-md text-sm font-semibold" disabled>
                   Memuat...
                 </Button>
               </div>
@@ -262,7 +262,7 @@ export function Navbar() {
                   <div>
                     <button
                       type="button"
-                      className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-gray-800 px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-700 hover:bg-gray-700"
+                      className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-slate-700 hover:bg-slate-700"
                       id="user-menu"
                       aria-expanded="false"
                       aria-haspopup="true"
@@ -279,40 +279,25 @@ export function Navbar() {
                   
                   <div 
                     id="user-menu-items"
-                    className="hidden absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-gray-800 shadow-lg ring-1 ring-gray-700 focus:outline-none"
+                    className="hidden absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-slate-800 shadow-lg ring-1 ring-slate-700 focus:outline-none"
                     role="menu"
                     aria-orientation="vertical"
                     aria-labelledby="user-menu"
                     tabIndex={-1}
                   >
                     <div className="py-1 px-4" role="none">
-                      <div className="flex flex-col space-y-1 pb-2 border-b border-gray-700">
+                      <div className="flex flex-col space-y-1 pb-2 border-b border-slate-700">
                         <p className="text-sm font-medium leading-none text-white">
                           {currentUser?.email || "Nama Pengguna"}
                         </p>
-                        <p className="text-xs leading-none text-gray-400">
+                        <p className="text-xs leading-none text-slate-400">
                           {isAdminUser ? "Admin" : "Klien"}
                         </p>
                       </div>
                     </div>
                     
                     <div className="py-1" role="none">
-                      <Link href="/dashboard/account" className="block px-4 py-2 text-sm text-white hover:bg-gray-700" role="menuitem">
-                        <div className="flex items-center">
-                          <User className="mr-2 h-4 w-4" />
-                          <span>Profil</span>
-                        </div>
-                      </Link>
-                      <Link href="/dashboard/account" className="block px-4 py-2 text-sm text-white hover:bg-gray-700" role="menuitem">
-                        <div className="flex items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.7l-.15.09a2 2 0 0 0-.73 2.72l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.73v-.5a2 2 0 0 1 1-1.7l.15-.09a2 2 0 0 0 .73-2.72l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-                            <circle cx="12" cy="12" r="3" />
-                          </svg>
-                          <span>Pengaturan</span>
-                        </div>
-                      </Link>
-                      <Link href="/dashboard" className="block px-4 py-2 text-sm text-white hover:bg-gray-700" role="menuitem">
+                      <Link href="/dashboard" className="block px-4 py-2 text-sm text-white hover:bg-slate-700" role="menuitem">
                         <div className="flex items-center">
                           <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <rect width="7" height="9" x="3" y="3" rx="1" />
@@ -323,11 +308,24 @@ export function Navbar() {
                           <span>Dashboard</span>
                         </div>
                       </Link>
+                      <Link href="/dashboard/account" className="block px-4 py-2 text-sm text-white hover:bg-slate-700" role="menuitem">
+                        <div className="flex items-center">
+                          <User className="mr-2 h-4 w-4" />
+                          <span>Profil</span>
+                        </div>
+                      </Link>
+                      <Link href="/dashboard/account" className="block px-4 py-2 text-sm text-white hover:bg-slate-700" role="menuitem">
+                        <div className="flex items-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.7l-.15.09a2 2 0 0 0-.73 2.72l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.73v-.5a2 2 0 0 1 1-1.7l.15-.09a2 2 0 0 0 .73-2.72l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                            <circle cx="12" cy="12" r="3" />
+                          </svg>
+                          <span>Pengaturan</span>
+                        </div>
+                      </Link>
                     </div>
                     
-                    
-                    
-                    <div className="py-1 border-t border-gray-700" role="none">
+                    <div className="py-1 border-t border-slate-700" role="none">
                       <button
                         onClick={async () => {
                           const supabase = createClient();
@@ -336,7 +334,7 @@ export function Navbar() {
                           setIsAdminUser(false);
                           window.location.href = '/';
                         }}
-                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700"
+                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-slate-700"
                         role="menuitem"
                       >
                         <div className="flex items-center">
@@ -351,12 +349,12 @@ export function Navbar() {
             ) : (
               <div className="flex items-center gap-x-4">
                 <Link href="/auth/login">
-                  <Button variant="outline" className="border border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-sm font-semibold">
+                  <Button variant="outline" className="border border-slate-600 text-white hover:bg-slate-800 py-2 px-4 rounded-md text-sm font-semibold">
                     Masuk
                   </Button>
                 </Link>
                 <Link href="/kontak">
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-sm font-semibold flex items-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900">
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-sm font-semibold flex items-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900">
                     Get Started
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -377,7 +375,7 @@ export function Navbar() {
         tabIndex={-1}
       >
         <div className="fixed inset-0 z-50"></div>
-        <div className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-gray-900 px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
+        <div className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-slate-900 px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-slate-900/10">
           <div className="flex items-center justify-between">
             <Link href={isAdminPage ? "/admin/dashboard" : "/"} className="-m-1.5 p-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md">
               <span className="sr-only">MiraiDev</span>
@@ -388,12 +386,12 @@ export function Navbar() {
                   width={64}
                   height={64}
                 />
-                <span className="text-xl font-bold">MiraiDev</span>
+                <span className="text-xl font-bold text-white">MiraiDev</span>
               </div>
             </Link>
             <button
               type="button"
-              className="-m-2.5 rounded-md p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="-m-2.5 rounded-md p-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               onClick={() => setMobileMenuOpen(false)}
             >
               <span className="sr-only">Tutup menu</span>
@@ -402,7 +400,7 @@ export function Navbar() {
           </div>
           
           <div className="mt-6 flow-root">
-            <div className="-my-6 divide-y divide-gray-500/10">
+            <div className="-my-6 divide-y divide-slate-500/10">
               <div className="space-y-2 py-6">
                 {isAdminPage ? (
                   <>
@@ -411,7 +409,7 @@ export function Navbar() {
                       className={`-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                         pathname === "/admin/dashboard"
                           ? "text-blue-400"
-                          : "text-white hover:bg-gray-800"
+                          : "text-white hover:bg-slate-800"
                       }`}
                       aria-current={pathname === "/admin/dashboard" ? "page" : undefined}
                       onClick={() => setMobileMenuOpen(false)}
@@ -423,7 +421,7 @@ export function Navbar() {
                       className={`-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                         pathname === "/admin/portfolio"
                           ? "text-blue-400"
-                          : "text-white hover:bg-gray-800"
+                          : "text-white hover:bg-slate-800"
                       }`}
                       aria-current={pathname === "/admin/portfolio" ? "page" : undefined}
                       onClick={() => setMobileMenuOpen(false)}
@@ -435,7 +433,7 @@ export function Navbar() {
                       className={`-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                         pathname === "/admin/settings"
                           ? "text-blue-400"
-                          : "text-white hover:bg-gray-800"
+                          : "text-white hover:bg-slate-800"
                       }`}
                       aria-current={pathname === "/admin/settings" ? "page" : undefined}
                       onClick={() => setMobileMenuOpen(false)}
@@ -451,7 +449,7 @@ export function Navbar() {
                       className={`-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                         pathname === item.href
                           ? "text-blue-400"
-                          : "text-white hover:bg-gray-800"
+                          : "text-white hover:bg-slate-800"
                       }`}
                       aria-current={pathname === item.href ? "page" : undefined}
                       onClick={() => setMobileMenuOpen(false)}
@@ -464,14 +462,14 @@ export function Navbar() {
               
               <div className="py-6 space-y-4">
                 {!isAdminPage && (
-                  <div className="pb-4 border-b border-gray-700">
+                  <div className="pb-4 border-b border-slate-700">
                     <GlobalSearch />
                   </div>
                 )}
                 {isAdminPage ? (
                   <button
                     onClick={handleLogout}
-                    className="w-full border border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                    className="w-full border border-slate-600 text-white hover:bg-slate-800 py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
                     Keluar
@@ -479,113 +477,71 @@ export function Navbar() {
                 ) : (
                   isAuthenticated === null ? (
                     <div className="space-y-4">
-                      <Button className="w-full border border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900" disabled>
+                      <Button className="w-full border border-slate-600 text-white hover:bg-slate-800 py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900" disabled>
                         Memuat...
                       </Button>
                     </div>
                   ) : isAuthenticated ? (
                     <div className="space-y-4">
-                      <div className="relative inline-block text-left">
-                        <div>
-                          <button
-                            type="button"
-                            className="w-full inline-flex justify-center gap-x-1.5 rounded-md bg-gray-800 px-3 py-2 text-base font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-700 hover:bg-gray-700"
-                            id="mobile-user-menu"
-                            aria-expanded="false"
-                            aria-haspopup="true"
-                            onClick={() => {
-                              const menu = document.getElementById('mobile-user-menu-items');
-                              if (menu) {
-                                menu.classList.toggle('hidden');
-                              }
-                            }}
-                          >
-                            <User className="mr-2 h-5 w-5" />
-                            Menu Pengguna
-                          </button>
-                        </div>
-                        
-                        <div 
-                          id="mobile-user-menu-items"
-                          className="hidden absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-gray-800 shadow-lg ring-1 ring-gray-700 focus:outline-none"
-                          role="menu"
-                          aria-orientation="vertical"
-                          aria-labelledby="mobile-user-menu"
-                          tabIndex={-1}
-                        >
-                          <div className="py-1 px-4" role="none">
-                            <div className="flex flex-col space-y-1 pb-2 border-b border-gray-700">
-                              <p className="text-sm font-medium leading-none text-white">
-                                {currentUser?.email || "Nama Pengguna"}
-                              </p>
-                              <p className="text-xs leading-none text-gray-400">
-                                {isAdminUser ? "Admin" : "Klien"}
-                              </p>
+                      <div className="relative inline-block text-left w-full">
+                        <div className="py-1" role="none">
+                          <Link href="/dashboard" className="block px-4 py-2 text-base text-white hover:bg-slate-700" role="menuitem" onClick={() => setMobileMenuOpen(false)}>
+                            <div className="flex items-center">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <rect width="7" height="9" x="3" y="3" rx="1" />
+                                <rect width="7" height="5" x="3" y="14" rx="1" />
+                                <rect width="7" height="5" x="14" y="14" rx="1" />
+                                <rect width="7" height="9" x="14" y="3" rx="1" />
+                              </svg>
+                              <span>Dashboard</span>
                             </div>
-                          </div>
-                          
-                          <div className="py-1" role="none">
-                            <Link href="/dashboard/account" className="block px-4 py-2 text-base text-white hover:bg-gray-700" role="menuitem" onClick={() => setMobileMenuOpen(false)}>
-                              <div className="flex items-center">
-                                <User className="mr-2 h-4 w-4" />
-                                <span>Profil</span>
-                              </div>
-                            </Link>
-                            <Link href="/dashboard/account" className="block px-4 py-2 text-base text-white hover:bg-gray-700" role="menuitem" onClick={() => setMobileMenuOpen(false)}>
-                              <div className="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                  <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.7l-.15.09a2 2 0 0 0-.73 2.72l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.73v-.5a2 2 0 0 1 1-1.7l.15-.09a2 2 0 0 0 .73-2.72l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-                                  <circle cx="12" cy="12" r="3" />
-                                </svg>
-                                <span>Pengaturan</span>
-                              </div>
-                            </Link>
-                            <Link href="/dashboard" className="block px-4 py-2 text-base text-white hover:bg-gray-700" role="menuitem" onClick={() => setMobileMenuOpen(false)}>
-                              <div className="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                  <rect width="7" height="9" x="3" y="3" rx="1" />
-                                  <rect width="7" height="5" x="3" y="14" rx="1" />
-                                  <rect width="7" height="5" x="14" y="14" rx="1" />
-                                  <rect width="7" height="9" x="14" y="3" rx="1" />
-                                </svg>
-                                <span>Dashboard</span>
-                              </div>
-                            </Link>
-                          </div>
-                          
-                          
-                          
-                          <div className="py-1 border-t border-gray-700" role="none">
-                            <button
-                              onClick={async () => {
-                                const supabase = createClient();
-                                await supabase.auth.signOut();
-                                setIsAuthenticated(false);
-                                setIsAdminUser(false);
-                                setMobileMenuOpen(false);
-                                window.location.href = '/';
-                              }}
-                              className="block w-full text-left px-4 py-2 text-base text-white hover:bg-gray-700"
-                              role="menuitem"
-                            >
-                              <div className="flex items-center">
-                                <LogOut className="mr-2 h-4 w-4" />
-                                <span>Keluar</span>
-                              </div>
-                            </button>
-                          </div>
+                          </Link>
+                          <Link href="/dashboard/account" className="block px-4 py-2 text-base text-white hover:bg-slate-700" role="menuitem" onClick={() => setMobileMenuOpen(false)}>
+                            <div className="flex items-center">
+                              <User className="mr-2 h-4 w-4" />
+                              <span>Profil</span>
+                            </div>
+                          </Link>
+                          <Link href="/dashboard/account" className="block px-4 py-2 text-base text-white hover:bg-slate-700" role="menuitem" onClick={() => setMobileMenuOpen(false)}>
+                            <div className="flex items-center">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.7l-.15.09a2 2 0 0 0-.73 2.72l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.73v-.5a2 2 0 0 1 1-1.7l.15-.09a2 2 0 0 0 .73-2.72l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                                <circle cx="12" cy="12" r="3" />
+                              </svg>
+                              <span>Pengaturan</span>
+                            </div>
+                          </Link>
+                        </div>
+                        <div className="py-1 border-t border-slate-700" role="none">
+                          <button
+                            onClick={async () => {
+                              const supabase = createClient();
+                              await supabase.auth.signOut();
+                              setIsAuthenticated(false);
+                              setIsAdminUser(false);
+                              setMobileMenuOpen(false);
+                              window.location.href = '/';
+                            }}
+                            className="block w-full text-left px-4 py-2 text-base text-white hover:bg-slate-700"
+                            role="menuitem"
+                          >
+                            <div className="flex items-center">
+                              <LogOut className="mr-2 h-4 w-4" />
+                              <span>Keluar</span>
+                            </div>
+                          </button>
                         </div>
                       </div>
                     </div>
                   ) : (
                     <div className="space-y-4">
                       <Link href="/auth/login" onClick={() => setMobileMenuOpen(false)}>
-                        <Button className="w-full border border-gray-600 text-white hover:bg-gray-800 py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900">
+                        <Button className="w-full border border-slate-600 text-white hover:bg-slate-800 py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900">
                           Masuk
                         </Button>
                       </Link>
                       <Link href="/kontak" onClick={() => setMobileMenuOpen(false)}>
-                        <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900">
+                        <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900">
                           Get Started
                           <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>

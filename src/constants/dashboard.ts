@@ -4,7 +4,8 @@ import {
   MessageSquareIcon,
   BarChartIcon,
   SettingsIcon,
-  PackageIcon
+  PackageIcon,
+  UserIcon
 } from "lucide-react";
 import { NavItem } from "@/types/dashboard";
 
@@ -38,6 +39,11 @@ export const dashboardNavItems: NavItem[] = [
     title: "Laporan",
     href: "/dashboard/reports",
     icon: BarChartIcon,
+  },
+  {
+    title: "Profil",
+    href: "/dashboard/profile",
+    icon: UserIcon,
   },
   {
     title: "Akun",

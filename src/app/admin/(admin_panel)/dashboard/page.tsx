@@ -55,6 +55,13 @@ export default function AdminDashboard() {
       icon: Eye,
       change: "+12.3% dari bulan lalu",
       color: "bg-purple-600"
+    },
+    {
+      title: "Pesan Baru",
+      value: realtimeStats.unreadMessages.toString(),
+      icon: MessageSquare,
+      change: realtimeStats.unreadMessages > 0 ? `+${realtimeStats.unreadMessages} pesan belum dibaca` : "Tidak ada pesan baru",
+      color: "bg-yellow-600"
     }
   ];
 
@@ -146,7 +153,7 @@ export default function AdminDashboard() {
         </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
