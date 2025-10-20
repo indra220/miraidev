@@ -41,7 +41,6 @@ export default function AdminLoginPage() {
       return;
     }
 
-    // Simpan role ke sessionStorage setelah login berhasil
     if (data.user) {
       setAuthInfoToStorage('admin', data.user.id);
     }
@@ -51,21 +50,17 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <>
-
-      <div className="w-full max-w-md">
-         <div className="text-center mb-8">
-          <div className="mx-auto w-16 h-16 rounded-full bg-blue-600/20 flex items-center justify-center mb-4">
-            <div className="w-10 h-10 rounded-full bg-blue-600/30 flex items-center justify-center">
-              <Lock className="w-6 h-6 text-blue-400" />
-            </div>
-          </div>
-          <h1 className="text-3xl font-bold text-white">Admin Portal</h1>
-          <p className="text-gray-400 mt-2">Masuk untuk mengelola situs</p>
+    <div className="w-full max-w-md">
+       <div className="text-center mb-8">
+        <div className="mx-auto w-16 h-16 rounded-full bg-slate-800/70 flex items-center justify-center mb-4 ring-1 ring-slate-700">
+          <Lock className="w-7 h-7 text-blue-400" />
         </div>
+        <h1 className="text-3xl font-bold text-white">Admin Portal</h1>
+        <p className="text-gray-400 mt-2">Masuk untuk mengelola situs</p>
+      </div>
 
-      <Card className="bg-white/10 backdrop-blur-md border border-gray-700 shadow-xl rounded-xl overflow-hidden">
-        <CardContent className="p-6">
+      <Card className="bg-slate-800/50 backdrop-blur-md border border-slate-700 shadow-xl rounded-xl overflow-hidden">
+        <CardContent className="p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-3 text-sm text-red-200">
@@ -74,29 +69,46 @@ export default function AdminLoginPage() {
             )}
             <div className="space-y-2">
               <Label htmlFor="email">Email Admin</Label>
-              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              <Input 
+                id="email" 
+                type="email" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+                required 
+                placeholder="admin@contoh.com"
+                className="bg-slate-700/50 border-slate-600 focus:border-blue-500 h-12 text-base"
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Kata Sandi</Label>
                <div className="relative">
-                <Input id="password" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                <Input 
+                  id="password" 
+                  type={showPassword ? "text" : "password"} 
+                  value={password} 
+                  onChange={(e) => setPassword(e.target.value)} 
+                  required 
+                  placeholder="••••••••"
+                  className="bg-slate-700/50 border-slate-600 focus:border-blue-500 h-12 text-base"
+                />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-white">
                   {showPassword ? <EyeOff className="h-5 w-5"/> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
             </div>
-            <Button type="submit" disabled={isLoading} className="w-full">
+            <Button type="submit" disabled={isLoading} className="w-full bg-blue-600 hover:bg-blue-700 py-6 text-base">
               {isLoading ? <LoadingSpinner /> : "Masuk sebagai Admin"}
             </Button>
           </form>
            <div className="mt-6 text-center text-sm">
-             <p>Bukan admin? <a href="/auth/login" className="underline">Login sebagai klien</a></p>
+             <p className="text-gray-400">
+               Bukan admin? <Link href="/auth/login" className="font-semibold text-blue-400 hover:underline">Login sebagai klien</Link>
+             </p>
           </div>
         </CardContent>
       </Card>
 
-      {/* Tombol Kembali ke Beranda */}
-      <div className="mt-6 text-center">
+      <div className="mt-8 text-center">
         <Button variant="ghost" asChild>
           <Link href="/beranda" className="text-sm text-gray-400 hover:text-white transition-colors">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -105,6 +117,5 @@ export default function AdminLoginPage() {
         </Button>
       </div>
     </div>
-  </>
-);
+  );
 }
