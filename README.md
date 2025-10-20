@@ -2,53 +2,11 @@
 
 # MiraiDev Website
 
-Versi: 0.5.45
+Versi: 0.5.26
 
 Sebuah aplikasi web modern untuk agensi pengembangan website MiraiDev, dibangun dengan Next.js 15, menggunakan Supabase untuk database, dan mendukung mode gelap.
 
 ## Riwayat Versi
-
-### Versi 0.5.45 (20 Oktober 2025)
-- Memperbarui tampilan login user dengan desain yang lebih modern dan responsif
-- Memperbarui tampilan login admin dengan desain yang lebih konsisten dengan standar admin panel
-- Memperbarui tampilan registrasi dengan peningkatan UX dan validasi form yang lebih baik
-
-### Versi 0.5.44 (19 Oktober 2025)
-- Menambahkan halaman profile pengguna di dashboard dengan tampilan detail informasi lengkap
-- Membuat halaman edit profile terpisah untuk mengedit informasi pengguna
-- Menambahkan navigasi ke halaman profile di sidebar dashboard
-- Memperbaiki beberapa bug terkait tampilan profile
-
-### Versi 0.5.43 (17 Oktober 2025)
-- Memperbaiki ketidaksesuaian antara penghitungan pesan unread di manajemen pesan admin dan dashboard
-- Menambahkan card 'Pesan Baru' di dashboard admin
-- Memperbaiki sistem identifikasi pengirim pesan (admin atau user) dalam sistem chat
-
-### Versi 0.5.33 (17 Oktober 2025)
-- Memperbaiki masalah di mana admin ditampilkan sebagai pengguna biasa dalam sistem pesan
-- Memastikan identitas pengirim pesan (admin atau user) ditentukan berdasarkan peran di tabel profiles
-
-### Versi 0.5.32 (17 Oktober 2025)
-- Memperbaiki masalah di mana admin ditampilkan sebagai pengguna biasa dalam sistem pesan
-- Memperbarui logika verifikasi peran pengirim pesan di komponen realtime-chat.tsx
-
-### Versi 0.5.31 (16 Oktober 2025)
-- Menambahkan estimasi waktu pengerjaan proyek dari kolom timeline_estimate ke halaman update proyek
-- Mengubah tombol "Edit" menjadi "Update" di halaman manajemen proyek admin
-
-### Versi 0.5.30 (15 Oktober 2025)
-- Menambahkan statistik Total Portofolio di dashboard admin
-- Memperbarui perhitungan Total Proyek untuk mengambil dari tabel projects bukan portfolio
-
-### Versi 0.5.29 (15 Oktober 2025)
-- Removed user icon dropdown from admin header (UserNav component)
-
-### Versi 0.5.28 (15 Oktober 2025)
-- Updated tampilan admin panel dengan desain modern dan warna solid
-- Modernized admin header dengan warna solid dan efek bayangan
-- Modernized admin sidebar dengan gradient, warna solid, dan animasi
-- Updated layout admin panel dengan gradient background
-- Modernized dashboard admin dengan tampilan baru dan warna solid
 
 ### Versi 0.5.26 (15 Oktober 2025)
 - Penambahan aturan pengelolaan CHANGELOG.md

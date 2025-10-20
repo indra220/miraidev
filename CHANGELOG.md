@@ -2,14 +2,6 @@
 
 All notable changes to the MiraiDev Admin Panel will be documented in this file.
 
-## [0.5.45] - 2025-10-20
-
-### Changed
-- Memperbarui tampilan login user dengan desain yang lebih modern dan responsif
-- Memperbarui tampilan login admin dengan desain yang lebih konsisten dengan standar admin panel
-- Memperbarui tampilan registrasi dengan peningkatan UX dan validasi form yang lebih baik
-- Menyesuaikan warna dan elemen UI pada halaman otentikasi agar konsisten dengan desain keseluruhan aplikasi
-
 ## [0.5.44] - 2025-10-19
 
 ### Added
