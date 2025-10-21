@@ -2,6 +2,37 @@
 
 All notable changes to the MiraiDev Admin Panel will be documented in this file.
 
+## [0.5.47] - 2025-10-21
+
+### Added
+- Menambahkan fitur Autentikasi Dua Faktor (2FA/MFA) di halaman profil dashboard klien (`src/app/dashboard/profile/page.tsx`).
+- Menambahkan dialog untuk proses *enrollment* 2FA (scan QR code dan verifikasi).
+- Menambahkan tombol "Kirim Ulang Verifikasi" di halaman edit profil jika email klien belum terverifikasi (`src/app/dashboard/profile/edit/page.tsx`).
+
+### Changed
+- Menggabungkan form edit informasi profil dan ganti kata sandi menjadi satu form di halaman edit profil (`src/app/dashboard/profile/edit/page.tsx`).
+- Menambahkan validasi "Kata Sandi Saat Ini" yang wajib diisi untuk menyimpan perubahan apa pun di halaman edit profil.
+- Membuka *lock* pada field email di halaman edit profil; sekarang email dapat diubah namun akan memicu proses verifikasi email baru oleh Supabase.
+- Memperbaiki logika `useEffect` di halaman edit profil untuk mencegah *reload* konten saat berganti tab browser (`useRef` flag).
+- Memperbaiki berbagai masalah layout dan konsistensi UI (jarak label) di halaman edit profil.
+
+### Removed
+- Menghapus field "Tanggal Bergabung" dan "Jumlah Proyek" dari tampilan form *edit* profil klien (`src/app/dashboard/profile/edit/page.tsx`).
+- Menghapus tombol "Kirim Verifikasi" dari halaman edit profil klien (`src/app/dashboard/profile/edit/page.tsx`) karena verifikasi email baru ditangani otomatis oleh Supabase setelah penyimpanan.
+
+### Fixed
+- Memperbaiki tautan "Profil" pada dropdown menu pengguna di dashboard klien (`src/components/dashboard/UserNav.tsx`) agar mengarah ke `/dashboard/profile`.
+- Memperbaiki tautan "Profil" pada dropdown menu pengguna di navbar utama (`src/components/navbar.tsx`) agar mengarah ke `/dashboard/profile`.
+
+## [0.5.46] - 2025-10-21
+
+### Removed
+- Menghapus halaman konfigurasi (sebelumnya pengaturan) beserta komponen terkait
+- Menghapus entri Konfigurasi dari sidebar
+- Menghapus item "Pengaturan" dari dropdown user di dashboard klien
+- Menghapus item "Pengaturan" dari dropdown user di dashboard admin
+- Menghapus link ke halaman setting dari dropdown user di navbar utama
+
 ## [0.5.45] - 2025-10-20
 
 ### Changed

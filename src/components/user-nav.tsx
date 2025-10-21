@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { User, Settings, LogOut } from 'lucide-react';
+import { User, LogOut } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 
@@ -38,10 +38,7 @@ export function UserNav() {
           <User className="mr-2 h-4 w-4" />
           <span>Profil Saya</span>
         </DropdownMenuItem>
-        <DropdownMenuItem className="text-slate-200 focus:bg-slate-700">
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Pengaturan</span>
-        </DropdownMenuItem>
+
         <DropdownMenuSeparator className="bg-slate-700" />
         <DropdownMenuItem 
           className="text-red-400 focus:bg-red-900/20 cursor-pointer"

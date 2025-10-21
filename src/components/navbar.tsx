@@ -1,12 +1,13 @@
+// src/components/navbar.tsx
 "use client";
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { 
-  Menu, 
-  X, 
+import {
+  Menu,
+  X,
   ArrowRight,
   LogOut,
   User
@@ -39,47 +40,47 @@ export function Navbar() {
   const pathname = usePathname();
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const openMenuButtonRef = useRef<HTMLButtonElement>(null);
-  
+  const userMenuRef = useRef<HTMLDivElement>(null); // Ref for desktop user menu
+  const [userMenuOpen, setUserMenuOpen] = useState(false); // State for desktop user menu
+
   const isAdminPage = pathname.startsWith('/admin');
-  
+
   const cameFromLogout = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('logged_out') === 'true';
 
   useEffect(() => {
     const checkAuthStatus = async () => {
       const supabase = createClient();
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       setIsAuthenticated(!!session);
-      
+
       if (session) {
         const user = await getCurrentUser();
         setCurrentUser(user);
-        
-        if (isAdminPage && isAdminUser === null) {
-          const admin = await isAdmin();
-          setIsAdminUser(admin);
-        } else if (!isAdminPage) {
-          setIsAdminUser(false);
-        }
+
+        // Always check role from auth service for consistency
+        const admin = await isAdmin();
+        setIsAdminUser(admin);
+
       } else {
         setIsAdminUser(false);
         setCurrentUser(null);
       }
     };
-    
+
     checkAuthStatus();
-    
+
     const { data: { subscription } } = createClient().auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
         checkAuthStatus();
       }
     });
-    
+
     return () => {
       subscription.unsubscribe();
     };
-  }, [isAdminUser, isAdminPage]);
-  
+  }, []); // Removed isAdminPage and isAdminUser from dependencies
+
   useEffect(() => {
     if (cameFromLogout && typeof window !== 'undefined') {
       const url = new URL(window.location.href);
@@ -97,57 +98,61 @@ export function Navbar() {
 
   useEffect(() => {
     setMobileMenuOpen(false);
+    setUserMenuOpen(false); // Close user menu on navigation
   }, [pathname]);
 
+  // Close menus on Escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        setMobileMenuOpen(false);
-        openMenuButtonRef.current?.focus();
+        if (mobileMenuOpen) {
+            setMobileMenuOpen(false);
+            openMenuButtonRef.current?.focus();
+        }
+        if (userMenuOpen) {
+            setUserMenuOpen(false);
+            // Optionally focus the user menu trigger button
+        }
       }
     };
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [mobileMenuOpen, userMenuOpen]);
 
-    if (mobileMenuOpen) {
-      document.addEventListener("keydown", handleEscape);
-      mobileMenuRef.current?.focus();
-    }
 
-    return () => {
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, [mobileMenuOpen]);
-
+  // Close menus on click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (mobileMenuOpen && mobileMenuRef.current && !mobileMenuRef.current.contains(e.target as Node)) {
-        setMobileMenuOpen(false);
-        openMenuButtonRef.current?.focus();
-      }
+        // Close mobile menu
+        if (mobileMenuOpen && mobileMenuRef.current && !mobileMenuRef.current.contains(e.target as Node)) {
+            setMobileMenuOpen(false);
+            openMenuButtonRef.current?.focus();
+        }
+        // Close desktop user menu
+        if (userMenuOpen && userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+            setUserMenuOpen(false);
+        }
     };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [mobileMenuOpen, userMenuOpen]);
 
-    if (mobileMenuOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [mobileMenuOpen]);
 
   const handleLogout = async () => {
     const supabase = createClient();
-    
+
     try {
       await supabase.auth.signOut();
     } catch (error) {
       console.error("Error during logout:", error);
     }
-    
+
     await new Promise(resolve => setTimeout(resolve, 500));
-    
+
     setIsAuthenticated(false);
     setIsAdminUser(false);
-    
+    setUserMenuOpen(false); // Close menu after logout
+
     window.location.href = "/auth/login?logged_out=true";
   };
 
@@ -169,7 +174,7 @@ export function Navbar() {
             </div>
           </Link>
         </div>
-        
+
         <div className="flex lg:hidden">
           <button
             ref={openMenuButtonRef}
@@ -183,10 +188,11 @@ export function Navbar() {
             <Menu className="h-6 w-6" aria-hidden="true" />
           </button>
         </div>
-        
+
         <div className="hidden lg:flex lg:gap-x-8">
           {isAdminPage ? (
             <>
+              {/* Admin Menu Items */}
               <Link
                 href="/admin/dashboard"
                 className={`text-sm font-semibold leading-6 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md px-2 py-1 ${
@@ -198,28 +204,7 @@ export function Navbar() {
               >
                 Dasbor
               </Link>
-              <Link
-                href="/admin/portfolio"
-                className={`text-sm font-semibold leading-6 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md px-2 py-1 ${
-                  pathname === "/admin/portfolio"
-                    ? "text-blue-400"
-                    : "text-white hover:text-blue-300"
-                }`}
-                aria-current={pathname === "/admin/portfolio" ? "page" : undefined}
-              >
-                Portofolio
-              </Link>
-              <Link
-                href="/admin/settings"
-                className={`text-sm font-semibold leading-6 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md px-2 py-1 ${
-                  pathname === "/admin/settings"
-                    ? "text-blue-400"
-                    : "text-white hover:text-blue-300"
-                }`}
-                aria-current={pathname === "/admin/settings" ? "page" : undefined}
-              >
-                Pengaturan
-              </Link>
+              {/* Add other admin menu items if needed */}
             </>
           ) : (
             navigation.map((item) => (
@@ -238,7 +223,7 @@ export function Navbar() {
             ))
           )}
         </div>
-        
+
         <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:gap-x-4">
           {!isAdminPage && <GlobalSearch />}
           {isAdminPage ? (
@@ -258,93 +243,78 @@ export function Navbar() {
               </div>
             ) : isAuthenticated ? (
               <div className="flex items-center gap-x-4">
-                <div className="relative inline-block text-left">
+                {/* --- DESKTOP USER DROPDOWN --- */}
+                <div ref={userMenuRef} className="relative inline-block text-left">
                   <div>
                     <button
                       type="button"
                       className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-slate-700 hover:bg-slate-700"
-                      id="user-menu"
-                      aria-expanded="false"
+                      id="user-menu-button-desktop"
+                      aria-expanded={userMenuOpen}
                       aria-haspopup="true"
-                      onClick={() => {
-                        const menu = document.getElementById('user-menu-items');
-                        if (menu) {
-                          menu.classList.toggle('hidden');
-                        }
-                      }}
+                      onClick={() => setUserMenuOpen(!userMenuOpen)}
                     >
                       <User className="h-5 w-5" />
                     </button>
                   </div>
-                  
-                  <div 
-                    id="user-menu-items"
-                    className="hidden absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-slate-800 shadow-lg ring-1 ring-slate-700 focus:outline-none"
-                    role="menu"
-                    aria-orientation="vertical"
-                    aria-labelledby="user-menu"
-                    tabIndex={-1}
-                  >
-                    <div className="py-1 px-4" role="none">
-                      <div className="flex flex-col space-y-1 pb-2 border-b border-slate-700">
-                        <p className="text-sm font-medium leading-none text-white">
-                          {currentUser?.email || "Nama Pengguna"}
-                        </p>
-                        <p className="text-xs leading-none text-slate-400">
-                          {isAdminUser ? "Admin" : "Klien"}
-                        </p>
-                      </div>
+
+                  {userMenuOpen && (
+                    <div
+                        className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-slate-800 shadow-lg ring-1 ring-slate-700 focus:outline-none"
+                        role="menu"
+                        aria-orientation="vertical"
+                        aria-labelledby="user-menu-button-desktop"
+                        tabIndex={-1}
+                    >
+                        <div className="py-1 px-4" role="none">
+                        <div className="flex flex-col space-y-1 pb-2 border-b border-slate-700">
+                            <p className="text-sm font-medium leading-none text-white">
+                            {currentUser?.email || "Nama Pengguna"}
+                            </p>
+                            <p className="text-xs leading-none text-slate-400">
+                            {isAdminUser ? "Admin" : "Klien"}
+                            </p>
+                        </div>
+                        </div>
+
+                        <div className="py-1" role="none">
+                        <Link href="/dashboard" className="block px-4 py-2 text-sm text-white hover:bg-slate-700" role="menuitem" onClick={() => setUserMenuOpen(false)}>
+                            <div className="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <rect width="7" height="9" x="3" y="3" rx="1" />
+                                <rect width="7" height="5" x="3" y="14" rx="1" />
+                                <rect width="7" height="5" x="14" y="14" rx="1" />
+                                <rect width="7" height="9" x="14" y="3" rx="1" />
+                            </svg>
+                            <span>Dashboard</span>
+                            </div>
+                        </Link>
+                        {/* --- PERUBAHAN LINK PROFIL --- */}
+                        <Link href="/dashboard/profile" className="block px-4 py-2 text-sm text-white hover:bg-slate-700" role="menuitem" onClick={() => setUserMenuOpen(false)}>
+                            <div className="flex items-center">
+                            <User className="mr-2 h-4 w-4" />
+                            <span>Profil</span>
+                            </div>
+                        </Link>
+                        {/* --- AKHIR PERUBAHAN LINK PROFIL --- */}
+                        </div>
+
+                        <div className="py-1 border-t border-slate-700" role="none">
+                        <button
+                            onClick={handleLogout}
+                            className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-slate-700"
+                            role="menuitem"
+                        >
+                            <div className="flex items-center">
+                            <LogOut className="mr-2 h-4 w-4" />
+                            <span>Keluar</span>
+                            </div>
+                        </button>
+                        </div>
                     </div>
-                    
-                    <div className="py-1" role="none">
-                      <Link href="/dashboard" className="block px-4 py-2 text-sm text-white hover:bg-slate-700" role="menuitem">
-                        <div className="flex items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <rect width="7" height="9" x="3" y="3" rx="1" />
-                            <rect width="7" height="5" x="3" y="14" rx="1" />
-                            <rect width="7" height="5" x="14" y="14" rx="1" />
-                            <rect width="7" height="9" x="14" y="3" rx="1" />
-                          </svg>
-                          <span>Dashboard</span>
-                        </div>
-                      </Link>
-                      <Link href="/dashboard/account" className="block px-4 py-2 text-sm text-white hover:bg-slate-700" role="menuitem">
-                        <div className="flex items-center">
-                          <User className="mr-2 h-4 w-4" />
-                          <span>Profil</span>
-                        </div>
-                      </Link>
-                      <Link href="/dashboard/account" className="block px-4 py-2 text-sm text-white hover:bg-slate-700" role="menuitem">
-                        <div className="flex items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.7l-.15.09a2 2 0 0 0-.73 2.72l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.73v-.5a2 2 0 0 1 1-1.7l.15-.09a2 2 0 0 0 .73-2.72l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-                            <circle cx="12" cy="12" r="3" />
-                          </svg>
-                          <span>Pengaturan</span>
-                        </div>
-                      </Link>
-                    </div>
-                    
-                    <div className="py-1 border-t border-slate-700" role="none">
-                      <button
-                        onClick={async () => {
-                          const supabase = createClient();
-                          await supabase.auth.signOut();
-                          setIsAuthenticated(false);
-                          setIsAdminUser(false);
-                          window.location.href = '/';
-                        }}
-                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-slate-700"
-                        role="menuitem"
-                      >
-                        <div className="flex items-center">
-                          <LogOut className="mr-2 h-4 w-4" />
-                          <span>Keluar</span>
-                        </div>
-                      </button>
-                    </div>
-                  </div>
+                  )}
                 </div>
+                 {/* --- AKHIR DESKTOP USER DROPDOWN --- */}
               </div>
             ) : (
               <div className="flex items-center gap-x-4">
@@ -364,8 +334,9 @@ export function Navbar() {
           )}
         </div>
       </nav>
-      
-      <div 
+
+      {/* Mobile Menu */}
+      <div
         ref={mobileMenuRef}
         id="mobile-menu"
         className={`lg:hidden ${mobileMenuOpen ? "block" : "hidden"}`}
@@ -398,12 +369,13 @@ export function Navbar() {
               <X className="h-6 w-6" aria-hidden="true" />
             </button>
           </div>
-          
+
           <div className="mt-6 flow-root">
             <div className="-my-6 divide-y divide-slate-500/10">
               <div className="space-y-2 py-6">
                 {isAdminPage ? (
                   <>
+                    {/* Admin Mobile Menu Items */}
                     <Link
                       href="/admin/dashboard"
                       className={`-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
@@ -416,30 +388,7 @@ export function Navbar() {
                     >
                       Dasbor
                     </Link>
-                    <Link
-                      href="/admin/portfolio"
-                      className={`-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                        pathname === "/admin/portfolio"
-                          ? "text-blue-400"
-                          : "text-white hover:bg-slate-800"
-                      }`}
-                      aria-current={pathname === "/admin/portfolio" ? "page" : undefined}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Portofolio
-                    </Link>
-                    <Link
-                      href="/admin/settings"
-                      className={`-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                        pathname === "/admin/settings"
-                          ? "text-blue-400"
-                          : "text-white hover:bg-slate-800"
-                      }`}
-                      aria-current={pathname === "/admin/settings" ? "page" : undefined}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Pengaturan
-                    </Link>
+                    {/* Add other admin menu items if needed */}
                   </>
                 ) : (
                   navigation.map((item) => (
@@ -459,7 +408,7 @@ export function Navbar() {
                   ))
                 )}
               </div>
-              
+
               <div className="py-6 space-y-4">
                 {!isAdminPage && (
                   <div className="pb-4 border-b border-slate-700">
@@ -483,7 +432,16 @@ export function Navbar() {
                     </div>
                   ) : isAuthenticated ? (
                     <div className="space-y-4">
+                      {/* --- MOBILE USER DROPDOWN ITEMS --- */}
                       <div className="relative inline-block text-left w-full">
+                        <div className="py-1 px-4 border-b border-slate-700 mb-2">
+                            <p className="text-sm font-medium leading-none text-white">
+                            {currentUser?.email || "Nama Pengguna"}
+                            </p>
+                            <p className="text-xs leading-none text-slate-400">
+                            {isAdminUser ? "Admin" : "Klien"}
+                            </p>
+                        </div>
                         <div className="py-1" role="none">
                           <Link href="/dashboard" className="block px-4 py-2 text-base text-white hover:bg-slate-700" role="menuitem" onClick={() => setMobileMenuOpen(false)}>
                             <div className="flex items-center">
@@ -496,32 +454,18 @@ export function Navbar() {
                               <span>Dashboard</span>
                             </div>
                           </Link>
-                          <Link href="/dashboard/account" className="block px-4 py-2 text-base text-white hover:bg-slate-700" role="menuitem" onClick={() => setMobileMenuOpen(false)}>
+                          {/* --- PERUBAHAN LINK PROFIL --- */}
+                          <Link href="/dashboard/profile" className="block px-4 py-2 text-base text-white hover:bg-slate-700" role="menuitem" onClick={() => setMobileMenuOpen(false)}>
                             <div className="flex items-center">
                               <User className="mr-2 h-4 w-4" />
                               <span>Profil</span>
                             </div>
                           </Link>
-                          <Link href="/dashboard/account" className="block px-4 py-2 text-base text-white hover:bg-slate-700" role="menuitem" onClick={() => setMobileMenuOpen(false)}>
-                            <div className="flex items-center">
-                              <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.7l-.15.09a2 2 0 0 0-.73 2.72l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.73v-.5a2 2 0 0 1 1-1.7l.15-.09a2 2 0 0 0 .73-2.72l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-                                <circle cx="12" cy="12" r="3" />
-                              </svg>
-                              <span>Pengaturan</span>
-                            </div>
-                          </Link>
+                          {/* --- AKHIR PERUBAHAN LINK PROFIL --- */}
                         </div>
-                        <div className="py-1 border-t border-slate-700" role="none">
+                        <div className="py-1 border-t border-slate-700 mt-2" role="none">
                           <button
-                            onClick={async () => {
-                              const supabase = createClient();
-                              await supabase.auth.signOut();
-                              setIsAuthenticated(false);
-                              setIsAdminUser(false);
-                              setMobileMenuOpen(false);
-                              window.location.href = '/';
-                            }}
+                            onClick={handleLogout}
                             className="block w-full text-left px-4 py-2 text-base text-white hover:bg-slate-700"
                             role="menuitem"
                           >
@@ -532,6 +476,7 @@ export function Navbar() {
                           </button>
                         </div>
                       </div>
+                      {/* --- AKHIR MOBILE USER DROPDOWN ITEMS --- */}
                     </div>
                   ) : (
                     <div className="space-y-4">

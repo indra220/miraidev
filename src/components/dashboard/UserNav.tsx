@@ -1,10 +1,12 @@
+// src/components/dashboard/UserNav.tsx
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { UserIcon, SettingsIcon, LogOutIcon } from "lucide-react";
+import { UserIcon, LogOutIcon } from "lucide-react";
 import { logout } from "@/lib/auth-service";
 import { Session } from "@/types/dashboard";
+import Link from "next/link"; // Import Link
 
 interface UserNavProps {
   session: Session | null;
@@ -16,7 +18,7 @@ export function UserNav({ session }: UserNavProps) {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
-            <AvatarImage src="/avatars/placeholder-avatar.jpg" alt="Avatar" />
+            <AvatarImage src="/placeholder-avatar.jpg" alt="Avatar" /> {/* Ganti placeholder jika perlu */}
             <AvatarFallback>
               <UserIcon className="h-4 w-4" />
             </AvatarFallback>
@@ -43,16 +45,16 @@ export function UserNav({ session }: UserNavProps) {
             </svg>
             <span>Beranda</span>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <UserIcon className="mr-2 h-4 w-4" />
-            <span>Profil</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <SettingsIcon className="mr-2 h-4 w-4" />
-            <span>Pengaturan</span>
-          </DropdownMenuItem>
+          {/* --- PERUBAHAN DI SINI --- */}
+          <Link href="/dashboard/profile" passHref legacyBehavior>
+            <DropdownMenuItem>
+                <UserIcon className="mr-2 h-4 w-4" />
+                <span>Profil</span>
+            </DropdownMenuItem>
+          </Link>
+          {/* --- AKHIR PERUBAHAN --- */}
         </DropdownMenuGroup>
-        
+
         <DropdownMenuItem onClick={async () => {
           await logout();
           window.location.href = '/';
