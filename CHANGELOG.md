@@ -2,6 +2,23 @@
 
 All notable changes to the MiraiDev Admin Panel will be documented in this file.
 
+## [0.5.48] - 2025-10-22
+
+### Changed
+- Mengoptimalkan pemuatan halaman utama beranda dengan menggabungkan pengambilan data dalam satu panggilan fungsi
+- Mengganti tampilan loading di halaman beranda hanya menampilkan spinner di tengah layar penuh tanpa teks
+- Menghapus komponen \"Apa Kata Klien Kami\" (Testimonials) dari halaman utama beranda
+- Mengoptimalkan pemuatan data di halaman portofolio dengan menggabungkan pengambilan data dalam satu Promise.all
+- Mengganti tampilan loading di halaman layanan hanya menampilkan spinner di tengah layar penuh
+- Mengganti tampilan loading di halaman kontak hanya menampilkan spinner di tengah layar penuh
+- Menyembunyikan komponen ClientTrustSection sampai sistem testimonial baru siap
+- Mengganti sumber data layanan di halaman utama dan layanan dari data statis ke data dari database
+- Menggunakan template default jika tidak ada data dari database di halaman layanan
+
+### Added
+- Menambahkan fungsi getAllHomeData untuk mengambil semua data halaman utama dalam satu panggilan
+- Menambahkan fungsi getDefaultServices untuk menyediakan template layanan jika tidak ada data dari database
+
 ## [0.5.47] - 2025-10-21
 
 ### Added

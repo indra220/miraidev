@@ -56,7 +56,12 @@ export default function PortofolioPage() {
         setLoading(true);
         setError(null);
         
-        const categoryResult = await getAllPortfolioCategories();
+        // Ambil semua data dalam satu Promise.all untuk mengoptimalkan pemuatan
+        const [categoryResult, projectResult] = await Promise.all([
+          getAllPortfolioCategories(),
+          getPortfolioProjects()
+        ]);
+        
         if (categoryResult.success) {
           const categoryData = categoryResult.data.map(cat => ({
             id: cat.toLowerCase().replace(/\s+/g, '-'),
@@ -70,7 +75,6 @@ export default function PortofolioPage() {
           ]);
         }
         
-        const projectResult = await getPortfolioProjects();
         if (projectResult.success) {
           setProjects(projectResult.data);
         } else {
@@ -175,7 +179,7 @@ export default function PortofolioPage() {
         </div>
 
         {loading ? (
-          <div className="text-center py-24">
+          <div className="flex justify-center items-center h-screen">
             <LoadingSpinner size="lg" />
           </div>
         ) : error ? (
