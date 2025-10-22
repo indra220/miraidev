@@ -1,16 +1,17 @@
 // src/app/dashboard/profile/page.tsx
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+// Hapus 'FormEvent' dari import React
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-// Impor Input dan Label tetap dipertahankan sesuai permintaan
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { createClient } from "@/lib/supabase/client";
-import { User as SupabaseUser } from "@supabase/supabase-js";
+// Ganti MfaFactor menjadi Factor, hapus SupabaseUserType jika tidak terpakai langsung
+import { User as SupabaseUserType, Factor } from "@supabase/supabase-js";
 import {
   User as UserIcon,
   Edit3,
@@ -18,12 +19,14 @@ import {
   Camera,
   Mail,
   Phone as PhoneIcon,
-  Building as BuildingIcon,
+  Building2 as BuildingIcon,
   Calendar as CalendarIcon,
   QrCode,
   Copy,
   ShieldCheck,
   ShieldOff,
+  KeyRound,
+  // Hapus import ShieldAlert
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import Image from "next/image";
@@ -40,9 +43,10 @@ import { AlertDialog } from "@/components/AlertDialog";
 import { useDialog } from "@/hooks/useDialog";
 
 // --- Interface Data Pengguna & Klien ---
-type ExtendedSupabaseUser = SupabaseUser & {
+
+type ExtendedSupabaseUser = SupabaseUserType & {
     aal?: string | null;
-    factors?: { id: string; factor_type: string; status: string }[] | null;
+    factors?: Factor[] | null;
 };
 
 interface UserData {
@@ -51,15 +55,17 @@ interface UserData {
   user_metadata: {
     name?: string;
     avatar_url?: string;
+    full_name?: string;
     [key: string]: unknown;
   };
   full_name?: string | null;
   avatar_url?: string | null;
   role?: string | null;
   updated_at?: string | null;
-  factors?: { id: string; factor_type: string; status: string }[] | null;
+  factors?: Factor[] | null;
   aal?: string | null;
 }
+
 
 interface ClientData {
   id: string;
@@ -76,22 +82,25 @@ interface ClientData {
 
 // --- Fungsi Helper untuk QR Code ---
 function svgToDataURL(svgString: string): string {
-  // Pastikan string SVG valid sebelum encoding
   if (!svgString || typeof svgString !== 'string' || !svgString.trim().startsWith('<svg')) {
       console.error("Invalid SVG string passed to svgToDataURL:", svgString);
-      return ""; // Kembalikan string kosong atau handle error lain
+      return "";
   }
   try {
       const encoded = encodeURIComponent(svgString)
           .replace(/'/g, '%27')
-          .replace(/"/g, '%22');
+          .replace(/"/g, '%22')
+          .replace(/</g, '%3C')
+          .replace(/>/g, '%3E')
+          .replace(/#/g, '%23')
+          .replace(/\(/g, '%28')
+          .replace(/\)/g, '%29');
       return `data:image/svg+xml,${encoded}`;
   } catch (error) {
       console.error("Error encoding SVG to Data URL:", error);
-      return ""; // Kembalikan string kosong jika encoding gagal
+      return "";
   }
 }
-
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -110,265 +119,242 @@ export default function ProfilePage() {
     qrCodeDataUrl: string;
   } | null>(null);
   const [verificationCode, setVerificationCode] = useState("");
-  const [isEnrolling, setIsEnrolling] = useState(false);
+  const [isEnrollingOrUnenrolling, setIsEnrollingOrUnenrolling] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [enrollError, setEnrollError] = useState<string | null>(null);
   const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
   const { showAlertDialog, alertDialogState, closeAlertDialog } = useDialog();
 
-  const supabase = createClient(); // Tetap di luar useEffect
+  // State baru untuk Unenroll Verification
+  const [showUnenrollVerifyDialog, setShowUnenrollVerifyDialog] = useState(false);
+  const [unenrollChallengeId, setUnenrollChallengeId] = useState<string | null>(null);
+  const [unenrollVerificationCode, setUnenrollVerificationCode] = useState("");
+  const [unenrollError, setUnenrollError] = useState<string | null>(null);
+
+  const supabase = createClient();
 
   useEffect(() => {
     document.title = "Profil Pengguna | MiraiDev";
   }, []);
 
-  useEffect(() => {
-    if (authLoading || hasFetched.current) return;
-
-    const fetchUserData = async () => {
-      if (!hasFetched.current) {
-         setIsLoading(true);
-      }
-      try {
-        if (!authUser) {
-          router.push("/auth/login");
-          return;
-        }
-
-        hasFetched.current = true;
-
-        // Gunakan instance supabase yang sudah dibuat di luar
-        const { data: { user: currentUserData }, error: getUserError } = await supabase.auth.getUser();
-
-        if (getUserError || !currentUserData) {
-            console.error("Error fetching current user:", getUserError);
-            router.push("/auth/login");
-            return;
-        }
-
-        const currentUser = currentUserData as ExtendedSupabaseUser;
-
-        const formattedUserData: UserData = {
-          id: currentUser.id,
-          email: currentUser.email || null,
-          user_metadata: currentUser.user_metadata || {},
-          full_name: currentUser.user_metadata?.full_name ?? currentUser.user_metadata?.name ?? null,
-          avatar_url: currentUser.user_metadata?.avatar_url ?? null,
-          role: currentUser.user_metadata?.role ?? null,
-          factors: currentUser.factors ?? null,
-          aal: currentUser.aal ?? null,
-          updated_at: currentUser.updated_at ?? null,
-        };
-
-        setUser(formattedUserData);
-
-        const mfaStatus = formattedUserData.aal === 'aal2';
-        setIsMfaEnabled(mfaStatus);
-        if (mfaStatus && formattedUserData.factors) {
-          const totpFactor = formattedUserData.factors.find(f => f.factor_type === 'totp');
-          if (totpFactor) {
-            setMfaFactorId(totpFactor.id);
-          }
-        } else {
-          setMfaFactorId(null);
-        }
-
-        const { data: clientDetails, error: clientError } = await supabase
-          .from('clients')
-          .select('id, user_id, phone, company, join_date, project_count, rating, status, created_at, updated_at')
-          .eq('user_id', currentUser.id)
-          .single();
-
-        if (clientError && clientError.code !== 'PGRST116') {
-          console.error("Error fetching client data:", clientError);
-        } else if (clientDetails) {
-          setClientData(clientDetails);
-        }
-      } catch (error) {
-        console.error("Error in fetchUserData:", error);
-        toast.error("Gagal memuat data profil", { description: (error as Error).message });
-        hasFetched.current = false;
-      } finally {
-        // PERBAIKAN: Selalu set isLoading false di finally
+  const fetchUserData = useCallback(async (forceRefresh = false) => {
+    if (!forceRefresh && hasFetched.current) {
         setIsLoading(false);
-      }
-    };
+        return;
+    }
+    if (authLoading) {
+        return;
+    }
 
-    fetchUserData();
-  // PERBAIKAN: Tambahkan supabase ke dependency array
+    setIsLoading(true);
+    try {
+      if (!authUser) {
+        router.push("/auth/login");
+        return;
+      }
+
+      const { data: { user: currentUserData }, error: getUserError } = await supabase.auth.getUser();
+
+      if (getUserError || !currentUserData) {
+          console.error("Error fetching current user:", getUserError);
+          if (getUserError?.message.includes("invalid claim: expired") || getUserError?.message.includes("invalid JWT")) {
+               await supabase.auth.signOut();
+               router.push("/auth/login");
+          } else {
+               toast.error("Gagal mendapatkan data user terbaru. Coba refresh halaman.");
+          }
+          return;
+      }
+
+      const currentUser = currentUserData as ExtendedSupabaseUser;
+
+      const { data: factorsData, error: factorsError } = await supabase.auth.mfa.listFactors();
+      if (factorsError) {
+          console.error("Error listing MFA factors:", factorsError);
+      }
+      const activeFactors = factorsData?.all ?? [];
+      const verifiedTotpFactor = activeFactors.find(f => f.factor_type === 'totp' && f.status === 'verified');
+
+      const formattedUserData: UserData = {
+        id: currentUser.id,
+        email: currentUser.email || null,
+        user_metadata: currentUser.user_metadata || {},
+        full_name: currentUser.user_metadata?.full_name ?? currentUser.user_metadata?.name ?? null,
+        avatar_url: currentUser.user_metadata?.avatar_url ?? null,
+        role: currentUser.user_metadata?.role ?? null,
+        factors: activeFactors,
+        aal: currentUser.aal ?? null,
+        updated_at: currentUser.updated_at ?? null,
+      };
+
+      setUser(formattedUserData);
+
+      const mfaStatus = !!verifiedTotpFactor;
+      setIsMfaEnabled(mfaStatus);
+      setMfaFactorId(verifiedTotpFactor?.id || null);
+
+
+      const { data: clientDetails, error: clientError } = await supabase
+        .from('clients')
+        .select('id, user_id, phone, company, join_date, project_count, rating, status, created_at, updated_at')
+        .eq('user_id', currentUser.id)
+        .single();
+
+      if (clientError && clientError.code !== 'PGRST116') {
+        console.error("Error fetching client data:", clientError);
+        toast.error("Gagal mengambil detail data klien.", { description: clientError.message });
+      } else if (clientDetails) {
+        setClientData(clientDetails);
+      }
+
+      hasFetched.current = true;
+
+    } catch (error) {
+      console.error("Error in fetchUserData:", error);
+      toast.error("Gagal memuat data profil", { description: (error as Error).message });
+    } finally {
+      setIsLoading(false);
+    }
   }, [authUser, authLoading, router, supabase]);
 
+  useEffect(() => {
+    fetchUserData();
+  }, [fetchUserData]);
+
     const handleEnroll = async () => {
-        setIsEnrolling(true);
+        setIsEnrollingOrUnenrolling(true);
         setEnrollError(null);
         setEnrollmentData(null);
         try {
-            const { data, error } = await supabase.auth.mfa.enroll({
-                factorType: 'totp',
-            });
+            const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'totp' });
             if (error) throw error;
             const enrollData = data as { id: string; totp: { qr_code: string; secret: string } };
-            if (!enrollData?.totp) throw new Error("Data enrollment TOTP tidak diterima dari Supabase.");
+            if (!enrollData?.totp) throw new Error("Data enrollment TOTP tidak diterima.");
 
             let qrCodeSvg = enrollData.totp.qr_code;
-
-            // PERBAIKAN: Coba ekstrak SVG jika ada prefix
             const svgStartIndex = qrCodeSvg.indexOf('<svg');
-            if (svgStartIndex > 0) {
-                console.warn("Received QR code with prefix, attempting to extract SVG content.");
-                qrCodeSvg = qrCodeSvg.substring(svgStartIndex);
-            } else if (svgStartIndex === -1) {
-                 // Jika tidak ditemukan tag <svg sama sekali
-                 console.error('Invalid SVG string received (no <svg tag found):', qrCodeSvg);
-                 throw new Error("Format Kode QR tidak valid dari server (tidak ada tag <svg>).");
-            }
-
-            // Validasi ulang setelah potensi ekstraksi
-            if (!qrCodeSvg || typeof qrCodeSvg !== 'string' || !qrCodeSvg.trim().startsWith('<svg')) {
-                console.error('Invalid SVG string after potential extraction:', qrCodeSvg);
-                throw new Error("Format Kode QR tidak valid dari server.");
-            }
+            if (svgStartIndex > 0) qrCodeSvg = qrCodeSvg.substring(svgStartIndex);
+            else if (svgStartIndex === -1) throw new Error("Format Kode QR tidak valid (tag <svg> tidak ditemukan).");
+            if (!qrCodeSvg.trim().startsWith('<svg')) throw new Error("Format Kode QR tidak valid.");
 
             const qrCodeDataUrl = svgToDataURL(qrCodeSvg);
-            if (!qrCodeDataUrl) {
-                // Handle error jika svgToDataURL gagal
-                 throw new Error("Gagal mengonversi Kode QR SVG ke format gambar.");
-            }
+            if (!qrCodeDataUrl) throw new Error("Gagal konversi Kode QR.");
 
-
-            setEnrollmentData({
-                factorId: enrollData.id,
-                secret: enrollData.totp.secret,
-                qrCodeDataUrl: qrCodeDataUrl,
-            });
+            setEnrollmentData({ factorId: enrollData.id, secret: enrollData.totp.secret, qrCodeDataUrl });
             setShowEnrollDialog(true);
         } catch (error) {
             console.error("Error starting MFA enrollment:", error);
-            setEnrollError((error as Error).message || "Gagal memulai proses aktivasi 2FA.");
+            setEnrollError((error as Error).message || "Gagal memulai aktivasi 2FA.");
             toast.error("Gagal Aktivasi 2FA", { description: (error as Error).message });
         } finally {
-            setIsEnrolling(false);
+            setIsEnrollingOrUnenrolling(false);
         }
     };
-
 
     const handleVerifyAndEnable = async () => {
         if (!enrollmentData || !verificationCode) return;
         setIsVerifying(true);
         setEnrollError(null);
         try {
-            const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
-                factorId: enrollmentData.factorId,
-            });
+            const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({ factorId: enrollmentData.factorId });
             if (challengeError) throw challengeError;
             const challengeResult = challengeData as { id: string };
             if (!challengeResult?.id) throw new Error("Challenge ID tidak diterima.");
 
-            const { error: verifyError } = await supabase.auth.mfa.verify({
-                factorId: enrollmentData.factorId,
-                challengeId: challengeResult.id,
-                code: verificationCode,
-            });
+            const { error: verifyError } = await supabase.auth.mfa.verify({ factorId: enrollmentData.factorId, challengeId: challengeResult.id, code: verificationCode });
             if (verifyError) throw verifyError;
 
-            setIsMfaEnabled(true);
-            setMfaFactorId(enrollmentData.factorId);
             setShowEnrollDialog(false);
             setVerificationCode("");
             setEnrollmentData(null);
             toast.success("Autentikasi Dua Faktor Berhasil Diaktifkan");
-
-            const { data: { user: refreshedUser } } = await supabase.auth.refreshSession();
-            if (refreshedUser) {
-                const currentUser = refreshedUser as ExtendedSupabaseUser;
-                const updatedUserData: UserData = {
-                    id: currentUser.id,
-                    email: currentUser.email || null,
-                    user_metadata: currentUser.user_metadata || {},
-                    full_name: currentUser.user_metadata?.full_name ?? null,
-                    avatar_url: currentUser.user_metadata?.avatar_url ?? null,
-                    role: currentUser.user_metadata?.role ?? null,
-                    factors: currentUser.factors ?? null,
-                    aal: currentUser.aal ?? null,
-                    updated_at: currentUser.updated_at ?? null,
-                };
-                setUser(updatedUserData);
-            }
-
+            await fetchUserData(true);
         } catch (error) {
             console.error("Error verifying MFA code:", error);
-            setEnrollError((error as Error).message || "Kode verifikasi tidak valid atau terjadi kesalahan.");
+            setEnrollError((error as Error).message || "Kode verifikasi salah.");
             toast.error("Verifikasi Gagal", { description: (error as Error).message });
         } finally {
             setIsVerifying(false);
         }
     };
 
-    const handleUnenroll = async () => {
+    const startUnenrollProcess = async () => {
+        closeAlertDialog();
         if (!mfaFactorId) {
-            toast.error("Tidak ada faktor MFA yang terdaftar untuk dinonaktifkan.");
+            toast.error("Tidak ada faktor MFA yang terdaftar.");
             return;
         }
-
-        closeAlertDialog();
-        setIsEnrolling(true);
+        setIsEnrollingOrUnenrolling(true);
+        setUnenrollError(null);
         try {
-            const { error } = await supabase.auth.mfa.unenroll({
-                factorId: mfaFactorId,
-            });
-            if (error) throw error;
+            const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({ factorId: mfaFactorId });
+            if (challengeError) throw challengeError;
+            const challengeResult = challengeData as { id: string };
+            if (!challengeResult?.id) throw new Error("Challenge ID tidak diterima untuk unenroll.");
 
-            setIsMfaEnabled(false);
-            setMfaFactorId(null);
-            toast.success("Autentikasi Dua Faktor Berhasil Dinonaktifkan");
+            setUnenrollChallengeId(challengeResult.id);
+            setUnenrollVerificationCode("");
+            setShowUnenrollVerifyDialog(true);
+        } catch (error) {
+            console.error("Error starting MFA unenrollment challenge:", error);
+            toast.error("Gagal Memulai Proses Nonaktifkan 2FA", { description: (error as Error).message });
+            setIsEnrollingOrUnenrolling(false);
+        }
+    };
 
-            const { data: { user: refreshedUser } } = await supabase.auth.refreshSession();
-            if (refreshedUser) {
-                const currentUser = refreshedUser as ExtendedSupabaseUser;
-                const updatedUserData: UserData = {
-                    id: currentUser.id,
-                    email: currentUser.email || null,
-                    user_metadata: currentUser.user_metadata || {},
-                    full_name: currentUser.user_metadata?.full_name ?? null,
-                    avatar_url: currentUser.user_metadata?.avatar_url ?? null,
-                    role: currentUser.user_metadata?.role ?? null,
-                    factors: currentUser.factors ?? null,
-                    aal: currentUser.aal ?? null,
-                    updated_at: currentUser.updated_at ?? null,
-                };
-                setUser(updatedUserData);
+    const handleVerifyAndUnenroll = async () => {
+        if (!mfaFactorId || !unenrollChallengeId || !unenrollVerificationCode) {
+            setUnenrollError("Informasi verifikasi tidak lengkap.");
+            return;
+        }
+        setIsVerifying(true);
+        setUnenrollError(null);
+
+        try {
+            const { error: verifyError } = await supabase.auth.mfa.verify({ factorId: mfaFactorId, challengeId: unenrollChallengeId, code: unenrollVerificationCode });
+            if (verifyError) throw verifyError;
+
+            const { error: unenrollError } = await supabase.auth.mfa.unenroll({ factorId: mfaFactorId });
+            if (unenrollError) {
+                 console.error("Supabase unenroll error after verification:", unenrollError);
+                 throw new Error(unenrollError.message || "Gagal menonaktifkan 2FA setelah verifikasi.");
             }
 
+            setShowUnenrollVerifyDialog(false);
+            setUnenrollVerificationCode("");
+            setUnenrollChallengeId(null);
+            toast.success("Autentikasi Dua Faktor Berhasil Dinonaktifkan");
+            await fetchUserData(true);
         } catch (error) {
-            console.error("Error unenrolling MFA:", error);
+            console.error("Error verifying and unenrolling MFA:", error);
+            setUnenrollError((error as Error).message || "Kode verifikasi salah.");
             toast.error("Gagal Menonaktifkan 2FA", { description: (error as Error).message });
         } finally {
-            setIsEnrolling(false);
+            setIsVerifying(false);
+            setIsEnrollingOrUnenrolling(false);
         }
     };
 
     const confirmUnenroll = () => {
         showAlertDialog(
-            "Konfirmasi Nonaktifkan 2FA",
-            "Apakah Anda yakin ingin menonaktifkan Autentikasi Dua Faktor? Ini akan mengurangi keamanan akun Anda.",
-            handleUnenroll,
+            "Nonaktifkan Autentikasi Dua Faktor",
+            "Anda perlu memasukkan kode verifikasi dari aplikasi authenticator Anda untuk melanjutkan.",
+            startUnenrollProcess,
             "destructive"
         );
     };
 
+
     const copySecretToClipboard = () => {
         if (enrollmentData?.secret) {
         navigator.clipboard.writeText(enrollmentData.secret)
-            .then(() => {
-            toast.success("Kunci rahasia berhasil disalin!");
-            })
+            .then(() => toast.success("Kunci rahasia berhasil disalin!"))
             .catch(err => {
-            console.error('Gagal menyalin kunci rahasia: ', err);
-            toast.error("Gagal menyalin kunci rahasia.");
+                console.error('Gagal menyalin kunci rahasia: ', err);
+                toast.error("Gagal menyalin kunci rahasia.");
             });
         }
     };
-
 
   if (authLoading || isLoading || isMfaEnabled === null) {
     return (
@@ -378,7 +364,6 @@ export default function ProfilePage() {
     );
   }
 
-  // Tampilkan pesan error jika data user gagal diambil setelah loading selesai
   if (!user && !isLoading) {
      return (
        <div className="flex items-center justify-center min-h-[calc(100vh-100px)]">
@@ -386,7 +371,6 @@ export default function ProfilePage() {
        </div>
      );
   }
-
 
   return (
     <>
@@ -423,7 +407,6 @@ export default function ProfilePage() {
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  {/* Gunakan Label meskipun Input tidak ada, agar styling konsisten */}
                   <Label htmlFor="phone">Nomor Telepon</Label>
                   <p id="phone" className="mt-1 text-muted-foreground flex items-center">
                     <PhoneIcon className="w-4 h-4 mr-2"/> {clientData?.phone || '-'}
@@ -467,24 +450,25 @@ export default function ProfilePage() {
                 <div>
                   <h3 className="font-medium flex items-center">
                     Autentikasi Dua Faktor (2FA)
-                    {isMfaEnabled ? (
+                    {isMfaEnabled === true && (
                       <ShieldCheck className="w-4 h-4 text-green-500 ml-2" />
-                    ) : (
+                    )}
+                    {isMfaEnabled === false && (
                       <ShieldOff className="w-4 h-4 text-gray-500 ml-2" />
                     )}
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    {isMfaEnabled
-                      ? "2FA aktif. Tingkatkan keamanan akun Anda."
+                    {isMfaEnabled === true
+                      ? "2FA aktif. Akun Anda lebih aman."
                       : "Tambahkan lapisan keamanan tambahan dengan 2FA."}
                   </p>
                 </div>
                 <Button
                   variant={isMfaEnabled ? "destructive" : "outline"}
                   onClick={isMfaEnabled ? confirmUnenroll : handleEnroll}
-                  disabled={isEnrolling}
+                  disabled={isEnrollingOrUnenrolling}
                 >
-                  {isEnrolling ? (
+                  {isEnrollingOrUnenrolling ? (
                     <LoadingSpinner size="sm" />
                   ) : isMfaEnabled ? (
                     "Nonaktifkan"
@@ -526,9 +510,9 @@ export default function ProfilePage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="verification-code" className="text-gray-300">Kode Verifikasi</Label>
+                <Label htmlFor="verification-code-enroll" className="text-gray-300">Kode Verifikasi</Label>
                 <Input
-                  id="verification-code"
+                  id="verification-code-enroll"
                   value={verificationCode}
                   onChange={(e) => setVerificationCode(e.target.value)}
                   placeholder="Masukkan 6 digit kode"
@@ -551,6 +535,56 @@ export default function ProfilePage() {
               className="bg-blue-600 hover:bg-blue-700"
             >
               {isVerifying ? <LoadingSpinner size="sm" /> : "Verifikasi & Aktifkan"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+       <Dialog open={showUnenrollVerifyDialog} onOpenChange={(open) => {
+           setShowUnenrollVerifyDialog(open);
+           if (!open) {
+               setIsEnrollingOrUnenrolling(false);
+               setUnenrollError(null);
+           }
+       }}>
+        <DialogContent className="sm:max-w-[425px] bg-gray-800 border-gray-700">
+          <DialogHeader>
+            <DialogTitle className="text-white flex items-center"><KeyRound className="mr-2"/>Verifikasi Nonaktifkan 2FA</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Masukkan kode dari aplikasi authenticator Anda untuk menonaktifkan Autentikasi Dua Faktor.
+              Jika Anda sudah menghapus akun dari authenticator, Anda perlu menonaktifkannya via Supabase Dashboard.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="verification-code-unenroll" className="text-gray-300">Kode Verifikasi Saat Ini</Label>
+              <Input
+                id="verification-code-unenroll"
+                value={unenrollVerificationCode}
+                onChange={(e) => setUnenrollVerificationCode(e.target.value)}
+                placeholder="Masukkan 6 digit kode"
+                maxLength={6}
+                className="bg-gray-700 border-gray-600 text-white text-center text-lg tracking-widest"
+              />
+            </div>
+            {unenrollError && (
+              <p className="text-sm text-red-400 text-center">{unenrollError}</p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+                setShowUnenrollVerifyDialog(false);
+                setIsEnrollingOrUnenrolling(false);
+                setUnenrollError(null);
+             }} className="border-gray-600 text-gray-300 hover:bg-gray-700">
+              Batal
+            </Button>
+            <Button
+              onClick={handleVerifyAndUnenroll}
+              disabled={isVerifying || unenrollVerificationCode.length !== 6 || !unenrollChallengeId}
+              variant="destructive"
+            >
+              {isVerifying ? <LoadingSpinner size="sm" /> : "Verifikasi & Nonaktifkan"}
             </Button>
           </DialogFooter>
         </DialogContent>
