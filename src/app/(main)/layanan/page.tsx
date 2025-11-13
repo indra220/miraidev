@@ -3,50 +3,64 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { 
-  Globe, 
+import {
+  Globe,
   ArrowRight,
   CheckCircle
 } from "lucide-react";
 import OptimizedMotion from "@/components/OptimizedMotion";
 import Link from "next/link";
 import { ServiceItem } from "@/lib/types";
+import Translate from "@/i18n/Translate";
+import { useLanguage } from "@/i18n/useLanguage";
+import { t } from "@/i18n/t";
 
 export default function LayananPage() {
+  const { locale } = useLanguage();
   const [services, setServices] = useState<ServiceItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    document.title = "Layanan Kami | MiraiDev";
+    const setTitle = async () => {
+      const title = await t('services.title', locale, locale === 'en' ? 'Our Services' : 'Layanan Kami');
+      document.title = `${title} | MiraiDev`;
+    };
     
-    const fetchServices = async () => {
+    setTitle();
+  }, [locale]);
+
+  useEffect(() => {
+    const fetchAndProcessServices = async () => {
+      setLoading(true);
       try {
         const response = await fetch('/api/services');
-        
+
         if (!response.ok) {
           throw new Error(`Error fetching services: ${response.status} ${response.statusText}`);
         }
-        
+
         const result = await response.json();
         const fetchedServices = result.data as ServiceItem[];
-        
+
         // Jika tidak ada data dari database, gunakan template default
         if (!fetchedServices || fetchedServices.length === 0) {
-          setServices(getDefaultServices());
+          const defaultServices = getDefaultServices();
+          setServices(defaultServices);
         } else {
           setServices(fetchedServices);
         }
       } catch (error) {
         console.error('Error fetching services:', error);
         // Jika terjadi error, gunakan template default
-        setServices(getDefaultServices());
+        const defaultServices = getDefaultServices();
+        setServices(defaultServices);
       } finally {
         setLoading(false);
       }
     };
-    
-    fetchServices();
-  }, []);
+
+    fetchAndProcessServices();
+  }, [locale]); // Tambahkan locale sebagai dependensi agar services diperbarui saat bahasa berubah
 
   if (loading) {
     return (
@@ -62,21 +76,21 @@ export default function LayananPage() {
       <div className="relative overflow-hidden pt-16">
         <div className="container mx-auto px-4 py-24 sm:py-32 relative">
           <div className="max-w-3xl mx-auto text-center">
-            <OptimizedMotion 
+            <OptimizedMotion
               className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              Layanan <span className="text-blue-400">Kami</span>
+              <Translate i18nKey="services.title" fallback="Our Services" />
             </OptimizedMotion>
-            <OptimizedMotion 
+            <OptimizedMotion
               className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              Solusi komprehensif untuk memenuhi semua kebutuhan pengembangan website dan digital Anda
+              <Translate i18nKey="services.description" fallback="Comprehensive solutions to meet all your website development and digital needs" />
             </OptimizedMotion>
           </div>
         </div>
@@ -108,26 +122,28 @@ export default function LayananPage() {
                   </div>
                   <h2 className="text-2xl font-bold mb-4">{service.title}</h2>
                   <p className="text-gray-300 mb-6">{service.description}</p>
-                  
+
                   <ul className="space-y-3 mb-8">
-                    {service.features && Array.isArray(service.features) ? 
+                    {service.features && Array.isArray(service.features) ?
                       (service.features as string[]).map((feature, featureIndex) => (
                         <li key={featureIndex} className="flex items-start">
                           <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
                           <span className="text-gray-300">{feature}</span>
                         </li>
-                      )) : 
-                      <li className="text-gray-300">Tidak ada fitur spesifik yang tercantum</li>
+                      )) :
+                      <li className="text-gray-300">
+                        <Translate i18nKey="services.noFeatures" fallback="No specific features listed" />
+                      </li>
                     }
                   </ul>
-                  
-                  <Button 
+
+                  <Button
                     asChild
                     variant="outline"
                     className="border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white w-full transition-all duration-150"
                   >
                     <Link href="/kontak">
-                      Pelajari Lebih Lanjut
+                      <Translate i18nKey="services.learnMore" fallback="Learn More" />
                       <ArrowRight className="ml-2 w-4 h-4" />
                     </Link>
                   </Button>
@@ -149,36 +165,38 @@ export default function LayananPage() {
               transition={{ duration: 0.5 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Siap Memulai Proyek Anda?</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                <Translate i18nKey="services.ctaTitle" fallback="Ready to Start Your Project?" />
+              </h2>
               <p className="text-gray-300 max-w-2xl mx-auto">
-                Setiap proyek memiliki kebutuhan yang unik. Diskusikan kebutuhan spesifik Anda dengan tim ahli kami untuk solusi yang disesuaikan.
+                <Translate i18nKey="services.ctaDescription" fallback="Every project has unique needs. Discuss your specific requirements with our expert team for a tailored solution." />
               </p>
             </OptimizedMotion>
-            <OptimizedMotion 
+            <OptimizedMotion
               className="flex flex-col sm:flex-row gap-4 justify-center"
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.2 }}
               viewport={{ once: true }}
             >
-              <Button 
-                asChild 
-                size="lg" 
+              <Button
+                asChild
+                size="lg"
                 className="bg-blue-600 hover:bg-blue-700 text-lg py-6 px-8 transition-all duration-150 hover:scale-105"
               >
                 <Link href="/kontak">
-                  Konsultasi Gratis
+                  <Translate i18nKey="services.freeConsultation" fallback="Free Consultation" />
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
-              <Button 
-                asChild 
-                size="lg" 
-                variant="outline" 
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
                 className="border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white text-lg py-6 px-8 transition-all duration-150"
               >
                 <Link href="/kontak">
-                  Hubungi Kami
+                  <Translate i18nKey="services.contactUs" fallback="Contact Us" />
                 </Link>
               </Button>
             </OptimizedMotion>
@@ -189,18 +207,20 @@ export default function LayananPage() {
   );
 }
 
+
+
 // Template default untuk layanan jika tidak ada data dari database
 function getDefaultServices(): ServiceItem[] {
   return [
     {
       id: 1,
       title: "Pengembangan Website Kustom",
-      category: "Web Development",
+      category: "Pengembangan Web",
       description: "Website yang dirancang khusus untuk memenuhi kebutuhan unik bisnis Anda dengan teknologi terkini.",
       price: 0,
       features: [
         "Desain responsif untuk semua perangkat",
-        "Optimasi kecepatan dan performa",
+        "Optimasi kecepatan dan kinerja",
         "Integrasi dengan sistem lain",
         "Dukungan SEO dasar"
       ],
@@ -213,15 +233,15 @@ function getDefaultServices(): ServiceItem[] {
     } as ServiceItem,
     {
       id: 2,
-      title: "Desain Ulang Website (Website Redesign)",
-      category: "Web Development",
-      description: "Modernisasi tampilan dan fungsionalitas website Anda yang sudah ada untuk meningkatkan pengalaman pengguna.",
+      title: "Redesain Website",
+      category: "Pengembangan Web",
+      description: "Pembaruan tampilan dan fungsionalitas website yang ada untuk meningkatkan pengalaman pengguna.",
       price: 0,
       features: [
         "Audit dan analisis website saat ini",
-        "Desain ulang dengan pendekatan modern",
+        "Redesain dengan pendekatan modern",
         "Migrasi konten yang aman",
-        "Testing kompatibilitas browser"
+        "Pengujian kompatibilitas browser"
       ],
       icon: "",
       order: 2,
@@ -233,13 +253,13 @@ function getDefaultServices(): ServiceItem[] {
     {
       id: 3,
       title: "Paket Pemeliharaan Website",
-      category: "Web Development",
-      description: "Solusi pemeliharaan rutin untuk menjaga website Anda tetap aman, terupdate, dan berjalan optimal.",
+      category: "Pengembangan Web",
+      description: "Solusi pemeliharaan berkala untuk menjaga website tetap aman, terbaru, dan berjalan optimal.",
       price: 0,
       features: [
-        "Update keamanan berkala",
-        "Backup data otomatis",
-        "Monitoring kinerja",
+        "Pembaruan keamanan berkala",
+        "Cadangan data otomatis",
+        "Pemantauan kinerja",
         "Dukungan teknis 24/7"
       ],
       icon: "",
@@ -251,15 +271,15 @@ function getDefaultServices(): ServiceItem[] {
     } as ServiceItem,
     {
       id: 4,
-      title: "Optimasi SEO & Performa",
-      category: "Web Development",
+      title: "Optimasi SEO & Kinerja",
+      category: "Pengembangan Web",
       description: "Layanan tambahan untuk meningkatkan peringkat website Anda di mesin pencari dan mempercepat waktu muat.",
       price: 0,
       features: [
-        "Audit SEO komprehensif",
+        "Audit SEO menyeluruh",
         "Optimasi kata kunci",
         "Peningkatan Core Web Vitals",
-        "Laporan bulanan performa"
+        "Laporan kinerja bulanan"
       ],
       icon: "",
       order: 4,

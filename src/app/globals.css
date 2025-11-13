@@ -121,6 +121,47 @@
   }
 }
 
+/* Force scrollbar to always be visible to prevent layout shift when changing languages */
+html {
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
+
+/* Maintain consistent layout during language changes */
+body {
+  margin: 0;
+  padding-right: calc(-1 * (100vw - 100%)); /* Compensate for scrollbar width to prevent layout shift */
+}
+
+/* Prevent layout shift during language change for all text elements */
+.translate-content {
+  min-height: 1em; /* Ensure minimum height is maintained */
+  min-width: fit-content; /* Maintain minimum width based on content */
+}
+
+/* Fixed width for navbar links to prevent layout shift during language change */
+.navbar-link {
+  min-width: 80px;
+  text-align: center;
+}
+
+/* Fixed width buttons to prevent layout shift */
+.navbar-btn {
+  min-width: 80px;
+  justify-content: center;
+}
+
+/* Fixed width for language toggle button to accommodate dropdown items */
+.language-toggle-btn {
+  min-width: 100px;
+}
+
+/* Fixed width for dropdown menu items to prevent layout shift */
+.language-dropdown-item {
+  min-width: 100px;
+  justify-content: center;
+}
+
 /* Hide scrollbar for elements with hide-scrollbar class */
 .hide-scrollbar {
   -ms-overflow-style: none; /* for Internet Explorer, Edge */

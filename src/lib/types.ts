@@ -47,7 +47,7 @@ type NotificationRow = Database['public']['Tables']['notifications']['Row'];
 type ReportRow = Database['public']['Tables']['reports']['Row'];
 type AnalyticsDataRow = Database['public']['Tables']['analytics_data']['Row'];
 type NewsletterSubscriptionRow = Database['public']['Tables']['newsletter_subscriptions']['Row'];
-type UserSessionRow = Database['public']['Tables']['user_sessions']['Row']; // Tipe ini akan otomatis diperbarui setelah regenerasi
+
 
 // --- Alias untuk Tipe Enum ---
 export type AppRole = Database['public']['Enums']['app_role'];
@@ -201,10 +201,7 @@ export type SeoSetting = SeoSettingRow;
 /** Tipe untuk pelanggan buletin. */
 export type NewsletterSubscription = NewsletterSubscriptionRow;
 
-/** * Tipe untuk sesi pengguna yang aktif.
- * Tipe ini secara otomatis mencerminkan skema tabel 'user_sessions'.
- */
-export type UserSession = UserSessionRow;
+
 
 /** Tipe untuk laporan. */
 export type Report = ReportRow;

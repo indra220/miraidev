@@ -182,7 +182,7 @@ export function ProjectSubmission() {
                 .filter(pf => pf.package_id === pkg.id)
                 .map(pf => {
                   const featureName = featurePricesData 
-                    ? featurePricesData.find(fp => fp.id === pf.feature_id)?.name 
+                    ? featurePricesData.find(fp => fp.id === pf.feature_id)?.name_key 
                     : undefined;
                   return featureName || pf.feature_id;
                 })
@@ -218,20 +218,20 @@ export function ProjectSubmission() {
 
   const getProjectTypeNameById = useCallback((id: string) => {
     const projectType = projectTypes.find(pt => pt.id === id);
-    return projectType?.name || 'Jenis Proyek Tidak Ditemukan';
+    return projectType?.name_key || 'Jenis Proyek Tidak Ditemukan';
   }, [projectTypes]);
 
   const getFeatureNameById = useCallback((id: string) => {
-    const feature = featurePrices.find(fp => fp.id === id)?.name;
+    const feature = featurePrices.find(fp => fp.id === id)?.name_key;
     return feature || id;
   }, [featurePrices]);
 
   const getComplexityNameById = useCallback((id: string) => {
-    return complexityPrices.find(cp => cp.id === id)?.complexity_label || id;
+    return complexityPrices.find(cp => cp.id === id)?.label_key || id;
   }, [complexityPrices]);
 
   const getTimelineNameById = useCallback((id: string) => {
-    return timelinePrices.find(tp => tp.id === id)?.timeline_label || id;
+    return timelinePrices.find(tp => tp.id === id)?.label_key || id;
   }, [timelinePrices]);
 
   const ensureClientRecordExists = async () => {
@@ -307,7 +307,7 @@ export function ProjectSubmission() {
           const selectedPackage = pricingPackages.find(pkg => pkg.id === newProject.type);
           if (selectedPackage) {
             projectPrice = selectedPackage.price;
-            categoryName = selectedPackage.name;
+            categoryName = selectedPackage.name_key;
           }
         }
         
@@ -409,7 +409,7 @@ export function ProjectSubmission() {
           
           const projectTypeDetail = projectTypes.find(pt => pt.id === calculatorResult.projectTypeId);
           if (projectTypeDetail) {
-            categoryName = projectTypeDetail.name;
+            categoryName = projectTypeDetail.name_key;
           }
         }
         
@@ -627,7 +627,7 @@ export function ProjectSubmission() {
                   <option value="">Pilih jenis proyek...</option>
                   {pricingPackages.map((pkg) => (
                     <option key={pkg.id} value={pkg.id}>
-                      {pkg.name}
+                      {pkg.name_key}
                     </option>
                   ))}
                 </select>
@@ -636,7 +636,7 @@ export function ProjectSubmission() {
                   <div className="mt-4 p-6 bg-gray-800/50 border border-gray-700 rounded-xl">
                     <div className="flex items-center mb-4">
                       <PackageIcon className="h-5 w-5 text-blue-400 mr-2" />
-                      <h3 className="text-lg font-bold text-blue-400">{selectedPackageDetail.name}</h3>
+                      <h3 className="text-lg font-bold text-blue-400">{selectedPackageDetail.name_key}</h3>
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -666,13 +666,13 @@ export function ProjectSubmission() {
                       </div>
                       
                       <div>
-                        {selectedPackageDetail.description && (
+                        {selectedPackageDetail.description_key && (
                           <div className="flex items-start">
                             <InfoIcon className="h-5 w-5 text-blue-400 mt-0.5 mr-2 flex-shrink-0" />
                             <div>
                               <p className="text-xs text-gray-400 uppercase tracking-wide">Deskripsi</p>
                               <p className="font-semibold text-white">
-                                {selectedPackageDetail.description}
+                                {selectedPackageDetail.description_key}
                               </p>
                             </div>
                           </div>

@@ -17,6 +17,9 @@ import { createClient } from "@/lib/supabase/client";
 import { isAdmin, getCurrentUser } from "@/lib/auth-service";
 import { Session } from "@/types/dashboard";
 import Image from "next/image";
+import Translate from "@/i18n/Translate";
+import { useLanguage } from "@/i18n/useLanguage";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
 const GlobalSearch = dynamic(() => import("@/components/GlobalSearch"), {
   loading: () => <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center">...</div>,
@@ -24,12 +27,12 @@ const GlobalSearch = dynamic(() => import("@/components/GlobalSearch"), {
 });
 
 const navigation = [
-  { name: "Beranda", href: "/" },
-  { name: "Layanan", href: "/layanan" },
-  { name: "Portofolio", href: "/portofolio" },
-  { name: "Harga", href: "/harga" },
-  { name: "Tentang Kami", href: "/tentang" },
-  { name: "Kontak", href: "/kontak" },
+  { name: "home", href: "/" },
+  { name: "services", href: "/layanan" },
+  { name: "portfolio", href: "/portofolio" },
+  { name: "pricing", href: "/harga" },
+  { name: "about", href: "/tentang" },
+  { name: "contact", href: "/kontak" },
 ];
 
 export function Navbar() {
@@ -44,6 +47,7 @@ export function Navbar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false); // State for desktop user menu
 
   const isAdminPage = pathname.startsWith('/admin');
+  const { t } = useLanguage();
 
   const cameFromLogout = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('logged_out') === 'true';
 
@@ -144,7 +148,9 @@ export function Navbar() {
     try {
       await supabase.auth.signOut();
     } catch (error) {
-      console.error("Error during logout:", error);
+      // Gunakan fungsi terjemahan untuk menangani pesan error
+      const logoutErrorMsg = await t('common.logoutError', 'Error during logout');
+      console.error(logoutErrorMsg, error);
     }
 
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -184,7 +190,7 @@ export function Navbar() {
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-menu"
           >
-            <span className="sr-only">Buka menu utama</span>
+            <span className="sr-only"><Translate i18nKey="common.openMainMenu" /></span>
             <Menu className="h-6 w-6" aria-hidden="true" />
           </button>
         </div>
@@ -195,14 +201,14 @@ export function Navbar() {
               {/* Admin Menu Items */}
               <Link
                 href="/admin/dashboard"
-                className={`text-sm font-semibold leading-6 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md px-2 py-1 ${
+                className={`text-sm font-semibold leading-6 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md px-2 py-1 navbar-link ${
                   pathname === "/admin/dashboard"
                     ? "text-blue-400"
                     : "text-white hover:text-blue-300"
                 }`}
                 aria-current={pathname === "/admin/dashboard" ? "page" : undefined}
               >
-                Dasbor
+                <Translate i18nKey="navbar.adminDashboard" />
               </Link>
               {/* Add other admin menu items if needed */}
             </>
@@ -211,14 +217,14 @@ export function Navbar() {
               <Link
                 key={item.name}
                 href={item.href}
-                className={`text-sm font-semibold leading-6 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md px-2 py-1 ${
+                className={`text-sm font-semibold leading-6 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md px-2 py-1 navbar-link ${
                   pathname === item.href
                     ? "text-blue-400"
                     : "text-white hover:text-blue-300"
                 }`}
                 aria-current={pathname === item.href ? "page" : undefined}
               >
-                {item.name}
+                <Translate i18nKey={`navbar.${item.name}`} />
               </Link>
             ))
           )}
@@ -226,19 +232,20 @@ export function Navbar() {
 
         <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:gap-x-4">
           {!isAdminPage && <GlobalSearch />}
+          <LanguageToggle />
           {isAdminPage ? (
             <button
               onClick={handleLogout}
-              className="border border-slate-600 text-white hover:bg-slate-800 py-2 px-4 rounded-md text-sm font-semibold flex items-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+              className="navbar-btn border border-slate-600 text-white hover:bg-slate-800 py-2 px-4 rounded-md text-sm font-semibold flex items-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900"
             >
               <LogOut className="mr-2 h-4 w-4" />
-              Keluar
+              <Translate i18nKey="common.logout" />
             </button>
           ) : (
             isAuthenticated === null ? (
               <div className="flex items-center gap-x-4">
-                <Button variant="outline" className="border border-slate-600 text-white hover:bg-slate-800 py-2 px-4 rounded-md text-sm font-semibold" disabled>
-                  Memuat...
+                <Button variant="outline" className="navbar-btn border border-slate-600 text-white hover:bg-slate-800 py-2 px-4 rounded-md text-sm font-semibold" disabled>
+                  <Translate i18nKey="common.loading" />
                 </Button>
               </div>
             ) : isAuthenticated ? (
@@ -269,16 +276,16 @@ export function Navbar() {
                         <div className="py-1 px-4" role="none">
                         <div className="flex flex-col space-y-1 pb-2 border-b border-slate-700">
                             <p className="text-sm font-medium leading-none text-white">
-                            {currentUser?.email || "Nama Pengguna"}
+                            {currentUser?.email || <Translate i18nKey="common.userName" />}
                             </p>
                             <p className="text-xs leading-none text-slate-400">
-                            {isAdminUser ? "Admin" : "Klien"}
+                            {isAdminUser ? <Translate i18nKey="common.admin" /> : <Translate i18nKey="common.client" />}
                             </p>
                         </div>
                         </div>
 
                         <div className="py-1" role="none">
-                        <Link href="/dashboard" className="block px-4 py-2 text-sm text-white hover:bg-slate-700" role="menuitem" onClick={() => setUserMenuOpen(false)}>
+                        <Link href="/dashboard" className="block px-4 py-2 text-sm text-white hover:bg-slate-700 navbar-btn" role="menuitem" onClick={() => setUserMenuOpen(false)}>
                             <div className="flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <rect width="7" height="9" x="3" y="3" rx="1" />
@@ -286,14 +293,14 @@ export function Navbar() {
                                 <rect width="7" height="5" x="14" y="14" rx="1" />
                                 <rect width="7" height="9" x="14" y="3" rx="1" />
                             </svg>
-                            <span>Dashboard</span>
+                            <span><Translate i18nKey="common.dashboard" /></span>
                             </div>
                         </Link>
                         {/* --- PERUBAHAN LINK PROFIL --- */}
-                        <Link href="/dashboard/profile" className="block px-4 py-2 text-sm text-white hover:bg-slate-700" role="menuitem" onClick={() => setUserMenuOpen(false)}>
+                        <Link href="/dashboard/profile" className="block px-4 py-2 text-sm text-white hover:bg-slate-700 navbar-btn" role="menuitem" onClick={() => setUserMenuOpen(false)}>
                             <div className="flex items-center">
                             <User className="mr-2 h-4 w-4" />
-                            <span>Profil</span>
+                            <span><Translate i18nKey="common.profile" /></span>
                             </div>
                         </Link>
                         {/* --- AKHIR PERUBAHAN LINK PROFIL --- */}
@@ -307,7 +314,7 @@ export function Navbar() {
                         >
                             <div className="flex items-center">
                             <LogOut className="mr-2 h-4 w-4" />
-                            <span>Keluar</span>
+                            <span><Translate i18nKey="common.logout" /></span>
                             </div>
                         </button>
                         </div>
@@ -319,13 +326,13 @@ export function Navbar() {
             ) : (
               <div className="flex items-center gap-x-4">
                 <Link href="/auth/login">
-                  <Button variant="outline" className="border border-slate-600 text-white hover:bg-slate-800 py-2 px-4 rounded-md text-sm font-semibold">
-                    Masuk
+                  <Button variant="outline" className="navbar-btn border border-slate-600 text-white hover:bg-slate-800 py-2 px-4 rounded-md text-sm font-semibold">
+                    <Translate i18nKey="common.login" />
                   </Button>
                 </Link>
                 <Link href="/kontak">
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-sm font-semibold flex items-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900">
-                    Get Started
+                  <Button className="navbar-btn bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-sm font-semibold flex items-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900">
+                    <Translate i18nKey="common.getStarted" />
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
@@ -365,7 +372,7 @@ export function Navbar() {
               className="-m-2.5 rounded-md p-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               onClick={() => setMobileMenuOpen(false)}
             >
-              <span className="sr-only">Tutup menu</span>
+              <span className="sr-only"><Translate i18nKey="common.closeMenu" /></span>
               <X className="h-6 w-6" aria-hidden="true" />
             </button>
           </div>
@@ -378,7 +385,7 @@ export function Navbar() {
                     {/* Admin Mobile Menu Items */}
                     <Link
                       href="/admin/dashboard"
-                      className={`-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      className={`-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 navbar-link ${
                         pathname === "/admin/dashboard"
                           ? "text-blue-400"
                           : "text-white hover:bg-slate-800"
@@ -386,7 +393,7 @@ export function Navbar() {
                       aria-current={pathname === "/admin/dashboard" ? "page" : undefined}
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Dasbor
+                      <Translate i18nKey="navbar.adminDashboard" />
                     </Link>
                     {/* Add other admin menu items if needed */}
                   </>
@@ -395,7 +402,7 @@ export function Navbar() {
                     <Link
                       key={item.name}
                       href={item.href}
-                      className={`-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      className={`-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 navbar-link ${
                         pathname === item.href
                           ? "text-blue-400"
                           : "text-white hover:bg-slate-800"
@@ -403,7 +410,7 @@ export function Navbar() {
                       aria-current={pathname === item.href ? "page" : undefined}
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      {item.name}
+                      <Translate i18nKey={`navbar.${item.name}`} />
                     </Link>
                   ))
                 )}
@@ -415,19 +422,20 @@ export function Navbar() {
                     <GlobalSearch />
                   </div>
                 )}
+                <LanguageToggle />
                 {isAdminPage ? (
                   <button
                     onClick={handleLogout}
-                    className="w-full border border-slate-600 text-white hover:bg-slate-800 py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+                    className="w-full navbar-btn border border-slate-600 text-white hover:bg-slate-800 py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
-                    Keluar
+                    <Translate i18nKey="common.logout" />
                   </button>
                 ) : (
                   isAuthenticated === null ? (
                     <div className="space-y-4">
-                      <Button className="w-full border border-slate-600 text-white hover:bg-slate-800 py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900" disabled>
-                        Memuat...
+                      <Button className="w-full navbar-btn border border-slate-600 text-white hover:bg-slate-800 py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900" disabled>
+                        <Translate i18nKey="common.loading" />
                       </Button>
                     </div>
                   ) : isAuthenticated ? (
@@ -436,14 +444,14 @@ export function Navbar() {
                       <div className="relative inline-block text-left w-full">
                         <div className="py-1 px-4 border-b border-slate-700 mb-2">
                             <p className="text-sm font-medium leading-none text-white">
-                            {currentUser?.email || "Nama Pengguna"}
+                            {currentUser?.email || <Translate i18nKey="common.userName" />}
                             </p>
                             <p className="text-xs leading-none text-slate-400">
-                            {isAdminUser ? "Admin" : "Klien"}
+                            {isAdminUser ? <Translate i18nKey="common.admin" /> : <Translate i18nKey="common.client" />}
                             </p>
                         </div>
                         <div className="py-1" role="none">
-                          <Link href="/dashboard" className="block px-4 py-2 text-base text-white hover:bg-slate-700" role="menuitem" onClick={() => setMobileMenuOpen(false)}>
+                          <Link href="/dashboard" className="block px-4 py-2 text-base text-white hover:bg-slate-700 navbar-btn" role="menuitem" onClick={() => setMobileMenuOpen(false)}>
                             <div className="flex items-center">
                               <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <rect width="7" height="9" x="3" y="3" rx="1" />
@@ -451,14 +459,14 @@ export function Navbar() {
                                 <rect width="7" height="5" x="14" y="14" rx="1" />
                                 <rect width="7" height="9" x="14" y="3" rx="1" />
                               </svg>
-                              <span>Dashboard</span>
+                              <span><Translate i18nKey="common.dashboard" /></span>
                             </div>
                           </Link>
                           {/* --- PERUBAHAN LINK PROFIL --- */}
-                          <Link href="/dashboard/profile" className="block px-4 py-2 text-base text-white hover:bg-slate-700" role="menuitem" onClick={() => setMobileMenuOpen(false)}>
+                          <Link href="/dashboard/profile" className="block px-4 py-2 text-base text-white hover:bg-slate-700 navbar-btn" role="menuitem" onClick={() => setMobileMenuOpen(false)}>
                             <div className="flex items-center">
                               <User className="mr-2 h-4 w-4" />
-                              <span>Profil</span>
+                              <span><Translate i18nKey="common.profile" /></span>
                             </div>
                           </Link>
                           {/* --- AKHIR PERUBAHAN LINK PROFIL --- */}
@@ -471,7 +479,7 @@ export function Navbar() {
                           >
                             <div className="flex items-center">
                               <LogOut className="mr-2 h-4 w-4" />
-                              <span>Keluar</span>
+                              <span><Translate i18nKey="common.logout" /></span>
                             </div>
                           </button>
                         </div>
@@ -481,13 +489,13 @@ export function Navbar() {
                   ) : (
                     <div className="space-y-4">
                       <Link href="/auth/login" onClick={() => setMobileMenuOpen(false)}>
-                        <Button className="w-full border border-slate-600 text-white hover:bg-slate-800 py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900">
-                          Masuk
+                        <Button className="w-full navbar-btn border border-slate-600 text-white hover:bg-slate-800 py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900">
+                          <Translate i18nKey="common.login" />
                         </Button>
                       </Link>
                       <Link href="/kontak" onClick={() => setMobileMenuOpen(false)}>
-                        <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900">
-                          Get Started
+                        <Button className="w-full navbar-btn bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-base font-semibold flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900">
+                          <Translate i18nKey="common.getStarted" />
                           <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
                       </Link>

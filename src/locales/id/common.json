@@ -1,0 +1,309 @@
+{
+  "common": {
+    "home": "Beranda",
+    "services": "Layanan",
+    "portfolio": "Portofolio",
+    "pricing": "Harga",
+    "about": "Tentang Kami",
+    "contact": "Kontak",
+    "dashboard": "Dasbor",
+    "profile": "Profil",
+    "logout": "Keluar",
+    "login": "Masuk",
+    "getStarted": "Mulai Sekarang",
+    "adminPanel": "Panel Admin",
+    "openMainMenu": "Buka menu utama",
+    "closeMenu": "Tutup menu",
+    "userName": "Nama Pengguna",
+    "userType": "Jenis Pengguna",
+    "client": "Klien",
+    "admin": "Admin",
+    "saveChanges": "Simpan Perubahan",
+    "reset": "Reset",
+    "cancel": "Batal",
+    "confirm": "Konfirmasi",
+    "yes": "Ya",
+    "no": "Tidak",
+    "search": "Cari",
+    "settings": "Pengaturan",
+    "notifications": "Notifikasi",
+    "messages": "Pesan",
+    "welcome": "Selamat Datang",
+    "popular": "POPULER",
+    "logoutError": "Kesalahan saat keluar",
+    "loading": "Memuat...",
+    "userName": "Nama Pengguna",
+    "userType": "Jenis Pengguna",
+    "client": "Klien",
+    "admin": "Admin",
+    "saveChanges": "Simpan Perubahan",
+    "reset": "Reset",
+    "cancel": "Batal",
+    "confirm": "Konfirmasi",
+    "yes": "Ya",
+    "no": "Tidak",
+    "search": "Cari",
+    "settings": "Pengaturan",
+    "notifications": "Notifikasi",
+    "messages": "Pesan",
+    "welcome": "Selamat Datang",
+    "popular": "POPULER",
+    "logoutError": "Kesalahan saat keluar",
+    "homepageTitle": "MiraiDev - Solusi Pengembangan Website Modern"
+  },
+  "home": {
+    "hero": {
+      "title": "Wujudkan <span class='text-blue-400'>Website Impian</span> Bisnis Anda dengan Solusi yang Terjangkau",
+      "description": "Website modern dan responsif yang dirancang khusus untuk membantu bisnis Anda tumbuh di era digital, dengan harga yang terjangkau untuk UMKM dan startup.",
+      "cta1": "Konsultasi Gratis Sekarang",
+      "cta2": "Lihat Portofolio",
+      "features": {
+        "affordablePricing": "Harga Terjangkau",
+        "transparentProcess": "Proses Transparan",
+        "freeRevisions": "Revisi Gratis",
+        "personalSupport": "Dukungan Personal"
+      }
+    },
+    "services": {
+      "customDev": {
+        "title": "Pengembangan Website Kustom",
+        "description": "Website yang dirancang khusus untuk memenuhi kebutuhan unik bisnis Anda dengan teknologi terkini.",
+        "features": {
+          "responsive": "Desain responsif untuk semua perangkat",
+          "optimization": "Optimasi kecepatan dan kinerja",
+          "integration": "Integrasi dengan sistem lain",
+          "seo": "Dukungan SEO dasar"
+        }
+      },
+      "redesign": {
+        "title": "Redesain Website",
+        "description": "Pembaruan tampilan dan fungsionalitas website Anda saat ini untuk meningkatkan pengalaman pengguna.",
+        "features": {
+          "audit": "Audit dan analisis website saat ini",
+          "modern": "Redesain dengan pendekatan modern",
+          "migration": "Migrasi konten dengan aman",
+          "testing": "Pengujian kompatibilitas browser"
+        }
+      },
+      "maintenance": {
+        "title": "Paket Perawatan Website",
+        "description": "Solusi perawatan rutin untuk menjaga website Anda tetap aman, terbaru, dan berjalan optimal.",
+        "features": {
+          "security": "Pembaruan keamanan rutin",
+          "backup": "Pencadangan data otomatis",
+          "monitoring": "Pemantauan kinerja",
+          "support": "Dukungan teknis 24/7"
+        }
+      },
+      "seo": {
+        "title": "Optimasi SEO & Kinerja",
+        "description": "Layanan tambahan untuk meningkatkan peringkat website Anda di mesin pencari dan mempercepat waktu muat.",
+        "features": {
+          "audit": "Audit SEO menyeluruh",
+          "keywords": "Optimasi kata kunci",
+          "vitals": "Peningkatan Core Web Vitals",
+          "report": "Laporan kinerja bulanan"
+        }
+      }
+    }
+  },
+  "navbar": {
+    "home": "Beranda",
+    "services": "Layanan",
+    "portfolio": "Portofolio",
+    "pricing": "Harga",
+    "about": "Tentang Kami",
+    "contact": "Kontak",
+    "adminDashboard": "Dasbor Admin"
+  },
+  "services": {
+    "title": "Layanan Kami",
+    "description": "Solusi komprehensif untuk kebutuhan digital Anda",
+    "noFeatures": "Tidak ada fitur spesifik yang tercantum",
+    "learnMore": "Pelajari Lebih Lanjut",
+    "ctaTitle": "Siap Memulai Proyek Anda?",
+    "ctaDescription": "Setiap proyek memiliki kebutuhan unik. Diskusikan kebutuhan spesifik Anda dengan tim ahli kami untuk solusi yang disesuaikan.",
+    "freeConsultation": "Konsultasi Gratis",
+    "contactUs": "Hubungi Kami"
+  },
+  "pricing": {
+    "calculator": "Kalkulator Harga",
+    "managePackages": "Kelola Paket Harga",
+    "packageName": "Nama Paket",
+    "description": "Deskripsi",
+    "basePrice": "Harga Dasar (IDR)",
+    "features": "Fitur dalam Paket",
+    "addFeature": "Tambah",
+    "newFeature": "Nama fitur baru...",
+    "noFeatures": "Belum ada fitur untuk paket ini",
+    "includedFeatures": "Fitur ditambahkan",
+    "totalPrice": "Total Harga",
+    "chooseThisPackage": "Pilih Paket Ini",
+    "save": "Simpan Perubahan",
+    "saving": "Menyimpan...",
+    "savedSuccess": "Pengaturan harga berhasil diperbarui",
+    "savedError": "Terjadi kesalahan saat menyimpan pengaturan harga"
+  },
+  "contact": {
+    "title": "Hubungi Kami",
+    "name": "Nama",
+    "email": "Email",
+    "phone": "Telepon",
+    "subject": "Subjek",
+    "message": "Pesan",
+    "send": "Kirim Pesan",
+    "sending": "Mengirim...",
+    "sentSuccess": "Pesan berhasil dikirim",
+    "sentError": "Terjadi kesalahan saat mengirim pesan",
+    "description": "Punya pertanyaan atau ingin diskusi proyek? Kami siap membantu Anda.",
+    "freeConsultation": "Konsultasi Gratis",
+    "sendProjectDetails": "Kirim detail proyek Anda dan kami akan segera menghubungi Anda.",
+    "company": "Nama Perusahaan (Opsional)",
+    "projectType": "Jenis Proyek",
+    "budget": "Estimasi Anggaran",
+    "timeline": "Estimasi Waktu Pengerjaan",
+    "sendMessage": "Kirim Pesan",
+    "estimation": "Estimasi Harga",
+    "basedOnYourSelection": "Berdasarkan pilihan Anda:",
+    "mainFeatures": "Fitur Utama:",
+    "note": "Catatan:",
+    "estimationNote": "Harga ini adalah estimasi. Kami akan memberikan penawaran final setelah konsultasi.",
+    "selectProjectType": "Pilih Jenis Proyek",
+    "selectProjectTypePrompt": "Pilih jenis proyek dari dropdown untuk melihat detail paket di sini.",
+    "contactInfo": "Informasi Kontak",
+    "address": "Alamat",
+    "monFri": "Senin - Jumat, 09:00 - 17:00",
+    "replyTime": "Balas dalam 24 jam kerja",
+    "remoteOps": "Remote-first operations",
+    "budgetOptions": {
+      "small": "Rp 1.000.000 - Rp 3.000.000",
+      "medium": "Rp 3.000.000 - Rp 10.000.000",
+      "large": "Rp 10.000.000+",
+      "flexible": "Fleksibel / Belum Tentu"
+    },
+    "timelineOptions": {
+      "urgent": "1-2 Minggu",
+      "short": "1-2 Bulan",
+      "medium": "3-6 Bulan",
+      "long": "6+ Bulan",
+      "flexible": "Fleksibel"
+    },
+    "successMessage": "Pesan Anda telah berhasil dikirim! Kami akan segera menghubungi Anda.",
+    "generalError": "Terjadi kesalahan",
+    "unexpectedError": "Terjadi kesalahan tak terduga",
+    "customSolution": "Solusi Kustom (dari Kalkulator)",
+    "chooseBudget": "Pilih anggaran...",
+    "chooseTimeline": "Pilih waktu...",
+    "chooseProjectType": "Pilih jenis..."
+  },
+  "auth": {
+    "login": "Masuk",
+    "register": "Daftar",
+    "email": "Email",
+    "password": "Kata Sandi",
+    "confirmPassword": "Konfirmasi Kata Sandi",
+    "forgotPassword": "Lupa Kata Sandi?",
+    "rememberMe": "Ingat saya",
+    "signIn": "Masuk",
+    "signUp": "Daftar",
+    "signingIn": "Sedang masuk...",
+    "signingUp": "Membuat akun...",
+    "logoutConfirm": "Apakah Anda yakin ingin keluar?",
+    "welcomeBack": "Selamat Datang Kembali",
+    "newUser": "Pengguna baru?"
+  },
+  "about": {
+    "hero": {
+      "title": "Tentang <span class='text-blue-400'>Kami</span>",
+      "description": "Mewujudkan visi digital masa depan untuk bisnis Anda"
+    },
+    "story": {
+      "title": "Cerita Kami",
+      "paragraph1": "MiraiDev bermula dari semangat seorang developer independen yang ingin membantu bisnis lokal bersaing di era digital. Dengan latar belakang pendidikan teknik informatika dan passion terhadap teknologi web, kami memulai perjalanan ini pada tahun 2023.",
+      "paragraph2": "Nama \"Mirai\" berasal dari bahasa Jepang yang berarti \"masa depan\". Kami memilih nama ini karena visi kami untuk membantu bisnis membangun kehadiran digital yang berkelanjutan dan siap menghadapi perkembangan teknologi di masa depan.",
+      "paragraph3": "Kami fokus pada pengembangan website modern dan solusi digital yang efisien, menggunakan teknologi terkini seperti React, Next.js, dan berbagai framework modern lainnya untuk memberikan hasil terbaik bagi klien kami."
+    },
+    "future": {
+      "digital": "Masa Depan Digital"
+    },
+    "values": {
+      "title": "Nilai Kami",
+      "description": "Prinsip-prinsip yang membimbing setiap aspek pekerjaan kami",
+      "excellence": {
+        "title": "Kualitas Terbaik",
+        "description": "Fokus pada pengiriman kode berkualitas tinggi dengan praktik terbaik dalam pengembangan web."
+      },
+      "clientFocus": {
+        "title": "Berorientasi pada Klien",
+        "description": "Mendengarkan kebutuhan klien dengan seksama untuk memberikan solusi yang tepat sasaran."
+      },
+      "innovation": {
+        "title": "Inovasi Berkelanjutan",
+        "description": "Terus belajar dan mengadopsi teknologi terbaru untuk solusi yang modern dan efisien."
+      },
+      "longTerm": {
+        "title": "Berpikir Jangka Panjang",
+        "description": "Membangun website yang scalable dan mudah dikelola untuk pertumbuhan bisnis jangka panjang."
+      }
+    },
+    "team": {
+      "title": "Tim Kami",
+      "description": "Seorang developer independen yang berdedikasi untuk kesuksesan proyek Anda",
+      "memberName": "Developer Independen",
+      "role": "Full-Stack Developer",
+      "bio": "Seorang developer yang bersemangat tentang teknologi web modern dan berkomitmen untuk memberikan solusi terbaik bagi setiap proyek."
+    },
+    "stats": {
+      "projectsCompleted": "Proyek Selesai",
+      "happyClients": "Klien Puas",
+      "yearsExperience": "Tahun Pengalaman",
+      "focusDeveloper": "Developer Fokus"
+    },
+    "cta": {
+      "title": "Siap Punya Website Profesional untuk Bisnis Anda?",
+      "description": "Diskusikan kebutuhan Anda dengan developer independen yang fokus pada solusi terjangkau dan berkualitas untuk UMKM.",
+      "cta1": "Konsultasi Gratis Sekarang",
+      "cta2": "Hubungi Kami"
+    }
+  },
+  "pricing": {
+    "title": "Estimasi <span class='text-blue-400'>Harga</span>",
+    "description": "Dapatkan estimasi harga proyek Anda secara real-time berdasarkan kebutuhan spesifik",
+    "cta": {
+      "title": "Siap Memulai Proyek Anda?",
+      "description": "Setelah mendapatkan estimasi harga, konsultasikan proyek Anda dengan tim kami untuk penawaran yang lebih akurat",
+      "button": "Konsultasi Sekarang"
+    }
+  },
+  "portfolio": {
+    "title": "Galeri <span class='text-blue-400'>Template</span>",
+    "description": "Pilih dari berbagai template website profesional yang siap pakai untuk mempercepat kehadiran digital bisnis Anda."
+  },
+  "pricingCalculator": {
+    "title": "Estimasi Harga <span class='text-blue-400'>Proyek</span>",
+    "description": "Dapatkan estimasi harga untuk proyek Anda berdasarkan kebutuhan spesifik",
+    "stepsCompleted": "langkah selesai",
+    "projectType": "Jenis Proyek",
+    "additionalFeatures": "Fitur Tambahan",
+    "pages": "Jumlah Halaman",
+    "timeline": "Estimasi Waktu Pengerjaan",
+    "complexity": "Tingkat Kompleksitas",
+    "calculateBtn": "Hitung Estimasi Harga",
+    "resetBtn": "Hitung Ulang",
+    "consultBtn": "Konsultasi Sekarang",
+    "resultTitle": "Estimasi Harga",
+    "resultNote": "Ini adalah estimasi awal berdasarkan pilihan Anda. Harga akhir mungkin bervariasi setelah konsultasi mendalam dengan tim kami.",
+    "noDataTitle": "Data Harga Belum Lengkap",
+    "noDataDesc": "Beberapa komponen harga belum diatur oleh admin. Pastikan semua jenis harga telah diisi.",
+    "noDataAdminNote": "Admin perlu mengisi harga untuk Jenis Proyek, Halaman, Waktu, dan Kompleksitas.",
+    "loading": "Memuat data harga...",
+    "retry": "Coba Lagi",
+    "errorTitle": "Error Memuat Data",
+    "errorDesc": "Gagal memuat data harga. Mohon coba lagi nanti.",
+    "tryAgain": "Coba Lagi",
+    "missingFields": "Harap lengkapi semua pilihan.",
+    "invalidSelection": "Pilihan tidak valid.",
+    "estimateSuccess": "Estimasi harga berhasil dihitung",
+    "pageCount": "halaman"
+  }
+}

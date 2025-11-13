@@ -4,15 +4,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { 
-  Calculator, 
-  Plus, 
-  Trash2, 
-  RotateCcw, 
-  CheckCircle, 
+import {
+  Calculator,
+  Plus,
+  Trash2,
+  RotateCcw,
+  CheckCircle,
   AlertCircle,
   Package
 } from 'lucide-react';
+import Translate from '@/i18n/Translate';
+import { useLanguage } from '@/i18n/useLanguage';
 
 interface PriceFeature {
   id: string;
@@ -41,6 +43,8 @@ export default function PricingCalculator({ initialPackages, onUpdate }: Pricing
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [saveMessage, setSaveMessage] = useState('');
+  
+  const { t } = useLanguage();
 
   // Tambah paket baru
   const addPackage = () => {
@@ -59,10 +63,10 @@ export default function PricingCalculator({ initialPackages, onUpdate }: Pricing
   // Hapus paket
   const removePackage = (id: string) => {
     if (packages.length <= 1) return; // Jangan hapus semua paket
-    
+
     const newPackages = packages.filter(pkg => pkg.id !== id);
     setPackages(newPackages);
-    
+
     // Perbarui indeks yang dipilih jika diperlukan
     if (selectedPackageIndex >= newPackages.length) {
       setSelectedPackageIndex(newPackages.length - 1);
@@ -72,13 +76,13 @@ export default function PricingCalculator({ initialPackages, onUpdate }: Pricing
   // Tambah fitur ke paket yang dipilih
   const addFeature = () => {
     if (!newFeatureName.trim()) return;
-    
+
     const newFeature: PriceFeature = {
       id: Date.now().toString(),
       name: newFeatureName,
       included: true
     };
-    
+
     const updatedPackages = [...packages];
     updatedPackages[selectedPackageIndex].features.push(newFeature);
     setPackages(updatedPackages);
@@ -88,7 +92,7 @@ export default function PricingCalculator({ initialPackages, onUpdate }: Pricing
   // Hapus fitur dari paket yang dipilih
   const removeFeature = (featureId: string) => {
     const updatedPackages = [...packages];
-    updatedPackages[selectedPackageIndex].features = 
+    updatedPackages[selectedPackageIndex].features =
       updatedPackages[selectedPackageIndex].features.filter(f => f.id !== featureId);
     setPackages(updatedPackages);
   };
@@ -110,20 +114,18 @@ export default function PricingCalculator({ initialPackages, onUpdate }: Pricing
     setPackages(updatedPackages);
   };
 
-
-
   // Simpan perubahan
   const handleSave = () => {
     setIsSaving(true);
     setSaveStatus('idle');
-    
+
     try {
       onUpdate(packages);
       setSaveStatus('success');
-      setSaveMessage('Pengaturan harga berhasil diperbarui');
+      t('pricing.savedSuccess').then(savedSuccessMsg => setSaveMessage(savedSuccessMsg));
     } catch {
       setSaveStatus('error');
-      setSaveMessage('Terjadi kesalahan saat menyimpan pengaturan harga');
+      t('pricing.savedError').then(savedErrorMsg => setSaveMessage(savedErrorMsg));
     } finally {
       setIsSaving(false);
     }
@@ -153,10 +155,10 @@ export default function PricingCalculator({ initialPackages, onUpdate }: Pricing
           <div>
             <CardTitle className="text-white flex items-center">
               <Calculator className="h-5 w-5 mr-2" />
-              Manajemen Harga
+              <Translate i18nKey="pricing.managePackages" />
             </CardTitle>
             <CardDescription className="text-gray-400">
-              Kelola paket harga dan kalkulator harga real-time
+              <Translate i18nKey="pricing.calculator" />
             </CardDescription>
           </div>
           <div className="flex items-center space-x-2">
@@ -168,7 +170,7 @@ export default function PricingCalculator({ initialPackages, onUpdate }: Pricing
               className="text-gray-300 hover:text-white border-gray-600"
             >
               <RotateCcw className="h-4 w-4 mr-2" />
-              Reset
+              <Translate i18nKey="common.reset" />
             </Button>
             <Button
               onClick={handleSave}
@@ -178,12 +180,12 @@ export default function PricingCalculator({ initialPackages, onUpdate }: Pricing
               {isSaving ? (
                 <>
                   <div className="h-4 w-4 mr-2 animate-spin rounded-full border-b-2 border-white"></div>
-                  Menyimpan...
+                  <Translate i18nKey="pricing.saving" />
                 </>
               ) : (
                 <>
                   <CheckCircle className="h-4 w-4 mr-2" />
-                  Simpan Perubahan
+                  <Translate i18nKey="pricing.save" />
                 </>
               )}
             </Button>
@@ -194,8 +196,8 @@ export default function PricingCalculator({ initialPackages, onUpdate }: Pricing
         {/* Status simpan */}
         {saveStatus !== 'idle' && (
           <div className={`mb-4 p-3 rounded-lg flex items-center ${
-            saveStatus === 'success' 
-              ? 'bg-green-900/20 text-green-400 border border-green-700' 
+            saveStatus === 'success'
+              ? 'bg-green-900/20 text-green-400 border border-green-700'
               : 'bg-red-900/20 text-red-400 border border-red-700'
           }`}>
             {saveStatus === 'success' ? (
@@ -214,13 +216,13 @@ export default function PricingCalculator({ initialPackages, onUpdate }: Pricing
               <CardHeader>
                 <CardTitle className="text-white text-sm flex items-center">
                   <Package className="h-4 w-4 mr-2" />
-                  Paket Harga
+                  <Translate i18nKey="pricing.packageName" />
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
                   {packages.map((pkg, index) => (
-                    <div 
+                    <div
                       key={pkg.id}
                       className={`p-3 rounded-lg cursor-pointer border ${
                         selectedPackageIndex === index
@@ -233,9 +235,9 @@ export default function PricingCalculator({ initialPackages, onUpdate }: Pricing
                         <div>
                           <h3 className="font-medium text-white">{pkg.name}</h3>
                           <p className="text-xs text-gray-400">
-                            {calculatePackagePrice(pkg).toLocaleString('id-ID', { 
-                              style: 'currency', 
-                              currency: 'IDR' 
+                            {calculatePackagePrice(pkg).toLocaleString('id-ID', {
+                              style: 'currency',
+                              currency: 'IDR'
                             })}
                           </p>
                         </div>
@@ -259,7 +261,7 @@ export default function PricingCalculator({ initialPackages, onUpdate }: Pricing
                     className="w-full mt-2 border-gray-600 text-gray-300 hover:text-white hover:bg-gray-700"
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    Tambah Paket
+                    <Translate i18nKey="pricing.addFeature" />
                   </Button>
                 </div>
               </CardContent>
@@ -271,14 +273,14 @@ export default function PricingCalculator({ initialPackages, onUpdate }: Pricing
             <Card className="bg-gray-750 border-gray-700">
               <CardHeader>
                 <CardTitle className="text-white text-sm">
-                  Detail Paket: {currentPackage?.name}
+                  <Translate i18nKey="pricing.packageName" />: {currentPackage?.name}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div className="space-y-2">
                     <Label htmlFor="packageName" className="text-gray-200">
-                      Nama Paket
+                      <Translate i18nKey="pricing.packageName" />
                     </Label>
                     <Input
                       id="packageName"
@@ -289,7 +291,7 @@ export default function PricingCalculator({ initialPackages, onUpdate }: Pricing
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="packagePrice" className="text-gray-200">
-                      Harga Dasar (IDR)
+                      <Translate i18nKey="pricing.basePrice" />
                     </Label>
                     <Input
                       id="packagePrice"
@@ -300,10 +302,10 @@ export default function PricingCalculator({ initialPackages, onUpdate }: Pricing
                     />
                   </div>
                 </div>
-                
+
                 <div className="space-y-2 mb-4">
                   <Label htmlFor="packageDescription" className="text-gray-200">
-                    Deskripsi Paket
+                    <Translate i18nKey="pricing.description" />
                   </Label>
                   <Textarea
                     id="packageDescription"
@@ -312,16 +314,18 @@ export default function PricingCalculator({ initialPackages, onUpdate }: Pricing
                     className="bg-gray-700 border-gray-600 text-white min-h-[80px]"
                   />
                 </div>
-                
+
                 {/* Fitur Paket */}
                 <div className="mb-4">
                   <div className="flex justify-between items-center mb-2">
-                    <Label className="text-gray-200">Fitur dalam Paket</Label>
+                    <Label className="text-gray-200">
+                      <Translate i18nKey="pricing.features" />
+                    </Label>
                     <div className="flex space-x-2">
                       <Input
                         value={newFeatureName}
                         onChange={(e) => setNewFeatureName(e.target.value)}
-                        placeholder="Nama fitur baru..."
+                        placeholder="pricing.newFeature"
                         className="bg-gray-700 border-gray-600 text-white text-sm w-48"
                       />
                       <Button
@@ -330,16 +334,16 @@ export default function PricingCalculator({ initialPackages, onUpdate }: Pricing
                         className="bg-blue-600 hover:bg-blue-700 h-8"
                       >
                         <Plus className="h-4 w-4 mr-1" />
-                        Tambah
+                        <Translate i18nKey="pricing.addFeature" />
                       </Button>
                     </div>
                   </div>
-                  
+
                   <div className="space-y-2 max-h-60 overflow-y-auto p-2 border border-gray-600 rounded-lg bg-gray-700/50">
                     {currentPackage?.features && currentPackage.features.length > 0 ? (
                       currentPackage.features.map((feature) => (
-                        <div 
-                          key={feature.id} 
+                        <div
+                          key={feature.id}
                           className="flex items-center justify-between p-2 bg-gray-700 rounded hover:bg-gray-600/50"
                         >
                           <div className="flex items-center">
@@ -365,37 +369,45 @@ export default function PricingCalculator({ initialPackages, onUpdate }: Pricing
                       ))
                     ) : (
                       <div className="text-center py-4 text-gray-500">
-                        Belum ada fitur untuk paket ini
+                        <Translate i18nKey="pricing.noFeatures" />
                       </div>
                     )}
                   </div>
                 </div>
-                
+
                 {/* Kalkulator Harga */}
                 <div className="bg-gray-800 border border-gray-600 rounded-lg p-4">
-                  <h3 className="font-medium text-white mb-2">Kalkulator Harga</h3>
+                  <h3 className="font-medium text-white mb-2">
+                    <Translate i18nKey="pricing.calculator" />
+                  </h3>
                   <div className="flex justify-between items-center">
                     <div>
-                      <p className="text-gray-400 text-sm">Harga Dasar</p>
+                      <p className="text-gray-400 text-sm">
+                        <Translate i18nKey="pricing.basePrice" />
+                      </p>
                       <p className="text-white">
-                        {currentPackage?.basePrice.toLocaleString('id-ID', { 
-                          style: 'currency', 
-                          currency: 'IDR' 
+                        {currentPackage?.basePrice.toLocaleString('id-ID', {
+                          style: 'currency',
+                          currency: 'IDR'
                         })}
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-400 text-sm">Fitur Ditambahkan</p>
+                      <p className="text-gray-400 text-sm">
+                        <Translate i18nKey="pricing.includedFeatures" />
+                      </p>
                       <p className="text-white">
                         {currentPackage?.features.filter(f => f.included).length} fitur
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-gray-400 text-sm">Total Harga</p>
+                      <p className="text-gray-400 text-sm">
+                        <Translate i18nKey="pricing.totalPrice" />
+                      </p>
                       <p className="text-xl font-bold text-green-400">
-                        {calculatePackagePrice(currentPackage).toLocaleString('id-ID', { 
-                          style: 'currency', 
-                          currency: 'IDR' 
+                        {calculatePackagePrice(currentPackage).toLocaleString('id-ID', {
+                          style: 'currency',
+                          currency: 'IDR'
                         })}
                       </p>
                     </div>

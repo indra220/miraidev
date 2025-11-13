@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: {
-    default: "MiraiDev - Solusi Pengembangan Website Modern",
+    default: "MiraiDev - Modern Website Development Solutions",
     template: "%s | MiraiDev" // <-- Template ini akan digunakan di semua halaman
   },
-  description: "MiraiDev menyediakan solusi pengembangan website modern, desain UI/UX, dan layanan pemeliharaan untuk bisnis Anda",
+  description: "MiraiDev provides modern website development solutions, UI/UX design, and maintenance services for your business",
   keywords: ["website", "development", "UMKM", "digital", "solution", "Indonesia"],
   authors: [{ name: "MiraiDev", url: "https://www.mirai.dev" }],
   creator: "MiraiDev",
@@ -21,8 +21,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    title: "MiraiDev - Solusi Pengembangan Website Modern",
-    description: "MiraiDev menyediakan solusi pengembangan website modern, desain UI/UX, dan layanan pemeliharaan untuk bisnis Anda",
+    title: "MiraiDev - Modern Website Development Solutions",
+    description: "MiraiDev provides modern website development solutions, UI/UX design, and maintenance services for your business",
     url: "https://www.mirai.dev",
     siteName: "MiraiDev",
     images: [
@@ -30,14 +30,14 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "MiraiDev - Solusi Pengembangan Website Modern",
+        alt: "MiraiDev - Modern Website Development Solutions",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "MiraiDev - Solusi Pengembangan Website Modern",
-    description: "MiraiDev menyediakan solusi pengembangan website modern, desain UI/UX, dan layanan pemeliharaan untuk bisnis Anda",
+    title: "MiraiDev - Modern Website Development Solutions",
+    description: "MiraiDev provides modern website development solutions, UI/UX design, and maintenance services for your business",
   },
   robots: {
     index: true,

@@ -22,6 +22,9 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import Image from "next/image";
+import Translate from "@/i18n/Translate";
+import { useLanguage } from "@/i18n/useLanguage";
+import { t } from "@/i18n/t";
 
 interface Category {
   id: string;
@@ -29,22 +32,29 @@ interface Category {
   icon: ReactNode;
 }
 
-const formatPrice = (price: number | null | undefined): string => {
+const formatPrice = (price: number | null | undefined, locale: string): string => {
     if (price === null || price === undefined || price === 0) {
-      return "Gratis";
+      return locale === 'en' ? "Free" : "Gratis";
     }
-    return `Rp ${price.toLocaleString('id-ID')}`;
+    return `Rp ${price.toLocaleString(locale === 'en' ? 'en-US' : 'id-ID')}`;
 };
   
-export default function PortofolioPage() {
+export default function PortfolioPage() {
+  const { locale } = useLanguage();
+
   useEffect(() => {
-    document.title = "Portofolio | MiraiDev";
-  }, []);
+    const setTitle = async () => {
+      const title = await t('common.portfolio', locale, 'Portfolio');
+      document.title = `${title} | MiraiDev`;
+    };
+
+    setTitle();
+  }, [locale]);
 
   const [activeFilter, setActiveFilter] = useState("all");
   const [projects, setProjects] = useState<PortfolioItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([
-    { id: "all", name: "Semua", icon: <Globe className="w-4 h-4" /> }
+    { id: "all", name: locale === 'en' ? "All" : "Semua", icon: <Globe className="w-4 h-4" /> }
   ]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -137,13 +147,13 @@ export default function PortofolioPage() {
               className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6"
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
             >
-              Galeri <span className="text-blue-400">Template</span>
+              <Translate i18nKey="portfolio.title" fallback="Template <span class='text-blue-400'>Gallery</span>" component="div" params={{locale}} />
             </OptimizedMotion>
             <OptimizedMotion 
               className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto"
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}
             >
-              Pilih dari berbagai template website profesional yang siap pakai untuk mempercepat kehadiran digital bisnis Anda.
+              <Translate i18nKey="portfolio.description" fallback="Choose from various professional website templates ready to use to accelerate your business digital presence." />
             </OptimizedMotion>
           </div>
         </div>
@@ -154,7 +164,7 @@ export default function PortofolioPage() {
             <div className="relative max-w-2xl mx-auto mb-6">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <Input
-                placeholder="Cari template (misal: toko online, company profile...)"
+                placeholder={locale === 'en' ? "Search template (e.g: online store, company profile...)" : "Cari template (misal: toko online, company profile...)"}
                 className="pl-12 pr-4 py-6 bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500 rounded-full"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -247,7 +257,7 @@ export default function PortofolioPage() {
                     
                     <div className="flex justify-between items-center mb-4">
                         <div className="text-xl font-bold text-green-400">
-                            {formatPrice(project.price)}
+                            {formatPrice(project.price, locale)}
                         </div>
                         <div className="text-xs text-gray-500 flex items-center">
                             <Eye className="h-4 w-4 mr-1"/>
@@ -264,7 +274,7 @@ export default function PortofolioPage() {
                       </Button>
                       <Button asChild variant="outline" className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-700">
                           <Link href={project.use_url || '/kontak'}>
-                              Gunakan
+                              {locale === 'en' ? "Use" : "Gunakan"}
                           </Link>
                       </Button>
                     </div>
@@ -277,7 +287,7 @@ export default function PortofolioPage() {
         )}
          { !loading && filteredProjects.length === 0 && (
             <div className="text-center col-span-full py-24">
-                <p className="text-gray-500">Tidak ada template yang cocok dengan pencarian Anda.</p>
+                <p className="text-gray-500">{locale === 'en' ? "No templates match your search." : "Tidak ada template yang cocok dengan pencarian Anda."}</p>
             </div>
          )}
       </div>

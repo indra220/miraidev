@@ -22,6 +22,8 @@ import {
   TimelinePrice, 
   ComplexityPrice 
 } from '@/lib/types';
+import { useLanguage } from '@/i18n/useLanguage';
+import { t } from '@/i18n/t';
 
 export default function DynamicPriceCalculator({ 
   onCalculate,
@@ -45,6 +47,7 @@ export default function DynamicPriceCalculator({
   complexity?: string;
   timeline?: string;
 }) {
+  const { locale } = useLanguage();
   const [projectType, setProjectType] = useState(initialProjectType);
   const [pages, setPages] = useState(initialPages);
   const [features, setFeatures] = useState<string[]>(initialFeatures || []);
@@ -112,9 +115,10 @@ export default function DynamicPriceCalculator({
         
         setError(null);
       } catch (err) {
+        const errorMsg = await t('pricingCalculator.errorDesc', locale, 'Failed to load price data. Please try again later.');
         setError((err as Error).message || "Terjadi kesalahan saat mengambil data harga");
         toast.error("Error", {
-          description: "Gagal memuat data harga. Mohon coba lagi nanti."
+          description: errorMsg
         });
       } finally {
         setLoading(false);
@@ -122,11 +126,12 @@ export default function DynamicPriceCalculator({
     };
     
     fetchData();
-  }, []);
+  }, [locale]);
 
-  const calculateEstimate = () => {
+  const calculateEstimate = async () => {
     if (!projectType || !timeline || !complexity) {
-      toast.error("Harap lengkapi semua pilihan.");
+      const missingFieldsMsg = await t('pricingCalculator.missingFields', locale, 'Please complete all selections.');
+      toast.error(missingFieldsMsg);
       return;
     }
 
@@ -135,7 +140,8 @@ export default function DynamicPriceCalculator({
     const selectedTimeline = timelinePrices.find(tp => tp.id === timeline);
     
     if (!selectedProjectType || !selectedComplexity || !selectedTimeline) {
-      toast.error("Pilihan tidak valid.");
+      const invalidSelectionMsg = await t('pricingCalculator.invalidSelection', locale, 'Invalid selection.');
+      toast.error(invalidSelectionMsg);
       return;
     }
 
@@ -166,7 +172,8 @@ export default function DynamicPriceCalculator({
     const finalPrice = Math.round(price);
     setEstimatedPrice(finalPrice);
     setShowResult(true);
-    toast.success("Estimasi harga berhasil dihitung");
+    const estimateSuccessMsg = await t('pricingCalculator.estimateSuccess', locale, 'Price estimate calculated successfully');
+    toast.success(estimateSuccessMsg);
 
     if (onCalculate) {
       onCalculate({
@@ -181,7 +188,7 @@ export default function DynamicPriceCalculator({
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('id-ID', {
+    return new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'id-ID', {
       style: 'currency',
       currency: 'IDR',
       minimumFractionDigits: 0,
@@ -207,20 +214,20 @@ export default function DynamicPriceCalculator({
     }
   };
 
-  const redirectToContactWithEstimation = () => {
+  const redirectToContactWithEstimation = async () => {
     const selectedProjectType = projectTypes.find(p => p.id === projectType);
     const selectedComplexity = complexityPrices.find(c => c.id === complexity);
     const selectedTimeline = timelinePrices.find(t => t.id === timeline);
-    const selectedFeatures = features.map(fId => featurePrices.find(f => f.id === fId)?.name).filter(Boolean);
+    const selectedFeatures = features.map(fId => featurePrices.find(f => f.id === fId)?.name_key).filter(Boolean);
 
     const queryString = new URLSearchParams({
       fromCalculator: 'true',
       projectType: 'custom',
-      projectTypeName: selectedProjectType?.name || 'Tidak ditentukan',
+      projectTypeName: selectedProjectType?.name_key || await t('common.undetermined', locale, 'Undetermined'),
       pages: pages.toString(),
       features: selectedFeatures.join(','),
-      complexityLabel: selectedComplexity?.complexity_label || 'Tidak ditentukan',
-      timelineLabel: selectedTimeline?.timeline_label || 'Tidak ditentukan',
+      complexityLabel: selectedComplexity?.label_key || await t('common.undetermined', locale, 'Undetermined'),
+      timelineLabel: selectedTimeline?.label_key || await t('common.undetermined', locale, 'Undetermined'),
       estimatedPrice: estimatedPrice.toString()
     }).toString();
 
@@ -242,7 +249,7 @@ export default function DynamicPriceCalculator({
           <div className="flex justify-center items-center h-64">
             <div className="text-center">
               <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-gray-400">Memuat data harga...</p>
+              <p className="text-gray-400">{locale === 'en' ? "Loading price data..." : "Memuat data harga..."}</p>
             </div>
           </div>
         </div>
@@ -256,10 +263,10 @@ export default function DynamicPriceCalculator({
         <div className="bg-gradient-to-br from-gray-800/70 to-gray-900/70 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-6 shadow-xl">
           <div className="flex flex-col items-center justify-center h-64 text-center">
             <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-            <h3 className="text-xl font-bold text-white mb-2">Error Memuat Data</h3>
+            <h3 className="text-xl font-bold text-white mb-2">{locale === 'en' ? "Error Loading Data" : "Error Memuat Data"}</h3>
             <p className="text-gray-400 mb-4">{error}</p>
             <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium" onClick={() => window.location.reload()}>
-              Coba Lagi
+              {locale === 'en' ? "Try Again" : "Coba Lagi"}
             </button>
           </div>
         </div>
@@ -273,9 +280,9 @@ export default function DynamicPriceCalculator({
         <div className="bg-gradient-to-br from-gray-800/70 to-gray-900/70 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-6 shadow-xl">
           <div className="flex flex-col items-center justify-center h-64 text-center">
             <AlertCircle className="w-12 h-12 text-yellow-500 mb-4" />
-            <h3 className="text-xl font-bold text-white mb-2">Data Harga Belum Lengkap</h3>
-            <p className="text-gray-400 mb-4">Beberapa komponen harga belum diatur oleh admin. Pastikan semua jenis harga telah diisi.</p>
-            <p className="text-sm text-gray-500 mt-2">Admin perlu mengisi harga untuk Jenis Proyek, Halaman, Waktu, dan Kompleksitas.</p>
+            <h3 className="text-xl font-bold text-white mb-2">{locale === 'en' ? "Price Data Not Complete" : "Data Harga Belum Lengkap"}</h3>
+            <p className="text-gray-400 mb-4">{locale === 'en' ? "Some price components have not been set by admin. Ensure all price types have been filled." : "Beberapa komponen harga belum diatur oleh admin. Pastikan semua jenis harga telah diisi."}</p>
+            <p className="text-sm text-gray-500 mt-2">{locale === 'en' ? "Admin needs to fill prices for Project Types, Pages, Timeline, and Complexity." : "Admin perlu mengisi harga untuk Jenis Proyek, Halaman, Waktu, dan Kompleksitas."}</p>
           </div>
         </div>
       </motion.div>
@@ -290,7 +297,7 @@ export default function DynamicPriceCalculator({
             <div className="bg-gradient-to-r from-blue-500 to-purple-600 h-2.5 rounded-full transition-all duration-500 ease-in-out" style={{ width: `${(completedSteps / 5) * 100}%` }}></div>
           </div>
           <div className="flex justify-between text-xs text-gray-500 mt-2">
-            <span>{completedSteps}/5 langkah selesai</span>
+            <span>{completedSteps}/5 {locale === 'en' ? "steps completed" : "langkah selesai"}</span>
           </div>
         </div>
         
@@ -301,60 +308,60 @@ export default function DynamicPriceCalculator({
             </div>
           </div>
           <h2 className="text-3xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
-            Estimasi Harga Proyek
+            {locale === 'en' ? "Project Price Estimation" : "Estimasi Harga Proyek"}
           </h2>
           <p className="text-gray-400 max-w-md mx-auto">
-            Dapatkan estimasi harga untuk proyek Anda berdasarkan kebutuhan spesifik
+            {locale === 'en' ? "Get project price estimation based on your specific needs" : "Dapatkan estimasi harga untuk proyek Anda berdasarkan kebutuhan spesifik"}
           </p>
         </div>
 
         {!showResult ? (
           <div className="space-y-8">
             <div className="space-y-4">
-              <div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center"><span className="text-blue-400 text-xs font-bold">1</span></div><Label className="text-base font-semibold text-gray-200">Jenis Proyek</Label></div>
+              <div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center"><span className="text-blue-400 text-xs font-bold">1</span></div><Label className="text-base font-semibold text-gray-200">{locale === 'en' ? "Project Type" : "Jenis Proyek"}</Label></div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {projectTypes.map((type) => {
                   let iconComponent = <Globe className="w-5 h-5" />;
-                  if (type.name.toLowerCase().includes('toko') || type.name.toLowerCase().includes('ecommerce')) iconComponent = <ShoppingCart className="w-5 h-5" />;
-                  if (type.name.toLowerCase().includes('bisnis') || type.name.toLowerCase().includes('business')) iconComponent = <Building className="w-5 h-5" />;
-                  return <button key={type.id} className={`p-4 rounded-xl border-2 transition-all duration-300 flex flex-col items-center justify-center ${projectType === type.id ? "border-blue-500 bg-blue-500/10" : "border-gray-700 hover:border-blue-500/50 hover:bg-gray-700/50"}`} onClick={() => setProjectType(type.id)}><div className={`p-3 rounded-full mb-2 ${projectType === type.id ? "bg-blue-500/20 text-blue-400" : "bg-gray-700 text-gray-400"}`}>{iconComponent}</div><span className={`font-medium ${projectType === type.id ? "text-blue-400" : "text-gray-300"}`}>{type.name}</span></button>;
+                  if (type.name_key?.toLowerCase().includes('toko') || type.name_key?.toLowerCase().includes('ecommerce')) iconComponent = <ShoppingCart className="w-5 h-5" />;
+                  if (type.name_key?.toLowerCase().includes('bisnis') || type.name_key?.toLowerCase().includes('business')) iconComponent = <Building className="w-5 h-5" />;
+                  return <button key={type.id} className={`p-4 rounded-xl border-2 transition-all duration-300 flex flex-col items-center justify-center ${projectType === type.id ? "border-blue-500 bg-blue-500/10" : "border-gray-700 hover:border-blue-500/50 hover:bg-gray-700/50"}`} onClick={() => setProjectType(type.id)}><div className={`p-3 rounded-full mb-2 ${projectType === type.id ? "bg-blue-500/20 text-blue-400" : "bg-gray-700 text-gray-400"}`}>{iconComponent}</div><span className={`font-medium ${projectType === type.id ? "text-blue-400" : "text-gray-300"}`}>{type.name_key}</span></button>;
                 })}
               </div>
             </div>
             <div className="space-y-4">
-              <div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center"><span className="text-blue-400 text-xs font-bold">2</span></div><Label className="text-base font-semibold text-gray-200">Fitur Tambahan</Label></div>
+              <div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center"><span className="text-blue-400 text-xs font-bold">2</span></div><Label className="text-base font-semibold text-gray-200">{locale === 'en' ? "Additional Features" : "Fitur Tambahan"}</Label></div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {featurePrices.map((feature) => <div key={feature.id} className={`p-4 rounded-lg border transition-all duration-300 flex items-center ${features.includes(feature.id) ? "border-blue-500 bg-blue-500/10" : "border-gray-700 hover:border-blue-500/50 hover:bg-gray-700/30"}`} onClick={() => toggleFeature(feature.id)}><div className={`w-5 h-5 rounded border mr-3 flex items-center justify-center ${features.includes(feature.id) ? "bg-blue-500 border-blue-500" : "border-gray-500"}`}>{features.includes(feature.id) && <CheckCircle className="w-3.5 h-3.5 text-white" />}</div><div className="flex-1"><span className={`${features.includes(feature.id) ? "text-blue-400" : "text-gray-300"}`}>{feature.name}</span></div></div>)}
+                {featurePrices.map((feature) => <div key={feature.id} className={`p-4 rounded-lg border transition-all duration-300 flex items-center ${features.includes(feature.id) ? "border-blue-500 bg-blue-500/10" : "border-gray-700 hover:border-blue-500/50 hover:bg-gray-700/30"}`} onClick={() => toggleFeature(feature.id)}><div className={`w-5 h-5 rounded border mr-3 flex items-center justify-center ${features.includes(feature.id) ? "bg-blue-500 border-blue-500" : "border-gray-500"}`}>{features.includes(feature.id) && <CheckCircle className="w-3.5 h-3.5 text-white" />}</div><div className="flex-1"><span className={`${features.includes(feature.id) ? "text-blue-400" : "text-gray-300"}`}>{feature.name_key}</span></div></div>)}
               </div>
             </div>
             <div className="space-y-4">
-              <div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center"><span className="text-blue-400 text-xs font-bold">3</span></div><Label className="text-base font-semibold text-gray-200">Jumlah Halaman</Label></div>
-              <div className="flex items-center justify-center"><button className="w-12 h-12 rounded-l-lg border border-gray-600 text-gray-300 hover:bg-blue-500 hover:border-blue-500 hover:text-white transition-all duration-300 flex items-center justify-center" onClick={() => setPages(Math.max(1, pages - 1))}>-</button><input type="number" min="1" value={pages} onChange={(e) => setPages(Math.max(1, parseInt(e.target.value) || 1))} className="h-12 w-24 bg-gray-700 border-y border-gray-600 focus:border-blue-500 text-center text-lg font-medium" /><button className="w-12 h-12 rounded-r-lg border border-gray-600 text-gray-300 hover:bg-blue-500 hover:border-blue-500 hover:text-white transition-all duration-300 flex items-center justify-center" onClick={() => setPages(pages + 1)}>+</button><span className="ml-4 text-gray-400">halaman</span></div>
+              <div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center"><span className="text-blue-400 text-xs font-bold">3</span></div><Label className="text-base font-semibold text-gray-200">{locale === 'en' ? "Number of Pages" : "Jumlah Halaman"}</Label></div>
+              <div className="flex items-center justify-center"><button className="w-12 h-12 rounded-l-lg border border-gray-600 text-gray-300 hover:bg-blue-500 hover:border-blue-500 hover:text-white transition-all duration-300 flex items-center justify-center" onClick={() => setPages(Math.max(1, pages - 1))}>-</button><input type="number" min="1" value={pages} onChange={(e) => setPages(Math.max(1, parseInt(e.target.value) || 1))} className="h-12 w-24 bg-gray-700 border-y border-gray-600 focus:border-blue-500 text-center text-lg font-medium" /><button className="w-12 h-12 rounded-r-lg border border-gray-600 text-gray-300 hover:bg-blue-500 hover:border-blue-500 hover:text-white transition-all duration-300 flex items-center justify-center" onClick={() => setPages(pages + 1)}>+</button><span className="ml-4 text-gray-400">{locale === 'en' ? "pages" : "halaman"}</span></div>
               <div className="text-center text-sm text-gray-500 h-4"></div>
             </div>
             <div className="space-y-4">
-              <div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center"><span className="text-blue-400 text-xs font-bold">4</span></div><Label className="text-base font-semibold text-gray-200">Estimasi Waktu Pengerjaan</Label></div>
+              <div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center"><span className="text-blue-400 text-xs font-bold">4</span></div><Label className="text-base font-semibold text-gray-200">{locale === 'en' ? "Project Timeline" : "Estimasi Waktu Pengerjaan"}</Label></div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {timelinePrices.map((option) => <button key={option.id} className={`p-4 rounded-lg border transition-all duration-300 text-center ${timeline === option.id ? "border-blue-500 bg-blue-500/10 text-blue-400" : "border-gray-700 hover:border-blue-500/50 hover:bg-gray-700/30 text-gray-300"}`} onClick={() => setTimeline(option.id)}><span className="text-sm font-medium">{option.timeline_label}</span></button>)}
+                {timelinePrices.map((option) => <button key={option.id} className={`p-4 rounded-lg border transition-all duration-300 text-center ${timeline === option.id ? "border-blue-500 bg-blue-500/10 text-blue-400" : "border-gray-700 hover:border-blue-500/50 hover:bg-gray-700/30 text-gray-300"}`} onClick={() => setTimeline(option.id)}><span className="text-sm font-medium">{option.label_key}</span></button>)}
               </div>
             </div>
             <div className="space-y-4">
-              <div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center"><span className="text-blue-400 text-xs font-bold">5</span></div><Label className="text-base font-semibold text-gray-200">Tingkat Kompleksitas</Label></div>
+              <div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center"><span className="text-blue-400 text-xs font-bold">5</span></div><Label className="text-base font-semibold text-gray-200">{locale === 'en' ? "Complexity Level" : "Tingkat Kompleksitas"}</Label></div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {complexityPrices.map((option) => <button key={option.id} className={`p-5 rounded-xl border-2 transition-all duration-300 ${complexity === option.id ? "border-blue-500 bg-blue-500/10" : "border-gray-700 hover:border-blue-500/50 hover:bg-gray-700/50"}`} onClick={() => setComplexity(option.id)}><span className={`font-semibold block mb-1 ${complexity === option.id ? "text-blue-400" : "text-gray-300"}`}>{option.complexity_label}</span><span className="text-xs text-gray-500">{option.description}</span></button>)}
+                {complexityPrices.map((option) => <button key={option.id} className={`p-5 rounded-xl border-2 transition-all duration-300 ${complexity === option.id ? "border-blue-500 bg-blue-500/10" : "border-gray-700 hover:border-blue-500/50 hover:bg-gray-700/50"}`} onClick={() => setComplexity(option.id)}><span className={`font-semibold block mb-1 ${complexity === option.id ? "text-blue-400" : "text-gray-300"}`}>{option.label_key}</span><span className="text-xs text-gray-500">{option.description_key}</span></button>)}
               </div>
             </div>
-            <div className="text-center pt-6"><button className={`py-3 px-8 rounded-xl text-base font-semibold transition-all duration-300 ${projectType && timeline && complexity ? "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl hover:scale-105" : "bg-gray-700 text-gray-400 cursor-not-allowed"}`} onClick={calculateEstimate} disabled={!projectType || !timeline || !complexity}>Hitung Estimasi Harga</button></div>
+            <div className="text-center pt-6"><button className={`py-3 px-8 rounded-xl text-base font-semibold transition-all duration-300 ${projectType && timeline && complexity ? "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl hover:scale-105" : "bg-gray-700 text-gray-400 cursor-not-allowed"}`} onClick={calculateEstimate} disabled={!projectType || !timeline || !complexity}>{locale === 'en' ? "Calculate Price Estimate" : "Hitung Estimasi Harga"}</button></div>
           </div>
         ) : (
           <div className="text-center py-8">
             <div className="bg-gradient-to-br from-blue-900/30 to-purple-900/30 border border-blue-800/50 rounded-2xl p-8 max-w-2xl mx-auto shadow-lg">
-              <h3 className="text-2xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">Estimasi Harga</h3>
+              <h3 className="text-2xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">{locale === 'en' ? "Price Estimate" : "Estimasi Harga"}</h3>
               <div className="text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">{formatPrice(estimatedPrice)}</div>
-              <p className="text-gray-300 mb-8 max-w-md mx-auto">Ini adalah estimasi awal berdasarkan pilihan Anda. Harga akhir mungkin bervariasi setelah konsultasi mendalam dengan tim kami.</p>
+              <p className="text-gray-300 mb-8 max-w-md mx-auto">{locale === 'en' ? "This is an initial estimate based on your selections. Final price may vary after consultation with our team." : "Ini adalah estimasi awal berdasarkan pilihan Anda. Harga akhir mungkin bervariasi setelah konsultasi mendalam dengan tim kami."}</p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button className="py-3 px-6 rounded-xl font-medium bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105" onClick={resetCalculator}>Hitung Ulang</button>
-                <button className="py-3 px-6 rounded-xl font-medium bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105" onClick={redirectToContactWithEstimation}>Konsultasi Sekarang</button>
+                <button className="py-3 px-6 rounded-xl font-medium bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105" onClick={resetCalculator}>{locale === 'en' ? "Recalculate" : "Hitung Ulang"}</button>
+                <button className="py-3 px-6 rounded-xl font-medium bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105" onClick={redirectToContactWithEstimation}>{locale === 'en' ? "Consult Now" : "Konsultasi Sekarang"}</button>
               </div>
             </div>
           </div>

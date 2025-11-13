@@ -284,8 +284,8 @@ function BasePricingTab({
   const handleUpdateProjectType = async () => {
     try {
       const result = await updateProjectType(projectTypeForm.id!, {
-        name: projectTypeForm.name,
-        description: projectTypeForm.description,
+        name_key: projectTypeForm.name,
+        description_key: projectTypeForm.description,
         base_price: projectTypeForm.basePrice,
         is_active: projectTypeForm.isActive,
         updated_by: null,
@@ -323,8 +323,8 @@ function BasePricingTab({
   const handleInsertProjectType = async () => {
     try {
       const result = await insertProjectType({
-        name: projectTypeForm.name,
-        description: projectTypeForm.description,
+        name_key: projectTypeForm.name,
+        description_key: projectTypeForm.description,
         base_price: projectTypeForm.basePrice,
         is_active: projectTypeForm.isActive,
         created_by: null,
@@ -363,8 +363,8 @@ function BasePricingTab({
   const handleUpdateFeaturePrice = async () => {
     try {
       const result = await updateFeaturePrice(featurePriceForm.id!, {
-        name: featurePriceForm.name,
-        description: featurePriceForm.description,
+        name_key: featurePriceForm.name,
+        description_key: featurePriceForm.description,
         price: featurePriceForm.price,
         category: featurePriceForm.category,
         is_active: featurePriceForm.isActive,
@@ -403,8 +403,8 @@ function BasePricingTab({
   const handleInsertFeaturePrice = async () => {
     try {
       const result = await insertFeaturePrice({
-        name: featurePriceForm.name,
-        description: featurePriceForm.description,
+        name_key: featurePriceForm.name,
+        description_key: featurePriceForm.description,
         price: featurePriceForm.price,
         category: featurePriceForm.category,
         is_active: featurePriceForm.isActive,
@@ -521,9 +521,9 @@ function BasePricingTab({
   const handleUpdateTimelinePrice = async () => {
     try {
       const result = await updateTimelinePrice(timelinePriceForm.id!, {
-        timeline_label: timelinePriceForm.timelineLabel,
+        label_key: timelinePriceForm.timelineLabel,
         timeline_type: timelinePriceForm.timelineType,
-        description: timelinePriceForm.description,
+        description_key: timelinePriceForm.description,
         multiplier: timelinePriceForm.multiplier,
         is_active: timelinePriceForm.isActive,
         updated_by: null,
@@ -561,9 +561,9 @@ function BasePricingTab({
   const handleInsertTimelinePrice = async () => {
     try {
       const result = await insertTimelinePrice({
-        timeline_label: timelinePriceForm.timelineLabel,
+        label_key: timelinePriceForm.timelineLabel,
         timeline_type: timelinePriceForm.timelineType,
-        description: timelinePriceForm.description,
+        description_key: timelinePriceForm.description,
         multiplier: timelinePriceForm.multiplier,
         is_active: timelinePriceForm.isActive,
         created_by: null,
@@ -602,9 +602,9 @@ function BasePricingTab({
   const handleUpdateComplexityPrice = async () => {
     try {
       const result = await updateComplexityPrice(complexityPriceForm.id!, {
-        complexity_label: complexityPriceForm.complexityLabel,
+        label_key: complexityPriceForm.complexityLabel,
         complexity_type: complexityPriceForm.complexityType,
-        description: complexityPriceForm.description,
+        description_key: complexityPriceForm.description,
         multiplier: complexityPriceForm.multiplier,
         is_active: complexityPriceForm.isActive,
         updated_by: null,
@@ -642,9 +642,9 @@ function BasePricingTab({
   const handleInsertComplexityPrice = async () => {
     try {
       const result = await insertComplexityPrice({
-        complexity_label: complexityPriceForm.complexityLabel,
+        label_key: complexityPriceForm.complexityLabel,
         complexity_type: complexityPriceForm.complexityType,
-        description: complexityPriceForm.description,
+        description_key: complexityPriceForm.description,
         multiplier: complexityPriceForm.multiplier,
         is_active: complexityPriceForm.isActive,
         created_by: null,
@@ -852,8 +852,8 @@ function BasePricingTab({
             <tbody>
               {data.projectTypes.map((type) => (
                 <tr key={type.id} className="border-b border-gray-800/50 hover:bg-gray-800/30">
-                  <td className="py-3 px-4 text-white font-medium">{type.name}</td>
-                  <td className="py-3 px-4 text-gray-300">{type.description}</td>
+                  <td className="py-3 px-4 text-white font-medium">{type.name_key}</td>
+                  <td className="py-3 px-4 text-gray-300">{type.description_key}</td>
                   <td className="py-3 px-4 text-white">Rp {type.base_price?.toLocaleString()}</td>
                   <td className="py-3 px-4">
                     <span className={`px-2 py-1 rounded-full text-xs ${
@@ -871,8 +871,8 @@ function BasePricingTab({
                         onClick={() => {
                           setProjectTypeForm({
                             id: type.id,
-                            name: type.name,
-                            description: type.description || '',
+                            name: type.name_key || '',
+                            description: type.description_key || '',
                             basePrice: type.base_price || 0,
                             price: 0,
                             category: '',
@@ -1035,8 +1035,8 @@ function BasePricingTab({
             <tbody>
               {data.featurePrices.map((feature) => (
                 <tr key={feature.id} className="border-b border-gray-800/50 hover:bg-gray-800/30">
-                  <td className="py-3 px-4 text-white font-medium">{feature.name}</td>
-                  <td className="py-3 px-4 text-gray-300">{feature.description}</td>
+                  <td className="py-3 px-4 text-white font-medium">{feature.name_key}</td>
+                  <td className="py-3 px-4 text-gray-300">{feature.description_key}</td>
                   <td className="py-3 px-4 text-gray-300">{feature.category}</td>
                   <td className="py-3 px-4 text-white">Rp {feature.price?.toLocaleString()}</td>
                   <td className="py-3 px-4">
@@ -1055,8 +1055,8 @@ function BasePricingTab({
                         onClick={() => {
                           setFeaturePriceForm({
                             id: feature.id,
-                            name: feature.name,
-                            description: feature.description || '',
+                            name: feature.name_key || '',
+                            description: feature.description_key || '',
                             basePrice: 0,
                             price: feature.price || 0,
                             category: feature.category || '',
@@ -1374,9 +1374,9 @@ function BasePricingTab({
             <tbody>
               {data.timelinePrices.map((timelinePrice) => (
                 <tr key={timelinePrice.id} className="border-b border-gray-800/50 hover:bg-gray-800/30">
-                  <td className="py-3 px-4 text-white font-medium">{timelinePrice.timeline_label}</td>
+                  <td className="py-3 px-4 text-white font-medium">{timelinePrice.label_key}</td>
                   <td className="py-3 px-4 text-gray-300">{timelinePrice.timeline_type}</td>
-                  <td className="py-3 px-4 text-gray-300">{timelinePrice.description}</td>
+                  <td className="py-3 px-4 text-gray-300">{timelinePrice.description_key}</td>
                   <td className="py-3 px-4 text-white">x{timelinePrice.multiplier}</td>
                   <td className="py-3 px-4">
                     <span className={`px-2 py-1 rounded-full text-xs ${
@@ -1395,13 +1395,13 @@ function BasePricingTab({
                           setTimelinePriceForm({
                             id: timelinePrice.id,
                             name: '',
-                            description: timelinePrice.description || '',
+                            description: timelinePrice.description_key || '',
                             basePrice: 0,
                             price: 0,
                             category: '',
                             pageCount: 0,
                             pricePerPage: 0,
-                            timelineLabel: timelinePrice.timeline_label || '',
+                            timelineLabel: timelinePrice.label_key || '',
                             timelineType: timelinePrice.timeline_type || '',
                             multiplier: timelinePrice.multiplier || 1.0,
                             complexityLabel: '',
@@ -1556,9 +1556,9 @@ function BasePricingTab({
             <tbody>
               {data.complexityPrices.map((complexityPrice) => (
                 <tr key={complexityPrice.id} className="border-b border-gray-800/50 hover:bg-gray-800/30">
-                  <td className="py-3 px-4 text-white font-medium">{complexityPrice.complexity_label}</td>
+                  <td className="py-3 px-4 text-white font-medium">{complexityPrice.label_key}</td>
                   <td className="py-3 px-4 text-gray-300">{complexityPrice.complexity_type}</td>
-                  <td className="py-3 px-4 text-gray-300">{complexityPrice.description}</td>
+                  <td className="py-3 px-4 text-gray-300">{complexityPrice.description_key}</td>
                   <td className="py-3 px-4 text-white">x{complexityPrice.multiplier}</td>
                   <td className="py-3 px-4">
                     <span className={`px-2 py-1 rounded-full text-xs ${
@@ -1577,7 +1577,7 @@ function BasePricingTab({
                           setComplexityPriceForm({
                             id: complexityPrice.id,
                             name: '',
-                            description: complexityPrice.description || '',
+                            description: complexityPrice.description_key || '',
                             basePrice: 0,
                             price: 0,
                             category: '',
@@ -1586,7 +1586,7 @@ function BasePricingTab({
                             timelineLabel: '',
                             timelineType: '',
                             multiplier: complexityPrice.multiplier || 1.0,
-                            complexityLabel: complexityPrice.complexity_label || '',
+                            complexityLabel: complexityPrice.label_key || '',
                             complexityType: complexityPrice.complexity_type || '',
                             isActive: complexityPrice.is_active || false,
                             isPopular: false
@@ -1653,8 +1653,8 @@ function PackagePricingTab({
   const handleUpdatePricingPackage = async () => {
     try {
       const result = await updatePricingPackage(packageForm.id!, {
-        name: packageForm.name,
-        description: packageForm.description,
+        name_key: packageForm.name,
+        description_key: packageForm.description,
         price: packageForm.price,
         is_active: packageForm.isActive,
         is_popular: packageForm.isPopular,
@@ -1693,8 +1693,8 @@ function PackagePricingTab({
   const handleInsertPricingPackage = async () => {
     try {
       const result = await insertPricingPackage({
-        name: packageForm.name,
-        description: packageForm.description,
+        name_key: packageForm.name,
+        description_key: packageForm.description,
         price: packageForm.price,
         is_active: packageForm.isActive,
         is_popular: packageForm.isPopular,
@@ -1958,8 +1958,8 @@ function PackagePricingTab({
             <tbody>
               {data.pricingPackages.map((pkg) => (
                 <tr key={pkg.id} className="border-b border-gray-800/50 hover:bg-gray-800/30">
-                  <td className="py-3 px-4 text-white font-medium">{pkg.name}</td>
-                  <td className="py-3 px-4 text-gray-300">{pkg.description}</td>
+                  <td className="py-3 px-4 text-white font-medium">{pkg.name_key}</td>
+                  <td className="py-3 px-4 text-gray-300">{pkg.description_key}</td>
                   <td className="py-3 px-4 text-white">Rp {pkg.price?.toLocaleString()}</td>
                   <td className="py-3 px-4">
                     <span className={`px-2 py-1 rounded-full text-xs ${
@@ -1986,8 +1986,8 @@ function PackagePricingTab({
                         onClick={() => {
                           setPackageForm({
                             id: pkg.id,
-                            name: pkg.name,
-                            description: pkg.description || '',
+                            name: pkg.name_key || '',
+                            description: pkg.description_key || '',
                             basePrice: 0,
                             price: pkg.price || 0,
                             category: '',
@@ -2060,14 +2060,14 @@ function PackagePricingTab({
                 >
                   <option value="">Pilih paket</option>
                   {data.pricingPackages.map(pkg => (
-                    <option key={pkg.id} value={pkg.id}>{pkg.name}</option>
+                    <option key={pkg.id} value={pkg.id}>{pkg.name_key}</option>
                   ))}
                 </select>
               </div>
               
               {packageFeatureForm.packageId && (
                 <div>
-                  <h4 className="text-md font-medium text-white mb-2">Pilih Fitur untuk Paket "{data.pricingPackages.find(p => p.id === packageFeatureForm.packageId)?.name}"</h4>
+                  <h4 className="text-md font-medium text-white mb-2">Pilih Fitur untuk Paket "{data.pricingPackages.find(p => p.id === packageFeatureForm.packageId)?.name_key}"</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-60 overflow-y-auto p-2 border border-gray-600 rounded-md bg-gray-700/30">
                     {data.featurePrices.map((feature) => {
                       // Periksa apakah fitur ini sudah termasuk dalam paket ini
@@ -2101,7 +2101,7 @@ function PackagePricingTab({
                             }}
                             className="rounded bg-gray-700 border-gray-600 text-blue-500 focus:ring-blue-500"
                           />
-                          <span className="ml-2 text-sm text-gray-200">{feature.name} (Rp {feature.price?.toLocaleString()})</span>
+                          <span className="ml-2 text-sm text-gray-200">{feature.name_key} (Rp {feature.price?.toLocaleString()})</span>
                         </label>
                       );
                     })}
@@ -2146,8 +2146,8 @@ function PackagePricingTab({
                 
                 return (
                   <tr key={pkgFeature.id} className="border-b border-gray-800/50 hover:bg-gray-800/30">
-                    <td className="py-3 px-4 text-white font-medium">{pkg?.name || 'N/A'}</td>
-                    <td className="py-3 px-4 text-gray-300">{feature?.name || 'N/A'}</td>
+                    <td className="py-3 px-4 text-white font-medium">{pkg?.name_key || 'N/A'}</td>
+                    <td className="py-3 px-4 text-gray-300">{feature?.name_key || 'N/A'}</td>
                     <td className="py-3 px-4">
                       <span className={`px-2 py-1 rounded-full text-xs ${
                         pkgFeature.is_included 

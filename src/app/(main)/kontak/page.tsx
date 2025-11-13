@@ -23,8 +23,12 @@ import { LoadingSpinner } from "@/components/loading-spinner";
 import { submitContactForm } from "@/lib/contact";
 import { createClient } from "@/lib/supabase/client";
 import { PricingPackage, PackageFeature, FeaturePrice } from "@/lib/types";
+import Translate from "@/i18n/Translate";
+import { useLanguage } from "@/i18n/useLanguage";
+import { t } from "@/i18n/t";
 
 export default function KontakPage() {
+  const { locale } = useLanguage();
   const [searchParams, setSearchParams] = useState<URLSearchParams | null>(null);
   const [isClient, setIsClient] = useState(false);
   
@@ -34,8 +38,13 @@ export default function KontakPage() {
   const [featurePrices, setFeaturePrices] = useState<FeaturePrice[]>([]);
 
   useEffect(() => {
-    document.title = "Kontak | MiraiDev";
-  }, []);
+    const setTitle = async () => {
+      const title = await t('contact.title', locale, 'Contact Us');
+      document.title = `${title} | MiraiDev`;
+    };
+    
+    setTitle();
+  }, [locale]);
 
   useEffect(() => {
     setIsClient(true);
@@ -53,12 +62,12 @@ export default function KontakPage() {
       ] = await Promise.all([
         supabase.from('pricing_packages').select('*').eq('is_active', true),
         supabase.from('package_features').select('*'),
-        supabase.from('feature_prices').select('id, name')
+        supabase.from('feature_prices').select('*') // Ubah select id, name menjadi select semua kolom
       ]);
 
       setPricingPackages(packagesData || []);
       setPackageFeatures(packageFeaturesData || []);
-      setFeaturePrices(featurePricesData as FeaturePrice[] || []);
+      setFeaturePrices(featurePricesData || []);
     };
 
     fetchPricingData();
@@ -111,15 +120,15 @@ export default function KontakPage() {
       .filter(pf => pf.package_id === packageId && pf.is_included)
       .map(pf => {
         const feature = featurePrices.find(f => f.id === pf.feature_id);
-        return feature ? feature.name : null;
+        return feature ? feature.name_key : null;
       })
       .filter((name): name is string => name !== null);
 
     setEstimation({
       show: true,
-      package: selectedPackage.name,
+      package: selectedPackage.name_key || selectedPackage.id,
       price: (selectedPackage.price || 0).toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }),
-      description: selectedPackage.description || '',
+      description: selectedPackage.description_key || '',
       features: featuresForPackage,
     });
   }, [pricingPackages, packageFeatures, featurePrices]);
@@ -137,10 +146,10 @@ export default function KontakPage() {
   const [customBudget, setCustomBudget] = useState<string | null>(null);
   
   const budgets = React.useMemo(() => [
-    { id: "small", name: "Rp 1.000.000 - Rp 3.000.000", value: "small" },
-    { id: "medium", name: "Rp 3.000.000 - Rp 10.000.000", value: "medium" },
-    { id: "large", name: "Rp 10.000.000+", value: "large" },
-    { id: "flexible", name: "Fleksibel / Belum Tentu", value: "flexible" }
+    { id: "small", name: "Rp 1,000,000 - Rp 3,000,000", value: "small" },
+    { id: "medium", name: "Rp 3,000,000 - Rp 10,000,000", value: "medium" },
+    { id: "large", name: "Rp 10,000,000+", value: "large" },
+    { id: "flexible", name: "Flexible / Not Sure", value: "flexible" }
   ], []);
 
   useEffect(() => {
@@ -196,17 +205,32 @@ export default function KontakPage() {
   const [success, setSuccess] = useState("");
   
   const contactInfo = [
-    { icon: <Phone className="w-6 h-6 text-blue-400" />, title: "Telepon", detail: "+62 812-3456-7890", description: "Senin - Jumat, 09:00 - 17:00" },
-    { icon: <Mail className="w-6 h-6 text-blue-400" />, title: "Email", detail: "hello@mirai.dev", description: "Balas dalam 24 jam kerja" },
-    { icon: <MapPin className="w-6 h-6 text-blue-400" />, title: "Alamat", detail: "Jakarta, Indonesia", description: "Remote-first operations" }
+    { 
+      icon: <Phone className="w-6 h-6 text-blue-400" />, 
+      title: "Phone", 
+      detail: "+62 812-3456-7890", 
+      description: "Monday - Friday, 09:00 - 17:00" 
+    },
+    { 
+      icon: <Mail className="w-6 h-6 text-blue-400" />, 
+      title: "Email", 
+      detail: "hello@mirai.dev", 
+      description: "Replies within 24 business hours" 
+    },
+    { 
+      icon: <MapPin className="w-6 h-6 text-blue-400" />, 
+      title: "Address", 
+      detail: "Jakarta, Indonesia", 
+      description: "Remote-first operations" 
+    }
   ];
 
   const timelines = [
-    { id: "urgent", name: "1-2 Minggu", value: "urgent" },
-    { id: "short", name: "1-2 Bulan", value: "short" },
-    { id: "medium", name: "3-6 Bulan", value: "medium" },
-    { id: "long", name: "6+ Bulan", value: "long" },
-    { id: "flexible", name: "Fleksibel", value: "flexible" }
+    { id: "urgent", name: "1-2 Weeks", value: "urgent" },
+    { id: "short", name: "1-2 Months", value: "short" },
+    { id: "medium", name: "3-6 Months", value: "medium" },
+    { id: "long", name: "6+ Months", value: "long" },
+    { id: "flexible", name: "Flexible", value: "flexible" }
   ];
 
   const validateForm = () => {
@@ -259,16 +283,19 @@ export default function KontakPage() {
     try {
       const result = await submitContactForm(dataToSend);
       if (result.success) {
-        setSuccess("Pesan Anda telah berhasil dikirim! Kami akan segera menghubungi Anda.");
+        const successMsg = await t('contact.successMessage', locale, 'Your message has been sent successfully! We\'ll contact you soon.');
+        setSuccess(successMsg);
         setFormData({ name: "", email: "", phone: "", company: "", projectType: "", budget: "", timeline: "", message: "" });
         setEstimation({ show: false, package: "", price: "", description: "", features: [] });
         setCustomBudget(null);
         setCustomTimeline(null);
       } else {
-        setErrors({ general: result.error || "Terjadi kesalahan" });
+        const errorMsg = result.error || await t('contact.generalError', locale, 'An error occurred');
+        setErrors({ general: errorMsg });
       }
     } catch {
-      setErrors({ general: "Terjadi kesalahan tak terduga" });
+      const unexpectedErrorMsg = await t('contact.unexpectedError', locale, 'An unexpected error occurred');
+      setErrors({ general: unexpectedErrorMsg });
     } finally {
       setIsSubmitting(false);
     }
@@ -286,10 +313,14 @@ export default function KontakPage() {
         <div className="container mx-auto px-4 py-24 sm:py-32 relative">
           <div className="max-w-3xl mx-auto text-center">
             <OptimizedMotion initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-              <h1 className="text-4xl md:text-5xl font-bold mb-6">Hubungi <span className="text-blue-400">Kami</span></h1>
+              <h1 className="text-4xl md:text-5xl font-bold mb-6">
+                <Translate i18nKey="contact.title" fallback="Contact Us" />
+              </h1>
             </OptimizedMotion>
             <OptimizedMotion initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
-              <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">Punya pertanyaan atau ingin diskusi proyek? Kami siap membantu Anda.</p>
+              <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+                <Translate i18nKey="contact.description" fallback="Have questions or want to discuss a project? We're ready to help you." />
+              </p>
             </OptimizedMotion>
           </div>
         </div>
@@ -301,14 +332,20 @@ export default function KontakPage() {
             <div>
               <OptimizedMotion initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
                 <Card className="bg-gray-800/50 border-gray-700 p-8">
-                  <h2 className="text-2xl font-bold mb-6">Konsultasi Gratis</h2>
-                  <p className="text-gray-400 mb-8">Kirim detail proyek Anda dan kami akan segera menghubungi Anda.</p>
+                  <h2 className="text-2xl font-bold mb-6">
+                    <Translate i18nKey="contact.freeConsultation" fallback="Free Consultation" />
+                  </h2>
+                  <p className="text-gray-400 mb-8">
+                    <Translate i18nKey="contact.sendProjectDetails" fallback="Send us your project details and we'll get back to you shortly." />
+                  </p>
                   <form onSubmit={handleSubmit} className="space-y-6">
                     {errors.general && <div className="bg-destructive/20 border-destructive/30 p-3 rounded-md text-sm text-destructive">{errors.general}</div>}
                     {success && <div className="bg-green-500/20 border-green-500/30 p-3 rounded-md text-sm text-green-500">{success}</div>}
                     
                     <div>
-                      <Label htmlFor="name">Nama Lengkap</Label>
+                      <Label htmlFor="name">
+                        <Translate i18nKey="contact.name" fallback="Full Name" />
+                      </Label>
                       <div className="relative mt-2">
                         <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                         <Input id="name" value={formData.name} onChange={handleInputChange} className="py-6 pl-10" />
@@ -336,7 +373,9 @@ export default function KontakPage() {
                     </div>
                     
                     <div>
-                      <Label htmlFor="company">Nama Perusahaan (Opsional)</Label>
+                      <Label htmlFor="company">
+                        <Translate i18nKey="contact.company" fallback="Company Name (Optional)" />
+                      </Label>
                       <div className="relative mt-2">
                         <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                         <Input id="company" value={formData.company} onChange={handleInputChange} className="py-6 pl-10" />
@@ -345,26 +384,42 @@ export default function KontakPage() {
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <Label htmlFor="projectType">Jenis Proyek</Label>
+                        <Label htmlFor="projectType">
+                          <Translate i18nKey="contact.projectType" fallback="Project Type" />
+                        </Label>
                         <div className="relative mt-2">
                           <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                           <select id="projectType" value={formData.projectType} onChange={handleInputChange} className="w-full appearance-none rounded-md bg-gray-700/50 border-gray-600 py-3 pl-10 pr-8 text-base">
-                            <option value="">Pilih jenis...</option>
-                            {pricingPackages.map(pkg => <option key={pkg.id} value={pkg.id}>{pkg.name}</option>)}
-                            <option value="custom">Solusi Kustom (dari Kalkulator)</option>
+                            <option value="">
+                              {locale === 'en' ? "Choose type..." : "Pilih jenis..."}
+                            </option>
+                            {pricingPackages.map(pkg => <option key={pkg.id} value={pkg.id}>
+                              {pkg.name_key || pkg.id}
+                            </option>)}
+                            <option value="custom">
+                              {locale === 'en' ? "Custom Solution (from Calculator)" : "Solusi Kustom (dari Kalkulator)"}
+                            </option>
                           </select>
                           <ArrowRight className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 rotate-90" />
                         </div>
                         <FormError error={errors.projectType} />
                       </div>
                       <div>
-                        <Label htmlFor="budget">Estimasi Anggaran</Label>
+                        <Label htmlFor="budget">
+                          <Translate i18nKey="contact.budget" fallback="Estimated Budget" />
+                        </Label>
                         <div className="relative mt-2">
                           <ArrowRight className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                           <select id="budget" value={formData.budget} onChange={handleInputChange} className="w-full appearance-none rounded-md bg-gray-700/50 border-gray-600 py-3 pl-10 pr-8 text-base">
-                            <option value="">Pilih anggaran...</option>
+                            <option value="">
+                              {locale === 'en' ? "Choose budget..." : "Pilih anggaran..."}
+                            </option>
                             {customBudget && <option value="custom">Kustom</option>}
-                            {budgets.map(b => <option key={b.id} value={b.value}>{b.name}</option>)}
+                            {budgets.map(b => (
+                              <option key={b.id} value={b.value}>
+                                {b.name}
+                              </option>
+                            ))}
                           </select>
                           <ArrowRight className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 rotate-90" />
                         </div>
@@ -373,13 +428,21 @@ export default function KontakPage() {
                     </div>
                     
                     <div>
-                      <Label htmlFor="timeline">Estimasi Waktu Pengerjaan</Label>
+                      <Label htmlFor="timeline">
+                        <Translate i18nKey="contact.timeline" fallback="Project Timeline" />
+                      </Label>
                       <div className="relative mt-2">
                         <ArrowRight className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                         <select id="timeline" value={formData.timeline} onChange={handleInputChange} className="w-full appearance-none rounded-md bg-gray-700/50 border-gray-600 py-3 pl-10 pr-8 text-base">
-                          <option value="">Pilih waktu...</option>
+                          <option value="">
+                            {locale === 'en' ? "Choose time..." : "Pilih waktu..."}
+                          </option>
                           {customTimeline && <option value="custom">Kustom</option>}
-                          {timelines.map(t => <option key={t.id} value={t.value}>{t.name}</option>)}
+                          {timelines.map(t => (
+                            <option key={t.id} value={t.value}>
+                              {t.name}
+                            </option>
+                          ))}
                         </select>
                         <ArrowRight className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 rotate-90" />
                       </div>
@@ -387,7 +450,9 @@ export default function KontakPage() {
                     </div>
 
                     <div>
-                      <Label htmlFor="message">Deskripsi Proyek</Label>
+                      <Label htmlFor="message">
+                        <Translate i18nKey="contact.message" fallback="Project Description" />
+                      </Label>
                       <div className="relative mt-2">
                         <MessageSquare className="absolute left-3 top-3 w-4 h-4 text-gray-500" />
                         <Textarea id="message" value={formData.message} onChange={handleInputChange} rows={4} className="pl-10" />
@@ -395,7 +460,9 @@ export default function KontakPage() {
                       <FormError error={errors.message} />
                     </div>
                     
-                    <Button type="submit" disabled={isSubmitting} className="w-full text-lg py-6">{isSubmitting ? <LoadingSpinner/> : "Kirim Pesan"}</Button>
+                    <Button type="submit" disabled={isSubmitting} className="w-full text-lg py-6">
+                      {isSubmitting ? <LoadingSpinner/> : <Translate i18nKey="contact.sendMessage" fallback="Send Message" />}
+                    </Button>
                   </form>
                 </Card>
               </OptimizedMotion>
@@ -403,8 +470,12 @@ export default function KontakPage() {
             <div>
               <OptimizedMotion initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }} className="mb-12">
                 <Card className="bg-gray-800/50 border-gray-700 p-8">
-                  <h2 className="text-3xl font-bold mb-6">Estimasi Harga</h2>
-                  <p className="text-gray-400 mb-8">Berdasarkan pilihan Anda:</p>
+                  <h2 className="text-3xl font-bold mb-6">
+                    <Translate i18nKey="contact.estimation" fallback="Price Estimate" />
+                  </h2>
+                  <p className="text-gray-400 mb-8">
+                    <Translate i18nKey="contact.basedOnYourSelection" fallback="Based on your selection:" />
+                  </p>
                   {estimation.show ? (
                     <div className="space-y-6">
                       <div className="bg-blue-900/20 border border-blue-800/50 rounded-xl p-6">
@@ -417,41 +488,82 @@ export default function KontakPage() {
                         </div>
                         <p className="text-gray-300 mb-4">{estimation.description}</p>
                         <div className="border-t border-gray-700 pt-4">
-                          <h4 className="font-semibold mb-2">Fitur Utama:</h4>
+                          <h4 className="font-semibold mb-2">
+                            <Translate i18nKey="contact.mainFeatures" fallback="Main Features:" />
+                          </h4>
                           <ul className="space-y-2">
                             {estimation.features.slice(0, 6).map((f, i) => <li key={i} className="flex items-start"><div className="w-2 h-2 rounded-full bg-blue-400 mt-1.5 mr-3"></div><span>{f}</span></li>)}
-                            {estimation.features.length > 6 && <li className="text-sm text-gray-400">+ {estimation.features.length - 6} fitur lainnya</li>}
+                            {estimation.features.length > 6 && 
+                              <li className="text-sm text-gray-400">
+                                + {estimation.features.length - 6} <Translate i18nKey="contact.otherFeatures" fallback="other features" />
+                              </li>}
                           </ul>
                         </div>
                       </div>
                       <div className="bg-gray-700/50 rounded-xl p-6">
-                        <h4 className="font-semibold mb-3">Catatan:</h4>
-                        <p className="text-sm text-gray-300">Harga ini adalah estimasi. Kami akan memberikan penawaran final setelah konsultasi.</p>
+                        <h4 className="font-semibold mb-3">
+                          <Translate i18nKey="contact.note" fallback="Note:" />
+                        </h4>
+                        <p className="text-sm text-gray-300">
+                          <Translate i18nKey="contact.estimationNote" fallback="This price is an estimate. We will provide a final quote after consultation." />
+                        </p>
                       </div>
                     </div>
                   ) : (
                     <div className="text-center py-12">
                       <div className="bg-gray-700/50 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6"><Globe className="w-8 h-8 text-gray-500" /></div>
-                      <h3 className="text-xl font-semibold">Pilih Jenis Proyek</h3>
-                      <p className="text-gray-400">Pilih jenis proyek dari dropdown untuk melihat detail paket di sini.</p>
+                      <h3 className="text-xl font-semibold">
+                        <Translate i18nKey="contact.selectProjectType" fallback="Select Project Type" />
+                      </h3>
+                      <p className="text-gray-400">
+                        <Translate i18nKey="contact.selectProjectTypePrompt" fallback="Select a project type from the dropdown to see package details here." />
+                      </p>
                     </div>
                   )}
                 </Card>
               </OptimizedMotion>
               <OptimizedMotion initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
                 <Card className="bg-gray-800/50 border-gray-700 p-8">
-                  <h2 className="text-2xl font-bold mb-6">Informasi Kontak</h2>
+                  <h2 className="text-2xl font-bold mb-6">
+                    <Translate i18nKey="contact.contactInfo" fallback="Contact Information" />
+                  </h2>
                   <div className="space-y-6">
-                    {contactInfo.map((info, index) => (
-                      <div key={index} className="flex items-start">
-                        <div className="mt-1 mr-4">{info.icon}</div>
-                        <div>
-                          <h3 className="font-semibold text-lg">{info.title}</h3>
-                          <p className="text-blue-400">{info.detail}</p>
-                          <p className="text-sm text-gray-400">{info.description}</p>
+                    {contactInfo.map((info, index) => {
+                      let titleKey = '';
+                      let descriptionKey = '';
+                      
+                      switch(index) {
+                        case 0: // Phone
+                          titleKey = 'contact.phone';
+                          descriptionKey = 'contact.monFri';
+                          break;
+                        case 1: // Email
+                          titleKey = 'contact.email';
+                          descriptionKey = 'contact.replyTime';
+                          break;
+                        case 2: // Address
+                          titleKey = 'contact.address';
+                          descriptionKey = 'contact.remoteOps';
+                          break;
+                        default:
+                          break;
+                      }
+                      
+                      return (
+                        <div key={index} className="flex items-start">
+                          <div className="mt-1 mr-4">{info.icon}</div>
+                          <div>
+                            <h3 className="font-semibold text-lg">
+                              <Translate i18nKey={titleKey} fallback={info.title} />
+                            </h3>
+                            <p className="text-blue-400">{info.detail}</p>
+                            <p className="text-sm text-gray-400">
+                              <Translate i18nKey={descriptionKey} fallback={info.description} />
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </Card>
               </OptimizedMotion>

@@ -1,0 +1,310 @@
+{
+  "common": {
+    "home": "Home",
+    "services": "Services",
+    "portfolio": "Portfolio",
+    "pricing": "Pricing",
+    "about": "About Us",
+    "contact": "Contact",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "logout": "Logout",
+    "login": "Login",
+    "getStarted": "Get Started",
+    "adminPanel": "Admin Panel",
+    "openMainMenu": "Open main menu",
+    "closeMenu": "Close menu",
+    "userName": "Username",
+    "userType": "User Type",
+    "client": "Client",
+    "admin": "Admin",
+    "saveChanges": "Save Changes",
+    "reset": "Reset",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "search": "Search",
+    "settings": "Settings",
+    "notifications": "Notifications",
+    "messages": "Messages",
+    "welcome": "Welcome",
+    "popular": "POPULAR",
+    "logoutError": "Error during logout",
+    "loading": "Loading...",
+    "userName": "Username",
+    "userType": "User Type",
+    "client": "Client",
+    "admin": "Admin",
+    "saveChanges": "Save Changes",
+    "reset": "Reset",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "search": "Search",
+    "settings": "Settings",
+    "notifications": "Notifications",
+    "messages": "Messages",
+    "welcome": "Welcome",
+    "popular": "POPULAR",
+    "logoutError": "Error during logout",
+    "homepageTitle": "MiraiDev - Modern Website Development Solutions"
+  },
+  "navbar": {
+    "home": "Home",
+    "services": "Services",
+    "portfolio": "Portfolio",
+    "pricing": "Pricing",
+    "about": "About Us",
+    "contact": "Contact",
+    "adminDashboard": "Admin Dashboard"
+  },
+  "services": {
+    "title": "Our Services",
+    "description": "Comprehensive solutions to meet all your website development and digital needs",
+    "noFeatures": "No specific features listed",
+    "learnMore": "Learn More",
+    "ctaTitle": "Ready to Start Your Project?",
+    "ctaDescription": "Every project has unique needs. Discuss your specific requirements with our expert team for a tailored solution.",
+    "freeConsultation": "Free Consultation",
+    "contactUs": "Contact Us",
+    "service1": {
+      "title": "Custom Website Development",
+      "description": "A website designed specifically to meet your business's unique needs with the latest technology.",
+      "features": {
+        "responsive": "Responsive design for all devices",
+        "optimization": "Speed and performance optimization",
+        "integration": "Integration with other systems",
+        "seo": "Basic SEO support"
+      }
+    },
+    "service2": {
+      "title": "Website Redesign",
+      "description": "Modernization of your existing website's appearance and functionality to improve user experience.",
+      "features": {
+        "audit": "Current website audit and analysis",
+        "modern": "Redesign with modern approach",
+        "migration": "Secure content migration",
+        "testing": "Browser compatibility testing"
+      }
+    },
+    "service3": {
+      "title": "Website Maintenance Package",
+      "description": "Regular maintenance solution to keep your website secure, updated, and running optimally.",
+      "features": {
+        "security": "Regular security updates",
+        "backup": "Automatic data backup",
+        "monitoring": "Performance monitoring",
+        "support": "24/7 technical support"
+      }
+    },
+    "service4": {
+      "title": "SEO & Performance Optimization",
+      "description": "Additional service to improve your website's ranking in search engines and speed up loading time.",
+      "features": {
+        "audit": "Comprehensive SEO audit",
+        "keywords": "Keyword optimization",
+        "vitals": "Core Web Vitals improvement",
+        "report": "Monthly performance report"
+      }
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Bring Your Business's Dream <span class='text-blue-400'>Website</span> to Life with Affordable Solutions",
+      "description": "Modern and responsive websites designed specifically to help your business grow in the digital era, with affordable pricing for UMKM and startups.",
+      "cta1": "Get Free Consultation Now",
+      "cta2": "View Portfolio",
+      "features": {
+        "affordablePricing": "Affordable Pricing",
+        "transparentProcess": "Transparent Process",
+        "freeRevisions": "Free Revisions",
+        "personalSupport": "Personal Support"
+      }
+    },
+    "services": {
+      "customDev": {
+        "title": "Custom Website Development",
+        "description": "A website designed specifically to meet your business's unique needs with the latest technology.",
+        "features": {
+          "responsive": "Responsive design for all devices",
+          "optimization": "Speed and performance optimization",
+          "integration": "Integration with other systems",
+          "seo": "Basic SEO support"
+        }
+      },
+      "redesign": {
+        "title": "Website Redesign",
+        "description": "Modernization of your existing website's appearance and functionality to improve user experience.",
+        "features": {
+          "audit": "Current website audit and analysis",
+          "modern": "Redesign with modern approach",
+          "migration": "Secure content migration",
+          "testing": "Browser compatibility testing"
+        }
+      },
+      "maintenance": {
+        "title": "Website Maintenance Package",
+        "description": "Regular maintenance solution to keep your website secure, updated, and running optimally.",
+        "features": {
+          "security": "Regular security updates",
+          "backup": "Automatic data backup",
+          "monitoring": "Performance monitoring",
+          "support": "24/7 technical support"
+        }
+      },
+      "seo": {
+        "title": "SEO & Performance Optimization",
+        "description": "Additional service to improve your website's ranking in search engines and speed up loading time.",
+        "features": {
+          "audit": "Comprehensive SEO audit",
+          "keywords": "Keyword optimization",
+          "vitals": "Core Web Vitals improvement",
+          "report": "Monthly performance report"
+        }
+      }
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "description": "Have questions or want to discuss a project? We're ready to help you.",
+    "freeConsultation": "Free Consultation",
+    "sendProjectDetails": "Send us your project details and we'll get back to you shortly.",
+    "name": "Full Name",
+    "company": "Company Name (Optional)",
+    "projectType": "Project Type",
+    "budget": "Estimated Budget",
+    "timeline": "Project Timeline",
+    "message": "Project Description",
+    "sendMessage": "Send Message",
+    "estimation": "Price Estimate",
+    "basedOnYourSelection": "Based on your selection:",
+    "mainFeatures": "Main Features:",
+    "note": "Note:",
+    "estimationNote": "This price is an estimate. We will provide a final quote after consultation.",
+    "selectProjectType": "Select Project Type",
+    "selectProjectTypePrompt": "Select a project type from the dropdown to see package details here.",
+    "contactInfo": "Contact Information",
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address",
+    "monFri": "Monday - Friday, 09:00 - 17:00",
+    "replyTime": "Replies within 24 business hours",
+    "remoteOps": "Remote-first operations",
+    "budgetOptions": {
+      "small": "Rp 1,000,000 - Rp 3,000,000",
+      "medium": "Rp 3,000,000 - Rp 10,000,000",
+      "large": "Rp 10,000,000+",
+      "flexible": "Flexible / Not Sure"
+    },
+    "timelineOptions": {
+      "urgent": "1-2 Weeks",
+      "short": "1-2 Months",
+      "medium": "3-6 Months",
+      "long": "6+ Months",
+      "flexible": "Flexible"
+    },
+    "successMessage": "Your message has been sent successfully! We'll contact you soon.",
+    "generalError": "An error occurred",
+    "unexpectedError": "An unexpected error occurred",
+    "customSolution": "Custom Solution (from Calculator)",
+    "chooseBudget": "Choose budget...",
+    "chooseTimeline": "Choose time...",
+    "chooseProjectType": "Choose type..."
+  },
+  "about": {
+    "hero": {
+      "title": "About <span class='text-blue-400'>Us</span>",
+      "description": "Bringing your business's digital future vision to life"
+    },
+    "story": {
+      "title": "Our Story",
+      "paragraph1": "MiraiDev began with the passion of an independent developer who wanted to help local businesses compete in the digital era. With an educational background in informatics engineering and a passion for web technology, we began this journey in 2023.",
+      "paragraph2": "The name \"Mirai\" comes from the Japanese language which means \"future\". We chose this name because of our vision to help businesses build a sustainable digital presence and be ready to face technological developments in the future.",
+      "paragraph3": "We focus on modern website development and efficient digital solutions, using the latest technologies such as React, Next.js, and various other modern frameworks to provide the best results for our clients."
+    },
+    "future": {
+      "digital": "Digital Future"
+    },
+    "values": {
+      "title": "Our Values",
+      "description": "Principles that guide every aspect of our work",
+      "excellence": {
+        "title": "Best Quality",
+        "description": "Focus on delivering high-quality code with best practices in web development."
+      },
+      "clientFocus": {
+        "title": "Client-Oriented",
+        "description": "Carefully listen to client needs to provide tailored solutions."
+      },
+      "innovation": {
+        "title": "Continuous Innovation",
+        "description": "Continuously learn and adopt new technologies for modern and efficient solutions."
+      },
+      "longTerm": {
+        "title": "Long-term Thinking",
+        "description": "Building scalable websites that are easy to manage for long-term business growth."
+      }
+    },
+    "team": {
+      "title": "Our Team",
+      "description": "An independent developer dedicated to your project's success",
+      "memberName": "Independent Developer",
+      "role": "Full-Stack Developer",
+      "bio": "A developer passionate about modern web technology and committed to delivering the best solutions for every project."
+    },
+    "stats": {
+      "projectsCompleted": "Projects Completed",
+      "happyClients": "Happy Clients",
+      "yearsExperience": "Years Experience",
+      "focusDeveloper": "Focus Developer"
+    },
+    "cta": {
+      "title": "Ready to have a Professional Website for your Business?",
+      "description": "Discuss your needs with an independent developer focused on affordable and quality solutions for UMKM.",
+      "cta1": "Get Free Consultation Now",
+      "cta2": "Contact Us"
+    }
+  },
+  "pricing": {
+    "title": "Price <span class='text-blue-400'>Estimation</span>",
+    "description": "Get real-time project price estimation based on your specific needs",
+    "cta": {
+      "title": "Ready to Start Your Project?",
+      "description": "After getting the price estimate, consult with our team for a more accurate quote",
+      "button": "Consult Now"
+    }
+  },
+  "portfolio": {
+    "title": "Template <span class='text-blue-400'>Gallery</span>",
+    "description": "Choose from various professional website templates ready to use to accelerate your business digital presence."
+  },
+  "pricingCalculator": {
+    "title": "Project Price <span class='text-blue-400'>Estimation</span>",
+    "description": "Get project price estimation based on your specific needs",
+    "stepsCompleted": "steps completed",
+    "projectType": "Project Type",
+    "additionalFeatures": "Additional Features",
+    "pages": "Number of Pages",
+    "timeline": "Project Timeline",
+    "complexity": "Complexity Level",
+    "calculateBtn": "Calculate Price Estimate",
+    "resetBtn": "Recalculate",
+    "consultBtn": "Consult Now",
+    "resultTitle": "Price Estimate",
+    "resultNote": "This is an initial estimate based on your selections. Final price may vary after consultation with our team.",
+    "noDataTitle": "Price Data Not Complete",
+    "noDataDesc": "Some price components have not been set by admin. Ensure all price types have been filled.",
+    "noDataAdminNote": "Admin needs to fill prices for Project Types, Pages, Timeline, and Complexity.",
+    "loading": "Loading price data...",
+    "retry": "Try Again",
+    "errorTitle": "Error Loading Data",
+    "errorDesc": "Failed to load price data. Please try again later.",
+    "tryAgain": "Try Again",
+    "missingFields": "Please complete all selections.",
+    "invalidSelection": "Invalid selection.",
+    "estimateSuccess": "Price estimate calculated successfully",
+    "pageCount": "pages"
+  }
+}

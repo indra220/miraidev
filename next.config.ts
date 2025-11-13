@@ -17,11 +17,11 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  
+
   experimental: {
     reactCompiler: false,
   },
-  
+
   images: {
     remotePatterns: [
       {
@@ -52,14 +52,14 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 60 * 60 * 24, // 24 jam cache
   },
-  
+
   output: "standalone",
-  
+
   onDemandEntries: {
     maxInactiveAge: 60 * 1000,
     pagesBufferLength: 2,
   },
-  
+
   outputFileTracingRoot: process.cwd(),
 };
 
