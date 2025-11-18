@@ -12,11 +12,22 @@ import { LoadingSpinner } from "@/components/loading-spinner";
 import { createClient } from "@/lib/supabase/client";
 import { Eye, EyeOff, Lock, ArrowLeft } from "lucide-react";
 import { setAuthInfoToStorage } from "@/utils/auth-utils";
+import Translate from "@/i18n/Translate";
+import { useLanguage } from "@/i18n/useLanguage";
 
 export default function AdminLoginPage() {
+  const { locale } = useLanguage();
+  const [adminEmailPlaceholder, setAdminEmailPlaceholder] = useState("");
+  const [passwordPlaceholder, setPasswordPlaceholder] = useState("••••••••");
+
   useEffect(() => {
     document.title = "Admin Login";
-  }, []);
+
+    // Update placeholders when locale changes
+    setAdminEmailPlaceholder(locale === 'en' ? "admin@example.com" : "admin@contoh.com");
+    setPasswordPlaceholder(locale === 'en' ? "••••••••" : "••••••••");
+  }, [locale]);
+
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,7 +47,7 @@ export default function AdminLoginPage() {
     });
 
     if (error) {
-      setError("Email atau kata sandi yang Anda masukkan salah.");
+      setError(locale === 'en' ? "The email or password you entered is incorrect." : "Email atau kata sandi yang Anda masukkan salah.");
       setIsLoading(false);
       return;
     }
@@ -55,8 +66,12 @@ export default function AdminLoginPage() {
         <div className="mx-auto w-16 h-16 rounded-full bg-slate-800/70 flex items-center justify-center mb-4 ring-1 ring-slate-700">
           <Lock className="w-7 h-7 text-blue-400" />
         </div>
-        <h1 className="text-3xl font-bold text-white">Admin Portal</h1>
-        <p className="text-gray-400 mt-2">Masuk untuk mengelola situs</p>
+        <h1 className="text-3xl font-bold text-white">
+          <Translate i18nKey="auth.adminPortal" fallback="Admin Portal" />
+        </h1>
+        <p className="text-gray-400 mt-2">
+          <Translate i18nKey="auth.adminSubtitle" fallback="Masuk untuk mengelola situs" />
+        </p>
       </div>
 
       <Card className="bg-slate-800/50 backdrop-blur-md border border-slate-700 shadow-xl rounded-xl overflow-hidden">
@@ -68,27 +83,31 @@ export default function AdminLoginPage() {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="email">Email Admin</Label>
-              <Input 
-                id="email" 
-                type="email" 
-                value={email} 
-                onChange={(e) => setEmail(e.target.value)} 
-                required 
-                placeholder="admin@contoh.com"
+              <Label htmlFor="email">
+                <Translate i18nKey="auth.adminEmail" fallback="Email Admin" />
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder={adminEmailPlaceholder}
                 className="bg-slate-700/50 border-slate-600 focus:border-blue-500 h-12 text-base"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Kata Sandi</Label>
+              <Label htmlFor="password">
+                <Translate i18nKey="auth.password" fallback="Kata Sandi" />
+              </Label>
                <div className="relative">
-                <Input 
-                  id="password" 
-                  type={showPassword ? "text" : "password"} 
-                  value={password} 
-                  onChange={(e) => setPassword(e.target.value)} 
-                  required 
-                  placeholder="••••••••"
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  placeholder={passwordPlaceholder}
                   className="bg-slate-700/50 border-slate-600 focus:border-blue-500 h-12 text-base"
                 />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-white">
@@ -97,12 +116,15 @@ export default function AdminLoginPage() {
               </div>
             </div>
             <Button type="submit" disabled={isLoading} className="w-full bg-blue-600 hover:bg-blue-700 py-6 text-base">
-              {isLoading ? <LoadingSpinner /> : "Masuk sebagai Admin"}
+              {isLoading ? <LoadingSpinner /> : <Translate i18nKey="auth.loginAsAdmin" fallback="Masuk sebagai Admin" />}
             </Button>
           </form>
            <div className="mt-6 text-center text-sm">
              <p className="text-gray-400">
-               Bukan admin? <Link href="/auth/login" className="font-semibold text-blue-400 hover:underline">Login sebagai klien</Link>
+               <Translate i18nKey="auth.notAdmin" fallback="Bukan admin?" />
+               <Link href="/auth/login" className="font-semibold text-blue-400 hover:underline ml-1">
+                 <Translate i18nKey="auth.clientLogin" fallback="Login sebagai klien" />
+               </Link>
              </p>
           </div>
         </CardContent>
@@ -112,7 +134,7 @@ export default function AdminLoginPage() {
         <Button variant="ghost" asChild>
           <Link href="/beranda" className="text-sm text-gray-400 hover:text-white transition-colors">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Kembali ke Beranda
+            <Translate i18nKey="auth.backToHome" fallback="Kembali ke Beranda" />
           </Link>
         </Button>
       </div>

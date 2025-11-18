@@ -12,9 +12,12 @@ import { FormError } from "@/components/form-error";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { createClient } from "@/lib/supabase/client";
 import { Eye, EyeOff, User, ArrowLeft } from "lucide-react";
+import Translate from "@/i18n/Translate";
+import { useLanguage } from "@/i18n/useLanguage";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { locale } = useLanguage();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,18 +27,28 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ name?: string; email?: string; password?: string; confirmPassword?: string; general?: string }>({});
   const [success, setSuccess] = useState<string | null>(null);
+  const [namePlaceholder, setNamePlaceholder] = useState("");
+  const [emailPlaceholder, setEmailPlaceholder] = useState("");
+  const [passwordPlaceholder, setPasswordPlaceholder] = useState("");
+  const [confirmPasswordPlaceholder, setConfirmPasswordPlaceholder] = useState("");
 
   useEffect(() => {
     document.title = "Register | MiraiDev";
-  }, []);
+
+    // Update placeholders when locale changes
+    setNamePlaceholder(locale === 'en' ? "Your full name" : "Nama lengkap Anda");
+    setEmailPlaceholder(locale === 'en' ? "email@example.com" : "email@contoh.com");
+    setPasswordPlaceholder(locale === 'en' ? "At least 6 characters" : "Minimal 6 karakter");
+    setConfirmPasswordPlaceholder(locale === 'en' ? "Repeat password" : "Ulangi kata sandi");
+  }, [locale]);
 
   const validateForm = () => {
     const newErrors: { name?: string; email?: string; password?: string; confirmPassword?: string } = {};
-    if (!name) newErrors.name = "Nama harus diisi";
-    if (!email) newErrors.email = "Email harus diisi";
-    if (!password) newErrors.password = "Kata sandi harus diisi";
-    else if (password.length < 6) newErrors.password = "Kata sandi minimal 6 karakter";
-    if (password !== confirmPassword) newErrors.confirmPassword = "Konfirmasi kata sandi tidak cocok";
+    if (!name) newErrors.name = locale === 'en' ? "Full name is required" : "Nama harus diisi";
+    if (!email) newErrors.email = locale === 'en' ? "Email is required" : "Email harus diisi";
+    if (!password) newErrors.password = locale === 'en' ? "Password is required" : "Kata sandi harus diisi";
+    else if (password.length < 6) newErrors.password = locale === 'en' ? "Password must be at least 6 characters" : "Kata sandi minimal 6 karakter";
+    if (password !== confirmPassword) newErrors.confirmPassword = locale === 'en' ? "Passwords do not match" : "Konfirmasi kata sandi tidak cocok";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -95,8 +108,12 @@ export default function RegisterPage() {
         <div className="mx-auto w-16 h-16 rounded-full bg-slate-800/70 flex items-center justify-center mb-4 ring-1 ring-slate-700">
           <User className="w-8 h-8 text-blue-400" />
         </div>
-        <h1 className="text-3xl font-bold text-white">Buat Akun Baru</h1>
-        <p className="text-gray-400 mt-2">Daftar untuk memulai perjalanan digital Anda</p>
+        <h1 className="text-3xl font-bold text-white">
+          <Translate i18nKey="auth.createAccount" fallback="Buat Akun Baru" />
+        </h1>
+        <p className="text-gray-400 mt-2">
+          <Translate i18nKey="auth.registerSubtitle" fallback="Daftar untuk memulai perjalanan digital Anda" />
+        </p>
       </div>
 
       <Card className="bg-slate-800/50 backdrop-blur-md border border-slate-700 shadow-xl rounded-xl overflow-hidden">
@@ -107,42 +124,48 @@ export default function RegisterPage() {
                 {success}
               </div>
             )}
-            
+
             {errors.general && <FormError error={errors.general} />}
 
             <div className="space-y-2">
-              <Label htmlFor="name">Nama Lengkap</Label>
-              <Input 
-                id="name" 
-                value={name} 
-                onChange={(e) => setName(e.target.value)} 
+              <Label htmlFor="name">
+                <Translate i18nKey="auth.fullName" fallback="Nama Lengkap" />
+              </Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 className="bg-slate-700/50 border-slate-600 focus:border-blue-500 h-12 text-base"
-                placeholder="Nama lengkap Anda"
+                placeholder={namePlaceholder}
               />
               <FormError error={errors.name} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input 
-                id="email" 
-                type="email" 
-                value={email} 
-                onChange={(e) => setEmail(e.target.value)} 
+              <Label htmlFor="email">
+                <Translate i18nKey="auth.email" fallback="Email" />
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="bg-slate-700/50 border-slate-600 focus:border-blue-500 h-12 text-base"
-                placeholder="email@contoh.com"
+                placeholder={emailPlaceholder}
               />
               <FormError error={errors.email} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Kata Sandi</Label>
+              <Label htmlFor="password">
+                <Translate i18nKey="auth.password" fallback="Kata Sandi" />
+              </Label>
               <div className="relative">
-                <Input 
-                  id="password" 
-                  type={showPassword ? "text" : "password"} 
-                  value={password} 
-                  onChange={(e) => setPassword(e.target.value)} 
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="bg-slate-700/50 border-slate-600 focus:border-blue-500 h-12 text-base"
-                  placeholder="Minimal 6 karakter"
+                  placeholder={passwordPlaceholder}
                 />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-white">
                   {showPassword ? <EyeOff className="h-5 w-5"/> : <Eye className="h-5 w-5" />}
@@ -151,15 +174,17 @@ export default function RegisterPage() {
               <FormError error={errors.password} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Konfirmasi Kata Sandi</Label>
+              <Label htmlFor="confirmPassword">
+                <Translate i18nKey="auth.confirmPassword" fallback="Konfirmasi Kata Sandi" />
+              </Label>
               <div className="relative">
-                <Input 
-                  id="confirmPassword" 
-                  type={showConfirmPassword ? "text" : "password"} 
-                  value={confirmPassword} 
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className="bg-slate-700/50 border-slate-600 focus:border-blue-500 h-12 text-base"
-                  placeholder="Ulangi kata sandi"
+                  placeholder={confirmPasswordPlaceholder}
                 />
                 <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-white">
                   {showConfirmPassword ? <EyeOff className="h-5 w-5"/> : <Eye className="h-5 w-5" />}
@@ -168,12 +193,15 @@ export default function RegisterPage() {
               <FormError error={errors.confirmPassword} />
             </div>
             <Button type="submit" disabled={isLoading} className="w-full bg-blue-600 hover:bg-blue-700 py-6 text-base">
-              {isLoading ? <LoadingSpinner /> : "Daftar"}
+              {isLoading ? <LoadingSpinner /> : <Translate i18nKey="auth.signUp" fallback="Daftar" />}
             </Button>
           </form>
           <div className="mt-6 text-center text-sm">
             <p className="text-gray-400">
-              Sudah punya akun? <Link href="/auth/login" className="font-semibold text-blue-400 hover:underline">Masuk di sini</Link>
+              <Translate i18nKey="auth.alreadyHaveAccount" fallback="Sudah punya akun?" />
+              <Link href="/auth/login" className="font-semibold text-blue-400 hover:underline ml-1">
+                <Translate i18nKey="auth.loginHere" fallback="Masuk di sini" />
+              </Link>
             </p>
           </div>
         </CardContent>
@@ -183,7 +211,7 @@ export default function RegisterPage() {
         <Button variant="ghost" asChild>
           <Link href="/beranda" className="text-sm text-gray-400 hover:text-white transition-colors">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Kembali ke Beranda
+            <Translate i18nKey="auth.backToHome" fallback="Kembali ke Beranda" />
           </Link>
         </Button>
       </div>
