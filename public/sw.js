@@ -4,7 +4,7 @@ const CACHE_NAME = 'mirai-dev-v1';
 const urlsToCache = [
   '/',
   '/layanan',
-  '/portofolio',
+  '/template',
   '/tentang',
   '/kontak',
   '/globals.css', // atau file CSS yang Anda gunakan

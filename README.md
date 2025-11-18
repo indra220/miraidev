@@ -37,8 +37,8 @@ Sebuah aplikasi web modern untuk agensi pengembangan website MiraiDev, dibangun 
 - Mengubah tombol "Edit" menjadi "Update" di halaman manajemen proyek admin
 
 ### Versi 0.5.30 (15 Oktober 2025)
-- Menambahkan statistik Total Portofolio di dashboard admin
-- Memperbarui perhitungan Total Proyek untuk mengambil dari tabel projects bukan portfolio
+- Menambahkan statistik Total Template di dashboard admin
+- Memperbarui perhitungan Total Proyek untuk mengambil dari tabel projects bukan template
 
 ### Versi 0.5.29 (15 Oktober 2025)
 - Removed user icon dropdown from admin header (UserNav component)
@@ -171,7 +171,7 @@ miraidev/
 │   │   ├── api/chat/          # Endpoint API chat AI
 │   │   ├── beranda/           # Halaman beranda
 │   │   ├── layanan/           # Halaman layanan
-│   │   ├── portofolio/        # Halaman portofolio
+│   │   ├── template/          # Halaman template
 │   │   ├── harga/             # Halaman harga
 │   │   ├── tentang/          # Halaman tentang kami
 │   │   ├── kontak/           # Halaman kontak

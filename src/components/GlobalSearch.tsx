@@ -19,7 +19,7 @@ interface SearchResult {
   id: string;
   title: string;
   description: string;
-  type: "page" | "portfolio" | "service" | "blog";
+  type: "page" | "template" | "service" | "blog";
   url: string;
 }
 
@@ -87,10 +87,10 @@ export default function GlobalSearch() {
         },
         {
           id: "2",
-          title: "Portofolio Website E-Commerce",
+          title: "Template Website E-Commerce",
           description: "Website toko online untuk UMKM lokal",
-          type: "portfolio" as const,
-          url: "/portofolio"
+          type: "template" as const,
+          url: "/template"
         },
         {
           id: "3",
@@ -128,10 +128,10 @@ export default function GlobalSearch() {
   };
 
   // Get icon for result type
-  const getTypeIcon = (type: "page" | "portfolio" | "service" | "blog") => {
+  const getTypeIcon = (type: "page" | "template" | "service" | "blog") => {
     switch (type) {
       case "page": return <Globe className="w-4 h-4" />;
-      case "portfolio": return <Briefcase className="w-4 h-4" />;
+      case "template": return <Briefcase className="w-4 h-4" />;
       case "service": return <Globe className="w-4 h-4" />;
       case "blog": return <FileText className="w-4 h-4" />;
       default: return <Globe className="w-4 h-4" />;
@@ -139,10 +139,10 @@ export default function GlobalSearch() {
   };
 
   // Get type label
-  const getTypeLabel = (type: "page" | "portfolio" | "service" | "blog") => {
+  const getTypeLabel = (type: "page" | "template" | "service" | "blog") => {
     switch (type) {
       case "page": return "Halaman";
-      case "portfolio": return "Portofolio";
+      case "template": return "Template";
       case "service": return "Layanan";
       case "blog": return "Blog";
       default: return "Halaman";

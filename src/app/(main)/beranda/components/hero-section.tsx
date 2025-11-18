@@ -54,7 +54,7 @@ export function HeroSection() {
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="text-lg py-6 px-8 border-white text-white hover:bg-white hover:text-gray-900 transition-all duration-150">
-              <Link href="/portofolio">
+              <Link href="/template">
                 <Translate i18nKey="home.hero.cta2" fallback="Lihat Portofolio" />
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>

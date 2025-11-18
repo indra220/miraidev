@@ -117,7 +117,7 @@ export default function AnalyticsDashboard() {
           .sort((a, b) => (b.views || 0) - (a.views || 0))
           .slice(0, 5)
           .map((item, index) => ({
-            page: `/portofolio/${item.id}`,
+            page: `/template/${item.id}`,
             views: item.views || 0,
             change: index === 0 ? "+15%" : index < 3 ? "+8%" : "-2%"
           }));

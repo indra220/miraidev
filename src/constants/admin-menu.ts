@@ -38,9 +38,9 @@ export const adminMenuConfig: AdminMenuItem[] = [
     roles: ["admin"],
   },
   {
-    id: "portfolio",
-    label: "Portofolio",
-    href: "/admin/portfolio",
+    id: "template",
+    label: "Template",
+    href: "/admin/template",
     icon: Briefcase,
     roles: ["admin", "pegawai"],
   },

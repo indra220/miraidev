@@ -2,7 +2,7 @@
   "common": {
     "home": "Beranda",
     "services": "Layanan",
-    "portfolio": "Portofolio",
+    "portfolio": "Template",
     "pricing": "Harga",
     "about": "Tentang Kami",
     "contact": "Kontak",
@@ -56,7 +56,7 @@
       "title": "Wujudkan <span class='text-blue-400'>Website Impian</span> Bisnis Anda dengan Solusi yang Terjangkau",
       "description": "Website modern dan responsif yang dirancang khusus untuk membantu bisnis Anda tumbuh di era digital, dengan harga yang terjangkau untuk UMKM dan startup.",
       "cta1": "Konsultasi Gratis Sekarang",
-      "cta2": "Lihat Portofolio",
+      "cta2": "Lihat Template",
       "features": {
         "affordablePricing": "Harga Terjangkau",
         "transparentProcess": "Proses Transparan",
@@ -110,7 +110,8 @@
   "navbar": {
     "home": "Beranda",
     "services": "Layanan",
-    "portfolio": "Portofolio",
+    "portfolio": "Template",
+    "template": "Template",
     "pricing": "Harga",
     "about": "Tentang Kami",
     "contact": "Kontak",
@@ -124,7 +125,10 @@
     "ctaTitle": "Siap Memulai Proyek Anda?",
     "ctaDescription": "Setiap proyek memiliki kebutuhan unik. Diskusikan kebutuhan spesifik Anda dengan tim ahli kami untuk solusi yang disesuaikan.",
     "freeConsultation": "Konsultasi Gratis",
-    "contactUs": "Hubungi Kami"
+    "contactUs": "Hubungi Kami",
+    "category": {
+      "webDevelopment": "Pengembangan Web"
+    }
   },
   "pricing": {
     "calculator": "Kalkulator Harga",
@@ -276,6 +280,59 @@
     }
   },
   "portfolio": {
+    "title": "Galeri <span class='text-blue-400'>Template</span>",
+    "description": "Pilih dari berbagai template website profesional yang siap pakai untuk mempercepat kehadiran digital bisnis Anda.",
+    "preview": "Pratinjau",
+    "use": "Gunakan",
+    "noMatch": "Tidak ada template yang cocok dengan pencarian Anda."
+  },
+  "home": {
+    "hero": {
+      "title": "Wujudkan <span class='text-blue-400'>Website Impian</span> Bisnis Anda dengan Solusi yang Terjangkau",
+      "description": "Website modern dan responsif yang dirancang khusus untuk membantu bisnis Anda tumbuh di era digital, dengan harga yang terjangkau untuk UMKM dan startup.",
+      "cta1": "Konsultasi Gratis Sekarang",
+      "cta2": "Lihat Template",
+      "features": {
+        "affordablePricing": "Harga Terjangkau",
+        "transparentProcess": "Proses Transparan",
+        "freeRevisions": "Revisi Gratis",
+        "personalSupport": "Dukungan Personal"
+      }
+    },
+    "featuredPortfolio": {
+      "title": "Template Unggulan",
+      "description": "Proyek-proyek terbaik kami yang telah membantu klien mencapai kesuksesan",
+      "viewAll": "Lihat Semua Template"
+    },
+    "whyChooseUs": {
+      "title": "Mengapa Memilih Kami?",
+      "description": "Alasan mengapa klien memilih MiraiDev sebagai mitra pengembangan digital mereka",
+      "features": {
+        "technology": {
+          "title": "Teknologi Terkini",
+          "description": "Kami menggunakan teknologi dan framework terbaru untuk memastikan performa dan keamanan terbaik."
+        },
+        "transparency": {
+          "title": "Proses Transparan",
+          "description": "Komunikasi yang jelas dan transparan sepanjang proses pengembangan untuk memastikan kepuasan klien."
+        },
+        "support": {
+          "title": "Dukungan Purna Jual",
+          "description": "Dukungan berkelanjutan setelah peluncuran untuk memastikan website Anda tetap berjalan optimal."
+        }
+      }
+    },
+    "finalCta": {
+      "title": "Siap Punya Website Profesional untuk Bisnis Anda?",
+      "description": "Diskusikan kebutuhan Anda dengan developer independen yang fokus pada solusi terjangkau dan berkualitas untuk UMKM.",
+      "primaryButton": "Konsultasi Gratis Sekarang",
+      "secondaryButton": "Hubungi Kami"
+    },
+    "portfolioCard": {
+      "viewDetail": "Lihat Detail"
+    }
+  },
+  "template": {
     "title": "Galeri <span class='text-blue-400'>Template</span>",
     "description": "Pilih dari berbagai template website profesional yang siap pakai untuk mempercepat kehadiran digital bisnis Anda."
   },

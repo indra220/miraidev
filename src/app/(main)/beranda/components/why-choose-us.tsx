@@ -1,32 +1,33 @@
 "use client";
 
 import OptimizedMotion from "@/components/OptimizedMotion";
-import { 
-  Zap, 
-  Shield, 
-  Database 
+import {
+  Zap,
+  Shield,
+  Database
 } from "lucide-react";
+import Translate from "@/i18n/Translate";
 
 export function WhyChooseUsSection() {
   const features = [
     {
       icon: <Zap className="w-8 h-8" />,
-      title: "Teknologi Terkini",
-      description: "Kami menggunakan teknologi dan framework terbaru untuk memastikan performa dan keamanan terbaik.",
+      title: "home.whyChooseUs.features.technology.title",
+      description: "home.whyChooseUs.features.technology.description",
       bgColor: "bg-blue-500/10",
       textColor: "text-blue-400"
     },
     {
       icon: <Shield className="w-8 h-8" />,
-      title: "Proses Transparan",
-      description: "Komunikasi yang jelas dan transparan sepanjang proses pengembangan untuk memastikan kepuasan klien.",
+      title: "home.whyChooseUs.features.transparency.title",
+      description: "home.whyChooseUs.features.transparency.description",
       bgColor: "bg-green-500/10",
       textColor: "text-green-400"
     },
     {
       icon: <Database className="w-8 h-8" />,
-      title: "Dukungan Purna Jual",
-      description: "Dukungan berkelanjutan setelah peluncuran untuk memastikan website Anda tetap berjalan optimal.",
+      title: "home.whyChooseUs.features.support.title",
+      description: "home.whyChooseUs.features.support.description",
       bgColor: "bg-purple-500/10",
       textColor: "text-purple-400"
     }
@@ -42,9 +43,15 @@ export function WhyChooseUsSection() {
           transition={{ duration: 0.3 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Mengapa Memilih Kami?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <Translate i18nKey="home.whyChooseUs.title" fallback="Mengapa Memilih Kami?" component="span" />
+          </h2>
           <p className="text-gray-400 max-w-2xl mx-auto">
-            Alasan mengapa klien memilih MiraiDev sebagai mitra pengembangan digital mereka
+            <Translate
+              i18nKey="home.whyChooseUs.description"
+              fallback="Alasan mengapa klien memilih MiraiDev sebagai mitra pengembangan digital mereka"
+              component="span"
+            />
           </p>
         </OptimizedMotion>
         
@@ -64,9 +71,11 @@ export function WhyChooseUsSection() {
                   {feature.icon}
                 </div>
               </div>
-              <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
+              <h3 className="text-xl font-semibold mb-3">
+                <Translate i18nKey={feature.title} fallback="" />
+              </h3>
               <p className="text-gray-400">
-                {feature.description}
+                <Translate i18nKey={feature.description} fallback="" />
               </p>
             </OptimizedMotion>
           ))}

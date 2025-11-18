@@ -100,20 +100,25 @@ async function getAllHomeData(): Promise<{
 async function getDefaultServices(): Promise<ServiceItem[]> {
   // Dapatkan fungsi terjemahan
   const { t } = await import("@/i18n/t");
-  
-  // Gunakan terjemahan atau default dalam bahasa Inggris
+
+  // Karena fungsi ini dipanggil dari server component, kita tidak bisa menggunakan hook useLanguage
+  // Jadi kita akan menggunakan bahasa default (en) atau bisa ditentukan berdasarkan konteks tertentu
+  // Dalam kasus ini, kita asumsikan locale adalah "en" untuk server-side default
+  const defaultLocale = "id"; // Gunakan bahasa Indonesia sebagai default
+
+  // Gunakan terjemahan atau default dalam bahasa Indonesia
   return [
     {
       id: 1,
-      title: await t("home.services.customDev.title", "en", "Custom Website Development"),
-      category: "Web Development",
-      description: await t("home.services.customDev.description", "en", "A website designed specifically to meet your business's unique needs with the latest technology."),
+      title: await t("home.services.customDev.title", defaultLocale, "Pengembangan Website Kustom"),
+      category: await t("services.category.webDevelopment", defaultLocale, "Pengembangan Web"),
+      description: await t("home.services.customDev.description", defaultLocale, "Website yang dirancang khusus untuk memenuhi kebutuhan unik bisnis Anda dengan teknologi terkini."),
       price: 0,
       features: [
-        await t("home.services.customDev.features.responsive", "en", "Responsive design for all devices"),
-        await t("home.services.customDev.features.optimization", "en", "Speed and performance optimization"),
-        await t("home.services.customDev.features.integration", "en", "Integration with other systems"),
-        await t("home.services.customDev.features.seo", "en", "Basic SEO support")
+        await t("home.services.customDev.features.responsive", defaultLocale, "Desain responsif untuk semua perangkat"),
+        await t("home.services.customDev.features.optimization", defaultLocale, "Optimasi kecepatan dan kinerja"),
+        await t("home.services.customDev.features.integration", defaultLocale, "Integrasi dengan sistem lain"),
+        await t("home.services.customDev.features.seo", defaultLocale, "Dukungan SEO dasar")
       ],
       icon: "",
       order: 1,
@@ -124,15 +129,15 @@ async function getDefaultServices(): Promise<ServiceItem[]> {
     } as ServiceItem,
     {
       id: 2,
-      title: await t("home.services.redesign.title", "en", "Website Redesign"),
-      category: "Web Development",
-      description: await t("home.services.redesign.description", "en", "Modernization of your existing website's appearance and functionality to improve user experience."),
+      title: await t("home.services.redesign.title", defaultLocale, "Redesain Website"),
+      category: await t("services.category.webDevelopment", defaultLocale, "Pengembangan Web"),
+      description: await t("home.services.redesign.description", defaultLocale, "Pembaruan tampilan dan fungsionalitas website Anda saat ini untuk meningkatkan pengalaman pengguna."),
       price: 0,
       features: [
-        await t("home.services.redesign.features.audit", "en", "Current website audit and analysis"),
-        await t("home.services.redesign.features.modern", "en", "Redesign with modern approach"),
-        await t("home.services.redesign.features.migration", "en", "Secure content migration"),
-        await t("home.services.redesign.features.testing", "en", "Browser compatibility testing")
+        await t("home.services.redesign.features.audit", defaultLocale, "Audit dan analisis website saat ini"),
+        await t("home.services.redesign.features.modern", defaultLocale, "Redesain dengan pendekatan modern"),
+        await t("home.services.redesign.features.migration", defaultLocale, "Migrasi konten dengan aman"),
+        await t("home.services.redesign.features.testing", defaultLocale, "Pengujian kompatibilitas browser")
       ],
       icon: "",
       order: 2,
@@ -143,15 +148,15 @@ async function getDefaultServices(): Promise<ServiceItem[]> {
     } as ServiceItem,
     {
       id: 3,
-      title: await t("home.services.maintenance.title", "en", "Website Maintenance Package"),
-      category: "Web Development",
-      description: await t("home.services.maintenance.description", "en", "Regular maintenance solution to keep your website secure, updated, and running optimally."),
+      title: await t("home.services.maintenance.title", defaultLocale, "Paket Perawatan Website"),
+      category: await t("services.category.webDevelopment", defaultLocale, "Pengembangan Web"),
+      description: await t("home.services.maintenance.description", defaultLocale, "Solusi perawatan rutin untuk menjaga website Anda tetap aman, terbaru, dan berjalan optimal."),
       price: 0,
       features: [
-        await t("home.services.maintenance.features.security", "en", "Regular security updates"),
-        await t("home.services.maintenance.features.backup", "en", "Automatic data backup"),
-        await t("home.services.maintenance.features.monitoring", "en", "Performance monitoring"),
-        await t("home.services.maintenance.features.support", "en", "24/7 technical support")
+        await t("home.services.maintenance.features.security", defaultLocale, "Pembaruan keamanan rutin"),
+        await t("home.services.maintenance.features.backup", defaultLocale, "Pencadangan data otomatis"),
+        await t("home.services.maintenance.features.monitoring", defaultLocale, "Pemantauan kinerja"),
+        await t("home.services.maintenance.features.support", defaultLocale, "Dukungan teknis 24/7")
       ],
       icon: "",
       order: 3,
@@ -162,15 +167,15 @@ async function getDefaultServices(): Promise<ServiceItem[]> {
     } as ServiceItem,
     {
       id: 4,
-      title: await t("home.services.seo.title", "en", "SEO & Performance Optimization"),
-      category: "Web Development",
-      description: await t("home.services.seo.description", "en", "Additional service to improve your website's ranking in search engines and speed up loading time."),
+      title: await t("home.services.seo.title", defaultLocale, "Optimasi SEO & Kinerja"),
+      category: await t("services.category.webDevelopment", defaultLocale, "Pengembangan Web"),
+      description: await t("home.services.seo.description", defaultLocale, "Layanan tambahan untuk meningkatkan peringkat website Anda di mesin pencari dan mempercepat waktu muat."),
       price: 0,
       features: [
-        await t("home.services.seo.features.audit", "en", "Comprehensive SEO audit"),
-        await t("home.services.seo.features.keywords", "en", "Keyword optimization"),
-        await t("home.services.seo.features.vitals", "en", "Core Web Vitals improvement"),
-        await t("home.services.seo.features.report", "en", "Monthly performance report")
+        await t("home.services.seo.features.audit", defaultLocale, "Audit SEO menyeluruh"),
+        await t("home.services.seo.features.keywords", defaultLocale, "Optimasi kata kunci"),
+        await t("home.services.seo.features.vitals", defaultLocale, "Peningkatan Core Web Vitals"),
+        await t("home.services.seo.features.report", defaultLocale, "Laporan kinerja bulanan")
       ],
       icon: "",
       order: 4,

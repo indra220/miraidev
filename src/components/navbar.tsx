@@ -29,7 +29,7 @@ const GlobalSearch = dynamic(() => import("@/components/GlobalSearch"), {
 const navigation = [
   { name: "home", href: "/" },
   { name: "services", href: "/layanan" },
-  { name: "portfolio", href: "/portofolio" },
+  { name: "template", href: "/template" },
   { name: "pricing", href: "/harga" },
   { name: "about", href: "/tentang" },
   { name: "contact", href: "/kontak" },

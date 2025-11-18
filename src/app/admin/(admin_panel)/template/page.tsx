@@ -26,7 +26,7 @@ import { AlertDialog, AlertDialogResult } from "@/components/AlertDialog";
 import { useDialog } from "@/hooks/useDialog";
 import Image from "next/image";
 
-export default function PortfolioManagement() {
+export default function TemplateManagement() {
   useEffect(() => {
     document.title = "Manajemen Template";
   }, []);
@@ -54,7 +54,7 @@ export default function PortfolioManagement() {
       setPortfolioItems(items);
     } catch (err) {
       console.error('Error fetching portfolio items:', err);
-      setError('Gagal mengambil data portofolio. Silakan coba lagi nanti.');
+      setError('Gagal mengambil data template. Silakan coba lagi nanti.');
     } finally {
       setLoading(false);
     }
@@ -84,7 +84,7 @@ export default function PortfolioManagement() {
           setPortfolioItems(portfolioItems.filter(item => item.id !== id));
           showAlertResult("Berhasil", "Item telah dihapus.");
         } catch (err) {
-          console.error('Error deleting portfolio item:', err);
+          console.error('Error deleting template item:', err);
           showAlertResult("Gagal", "Gagal menghapus item. Silakan coba lagi.");
         }
       },
@@ -120,7 +120,7 @@ export default function PortfolioManagement() {
       setIsModalOpen(false);
       setCurrentItem(null);
     } catch (err) {
-      console.error('Error saving portfolio item:', err);
+      console.error('Error saving template item:', err);
       showAlertResult("Gagal", "Gagal menyimpan item. Silakan coba lagi.");
     }
   };
@@ -215,7 +215,7 @@ export default function PortfolioManagement() {
       )}
 
       {isModalOpen && (
-        <PortfolioModal 
+        <TemplateModal
           item={currentItem}
           onSave={handleSave}
           onClose={() => {
@@ -248,13 +248,13 @@ export default function PortfolioManagement() {
 );
 }
 
-interface PortfolioModalProps {
+interface TemplateModalProps {
   item: PortfolioItem | null;
   onSave: (item: PortfolioItem) => void;
   onClose: () => void;
 }
 
-function PortfolioModal({ item, onSave, onClose }: PortfolioModalProps) {
+function TemplateModal({ item, onSave, onClose }: TemplateModalProps) {
   const [formData, setFormData] = useState<PortfolioItem>(
     item || {
       id: 0,

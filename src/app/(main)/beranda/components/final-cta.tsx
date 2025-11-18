@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import OptimizedMotion from "@/components/OptimizedMotion";
+import Translate from "@/i18n/Translate";
 
 export function FinalCtaSection() {
   return (
@@ -17,20 +18,26 @@ export function FinalCtaSection() {
           viewport={{ once: true }}
           whileHover={{ scale: 1.02 }}
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Siap Punya Website Profesional untuk Bisnis Anda?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <Translate i18nKey="home.finalCta.title" fallback="Siap Punya Website Profesional untuk Bisnis Anda?" component="span" />
+          </h2>
           <p className="text-gray-300 mb-8 max-w-2xl mx-auto">
-            Diskusikan kebutuhan Anda dengan developer independen yang fokus pada solusi terjangkau dan berkualitas untuk UMKM.
+            <Translate
+              i18nKey="home.finalCta.description"
+              fallback="Diskusikan kebutuhan Anda dengan developer independen yang fokus pada solusi terjangkau dan berkualitas untuk UMKM."
+              component="span"
+            />
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg py-6 px-8 transition-all duration-150 hover:scale-105">
               <Link href="/kontak">
-                Konsultasi Gratis Sekarang
+                <Translate i18nKey="home.finalCta.primaryButton" fallback="Konsultasi Gratis Sekarang" />
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white text-lg py-6 px-8 transition-all duration-150">
               <Link href="/kontak">
-                Hubungi Kami
+                <Translate i18nKey="home.finalCta.secondaryButton" fallback="Hubungi Kami" />
               </Link>
             </Button>
           </div>

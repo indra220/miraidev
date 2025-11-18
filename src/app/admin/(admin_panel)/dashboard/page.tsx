@@ -36,7 +36,7 @@ export default function AdminDashboard() {
       color: "bg-blue-600"
     },
     {
-      title: "Total Portofolio",
+      title: "Total Template",
       value: realtimeStats.totalPortfolios.toString(),
       icon: FolderOpen,
       change: "+3.1% dari bulan lalu",
@@ -174,9 +174,9 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <AnimatedCard className="p-6 bg-slate-800 border border-slate-700 shadow-md" delay={0.2}>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold text-white">Portofolio</h2>
+            <h2 className="text-lg font-bold text-white">Template</h2>
             <button 
-              onClick={() => window.location.href = "/admin/portfolio"} 
+              onClick={() => window.location.href = "/admin/template"} 
               className="text-sm text-slate-400 hover:text-slate-300 hover:underline"
             >
               Lihat Semua

@@ -1,4 +1,4 @@
-// src/app/api/portfolio/[id]/increment-view/route.ts
+// src/app/api/template/[id]/increment-view/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
@@ -17,21 +17,21 @@ export async function POST(
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    
+
     // Menunggu resolusi params dari Promise
     const resolvedParams = await params;
-    const portfolioId = resolvedParams.id;
+    const templateId = resolvedParams.id;
 
-    if (!portfolioId || isNaN(parseInt(portfolioId))) {
-      return new NextResponse(JSON.stringify({ error: 'Valid Portfolio ID is required' }), {
+    if (!templateId || isNaN(parseInt(templateId))) {
+      return new NextResponse(JSON.stringify({ error: 'Valid Template ID is required' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
       });
     }
 
-    // Panggil fungsi RPC dengan portfolioId
+    // Panggil fungsi RPC dengan templateId
     const { error } = await supabase.rpc('increment_portfolio_view', {
-      portfolio_id: parseInt(portfolioId),
+      portfolio_id: parseInt(templateId),
     });
 
     if (error) {

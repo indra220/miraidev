@@ -2,7 +2,7 @@
   "common": {
     "home": "Home",
     "services": "Services",
-    "portfolio": "Portfolio",
+    "portfolio": "Template",
     "pricing": "Pricing",
     "about": "About Us",
     "contact": "Contact",
@@ -54,7 +54,8 @@
   "navbar": {
     "home": "Home",
     "services": "Services",
-    "portfolio": "Portfolio",
+    "portfolio": "Template",
+    "template": "Template",
     "pricing": "Pricing",
     "about": "About Us",
     "contact": "Contact",
@@ -69,6 +70,9 @@
     "ctaDescription": "Every project has unique needs. Discuss your specific requirements with our expert team for a tailored solution.",
     "freeConsultation": "Free Consultation",
     "contactUs": "Contact Us",
+    "category": {
+      "webDevelopment": "Web Development"
+    },
     "service1": {
       "title": "Custom Website Development",
       "description": "A website designed specifically to meet your business's unique needs with the latest technology.",
@@ -115,7 +119,7 @@
       "title": "Bring Your Business's Dream <span class='text-blue-400'>Website</span> to Life with Affordable Solutions",
       "description": "Modern and responsive websites designed specifically to help your business grow in the digital era, with affordable pricing for UMKM and startups.",
       "cta1": "Get Free Consultation Now",
-      "cta2": "View Portfolio",
+      "cta2": "View Template",
       "features": {
         "affordablePricing": "Affordable Pricing",
         "transparentProcess": "Transparent Process",
@@ -277,6 +281,59 @@
     }
   },
   "portfolio": {
+    "title": "Template <span class='text-blue-400'>Gallery</span>",
+    "description": "Choose from various professional website templates ready to use to accelerate your business digital presence.",
+    "preview": "Preview",
+    "use": "Use",
+    "noMatch": "No templates match your search."
+  },
+  "home": {
+    "hero": {
+      "title": "Bring Your Business's Dream <span class='text-blue-400'>Website</span> to Life with Affordable Solutions",
+      "description": "Modern and responsive websites designed specifically to help your business grow in the digital era, with affordable pricing for UMKM and startups.",
+      "cta1": "Get Free Consultation Now",
+      "cta2": "View Template",
+      "features": {
+        "affordablePricing": "Affordable Pricing",
+        "transparentProcess": "Transparent Process",
+        "freeRevisions": "Free Revisions",
+        "personalSupport": "Personal Support"
+      }
+    },
+    "featuredPortfolio": {
+      "title": "Featured Template",
+      "description": "Our best projects that have helped clients achieve success",
+      "viewAll": "View All Template"
+    },
+    "whyChooseUs": {
+      "title": "Why Choose Us?",
+      "description": "Reasons why clients choose MiraiDev as their digital development partner",
+      "features": {
+        "technology": {
+          "title": "Latest Technology",
+          "description": "We use the latest technology and frameworks to ensure the best performance and security."
+        },
+        "transparency": {
+          "title": "Transparent Process",
+          "description": "Clear and transparent communication throughout the development process to ensure client satisfaction."
+        },
+        "support": {
+          "title": "After-Sales Support",
+          "description": "Continuous support after launch to ensure your website keeps running optimally."
+        }
+      }
+    },
+    "finalCta": {
+      "title": "Ready to Have a Professional Website for Your Business?",
+      "description": "Discuss your needs with an independent developer focused on affordable and quality solutions for UMKM.",
+      "primaryButton": "Get Free Consultation Now",
+      "secondaryButton": "Contact Us"
+    },
+    "portfolioCard": {
+      "viewDetail": "View Detail"
+    }
+  },
+  "template": {
     "title": "Template <span class='text-blue-400'>Gallery</span>",
     "description": "Choose from various professional website templates ready to use to accelerate your business digital presence."
   },

@@ -14,9 +14,9 @@ export const createSupabaseAdminClient = () => {
   return createClient(supabaseUrl, supabaseServiceKey);
 };
 
-// Service untuk manajemen portfolio
+// Service untuk manajemen template
 export const portfolioService = {
-  // Mendapatkan semua item portfolio
+  // Mendapatkan semua item template
   getAll: async (): Promise<PortfolioItem[]> => {
     const supabase = createSupabaseAdminClient();
     
@@ -27,7 +27,7 @@ export const portfolioService = {
     
     if (error) {
       console.error('Error fetching portfolio items:', error);
-      throw new Error('Gagal mengambil data portofolio');
+      throw new Error('Gagal mengambil data template');
     }
     
     // Tambahkan default value untuk is_highlighted karena itu adalah properti tambahan
@@ -37,7 +37,7 @@ export const portfolioService = {
     })) as PortfolioItem[];
   },
 
-  // Mendapatkan item portfolio berdasarkan ID
+  // Mendapatkan item template berdasarkan ID
   getById: async (id: number): Promise<PortfolioItem | null> => {
     const supabase = createSupabaseAdminClient();
     
@@ -53,14 +53,14 @@ export const portfolioService = {
         return null;
       }
       console.error('Error fetching portfolio item:', error);
-      throw new Error('Gagal mengambil data portofolio');
+      throw new Error('Gagal mengambil data template');
     }
     
     // Tambahkan default value untuk is_highlighted karena itu adalah properti tambahan
     return data ? { ...data, is_highlighted: false } as PortfolioItem : null;
   },
 
-  // Menambahkan atau memperbarui item portfolio
+  // Menambahkan atau memperbarui item template
   upsert: async (item: Omit<PortfolioItem, 'id' | 'created_at' | 'updated_at' | 'is_highlighted'> & { id?: number }): Promise<PortfolioItem> => {
     const supabase = createSupabaseAdminClient();
     
@@ -79,7 +79,7 @@ export const portfolioService = {
       
       if (error) {
         console.error('Error updating portfolio item:', error);
-        throw new Error('Gagal memperbarui data portofolio');
+        throw new Error('Gagal memperbarui data template');
       }
       
       result = data;
@@ -97,7 +97,7 @@ export const portfolioService = {
       
       if (error) {
         console.error('Error inserting portfolio item:', error);
-        throw new Error('Gagal menambahkan data portofolio');
+        throw new Error('Gagal menambahkan data template');
       }
       
       result = data;
@@ -107,7 +107,7 @@ export const portfolioService = {
     return { ...result, is_highlighted: false } as PortfolioItem;
   },
 
-  // Menghapus item portfolio
+  // Menghapus item template
   delete: async (id: number): Promise<void> => {
     const supabase = createSupabaseAdminClient();
     
@@ -118,7 +118,7 @@ export const portfolioService = {
     
     if (error) {
       console.error('Error deleting portfolio item:', error);
-      throw new Error('Gagal menghapus data portofolio');
+      throw new Error('Gagal menghapus data template');
     }
   }
 };

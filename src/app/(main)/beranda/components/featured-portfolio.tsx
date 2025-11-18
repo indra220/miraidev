@@ -6,6 +6,7 @@ import { ArrowRight } from "lucide-react";
 import OptimizedMotion from "@/components/OptimizedMotion";
 import { PortfolioItem } from "@/lib/types";
 import { PortfolioCard } from "./portfolio-card";
+import Translate from "@/i18n/Translate";
 
 interface FeaturedPortfolioProps {
   portfolio: PortfolioItem[];
@@ -22,9 +23,15 @@ export function FeaturedPortfolio({ portfolio }: FeaturedPortfolioProps) {
           transition={{ duration: 0.3 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Portofolio Unggulan</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <Translate i18nKey="home.featuredPortfolio.title" fallback="Portofolio Unggulan" component="span" />
+          </h2>
           <p className="text-gray-400 max-w-2xl mx-auto">
-            Proyek-proyek terbaik kami yang telah membantu klien mencapai kesuksesan
+            <Translate
+              i18nKey="home.featuredPortfolio.description"
+              fallback="Proyek-proyek terbaik kami yang telah membantu klien mencapai kesuksesan"
+              component="span"
+            />
           </p>
         </OptimizedMotion>
         
@@ -42,8 +49,8 @@ export function FeaturedPortfolio({ portfolio }: FeaturedPortfolioProps) {
           viewport={{ once: true }}
         >
           <Button asChild size="lg" variant="outline" className="border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white transition-all duration-150">
-            <Link href="/portofolio">
-              Lihat Semua Portofolio
+            <Link href="/template">
+              <Translate i18nKey="home.featuredPortfolio.viewAll" fallback="Lihat Semua Portofolio" />
               <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
           </Button>

@@ -67,7 +67,7 @@ export default function AdminSidebar({ userRole }: AdminSidebarProps) {
         return Users;
       case 'pesan':
         return MessageCircle;
-      case 'portfolio':
+      case 'template':
         return Briefcase;
       case 'services':
         return Briefcase;

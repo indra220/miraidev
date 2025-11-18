@@ -8,7 +8,7 @@ All notable changes to the MiraiDev Admin Panel will be documented in this file.
 - Mengoptimalkan pemuatan halaman utama beranda dengan menggabungkan pengambilan data dalam satu panggilan fungsi
 - Mengganti tampilan loading di halaman beranda hanya menampilkan spinner di tengah layar penuh tanpa teks
 - Menghapus komponen \"Apa Kata Klien Kami\" (Testimonials) dari halaman utama beranda
-- Mengoptimalkan pemuatan data di halaman portofolio dengan menggabungkan pengambilan data dalam satu Promise.all
+- Mengoptimalkan pemuatan data di halaman template dengan menggabungkan pengambilan data dalam satu Promise.all
 - Mengganti tampilan loading di halaman layanan hanya menampilkan spinner di tengah layar penuh
 - Mengganti tampilan loading di halaman kontak hanya menampilkan spinner di tengah layar penuh
 - Menyembunyikan komponen ClientTrustSection sampai sistem testimonial baru siap
@@ -138,8 +138,8 @@ All notable changes to the MiraiDev Admin Panel will be documented in this file.
 ## [0.5.30] - 2025-10-15
 
 ### Added
-- Menambahkan statistik Total Portofolio di dashboard admin
-- Memperbarui perhitungan Total Proyek untuk mengambil dari tabel projects bukan portfolio
+- Menambahkan statistik Total Template di dashboard admin
+- Memperbarui perhitungan Total Proyek untuk mengambil dari tabel projects bukan template
 - Menyesuaikan tampilan dashboard admin untuk menampilkan 5 card statistik
 
 ## [0.5.29] - 2025-10-15

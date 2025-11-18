@@ -12,13 +12,13 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 6;
     const offset = searchParams.get('offset') ? parseInt(searchParams.get('offset')!) : 0;
-    
+
     const { data, error } = await supabase
       .from('portfolio')
       .select('*')
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
-    
+
     if (error) {
       console.error('Supabase error:', error);
       return new Response(JSON.stringify({ error: error.message }), {
@@ -26,13 +26,13 @@ export async function GET(request: NextRequest) {
         headers: { 'Content-Type': 'application/json' }
       });
     }
-    
+
     return new Response(JSON.stringify({ data } as { data: PortfolioItem[] }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (error) {
-    console.error('Error fetching portfolio:', error);
+    console.error('Error fetching template:', error);
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }

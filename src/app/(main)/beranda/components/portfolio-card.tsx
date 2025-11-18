@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import OptimizedMotion from "@/components/OptimizedMotion";
 import { PortfolioItem } from "@/lib/types";
+import Translate from "@/i18n/Translate";
 
 interface PortfolioCardProps {
   item: PortfolioItem;
@@ -23,7 +24,7 @@ export function PortfolioCard({ item, index }: PortfolioCardProps) {
       className="transition-all duration-200"
     >
       <Card className="bg-gray-800/50 border-gray-700 overflow-hidden group h-full cursor-pointer">
-        <Link href={`/portofolio/${item.id}`} className="block h-full">
+        <Link href={`/template/${item.id}`} className="block h-full">
           <div className="relative h-48 overflow-hidden">
             <Image
               src={item.image_urls && item.image_urls.length > 0 ? item.image_urls[0] : "/placeholder-portfolio.jpg"}
@@ -41,7 +42,7 @@ export function PortfolioCard({ item, index }: PortfolioCardProps) {
             <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
             <p className="text-gray-400 mb-4 line-clamp-2">{item.description}</p>
             <button className="text-blue-400 hover:text-blue-300 flex items-center text-sm font-medium">
-              Lihat Detail
+              <Translate i18nKey="home.portfolioCard.viewDetail" fallback="Lihat Detail" />
               <ArrowRight className="ml-1 w-4 h-4" />
             </button>
           </div>
